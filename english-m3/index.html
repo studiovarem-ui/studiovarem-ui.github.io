@@ -20,11 +20,10 @@
     .wrap{
       width:min(560px, 92vw);
       position:relative;
-      padding-top:34px;   /* VAREM 위 공간 */
-      padding-bottom:30px; /* 힌트 공간 */
+      padding-top:34px;
+      padding-bottom:30px;
     }
 
-    /* VAREM: 박스 밖 상단 중앙 */
     .brandTop{
       position:absolute;
       top:0;
@@ -37,11 +36,10 @@
       user-select:none;
     }
 
-    /* 카드 */
     .card{
       position:relative;
       width:100%;
-      padding:22px 22px 22px 22px;
+      padding:22px;
       border:1px solid rgba(255,255,255,.12);
       border-radius:18px;
       background:rgba(255,255,255,.02);
@@ -49,7 +47,6 @@
       overflow:hidden;
     }
 
-    /* 상단 줄: 왼쪽 제목, 오른쪽 Day */
     .topRow{
       display:flex;
       align-items:flex-start;
@@ -63,7 +60,7 @@
       line-height:1.3;
     }
 
-    /* Day: 박스 안 상단 오른쪽 */
+    /* Day: 박스 안 상단 오른쪽 + 클릭 가능 */
     .dayPill{
       border:1px solid rgba(255,255,255,.18);
       border-radius:999px;
@@ -71,9 +68,10 @@
       font-size:12px;
       opacity:.75;
       white-space:nowrap;
+      cursor:pointer;
+      user-select:none;
     }
 
-    /* 메인 단어: 소문자 */
     .word{
       margin-top:14px;
       font-size:42px;
@@ -82,7 +80,6 @@
       text-transform:none;
     }
 
-    /* 메타 라인 */
     .meta{
       margin-top:14px;
       display:flex;
@@ -99,7 +96,6 @@
       opacity:.75;
     }
 
-    /* 언어 버튼 */
     .langBtn{
       background:transparent;
       color:#fff;
@@ -115,7 +111,6 @@
       border-color:rgba(255,255,255,.65);
     }
 
-    /* 힌트용 강조 애니메이션 (2회 깜빡임에 사용) */
     @keyframes hintPulse {
       0%   { opacity:.45; border-color:rgba(255,255,255,.18); transform:translateY(0); }
       50%  { opacity:1;   border-color:rgba(255,255,255,.75); transform:translateY(-1px); }
@@ -138,7 +133,6 @@
       opacity:.88;
     }
 
-    /* 하단 힌트: 박스 밖 + 박스에 붙여서 하단 왼쪽 */
     .hintOutside{
       position:absolute;
       left:0;
@@ -159,7 +153,7 @@
     <div class="card">
       <div class="topRow">
         <div class="subtitle">중3 영어 · 매일 한 단어</div>
-        <div class="dayPill" id="daypill">Day -</div>
+        <div class="dayPill" id="daypill" title="Archive">Day -</div>
       </div>
 
       <div class="word" id="word">loading</div>
@@ -168,7 +162,6 @@
         <div class="pill" id="pospill">POS</div>
         <div class="pill" id="levelpill">M3</div>
 
-        <!-- ✅ 버튼 위치 변경: English 먼저, Korean 나중 -->
         <button class="langBtn active" id="btnEN" type="button">English</button>
         <button class="langBtn" id="btnKO" type="button">Korean</button>
       </div>
@@ -181,9 +174,9 @@
   </div>
 
 <script>
-/* ======================
-   1) 단어 데이터 (샘플)
-   ====================== */
+/* ==========
+   DATA
+   ========== */
 const LIST = [
   {
     w:"anxious",
@@ -214,9 +207,9 @@ const LIST = [
   }
 ];
 
-/* ======================
-   2) KST 기준 오늘 인덱스
-   ====================== */
+/* ==========
+   DATE (KST)
+   ========== */
 function getKST(){
   const now = new Date();
   const utc = now.getTime() + now.getTimezoneOffset() * 60000;
@@ -231,15 +224,18 @@ const today = getKST();
 const doy = dayOfYear(today);
 const item = LIST[doy % LIST.length];
 
-/* ======================
-   3) 기본 렌더 (영어 디폴트)
-   ====================== */
-document.getElementById("daypill").innerText = "Day " + (doy + 1);
+/* ==========
+   UI SETUP
+   ========== */
+const dayPill = document.getElementById("daypill");
+dayPill.innerText = "Day " + (doy + 1);
+dayPill.onclick = () => location.href = "archive.html"; // ✅ 아카이브로
+
 document.getElementById("pospill").innerText = item.p;
 document.getElementById("levelpill").innerText = item.l;
 document.getElementById("word").innerText = (item.w ?? "").toLowerCase();
 
-let mode = "EN"; // ✅ English default
+let mode = "EN"; // English default
 
 function render(){
   const meaningEl = document.getElementById("meaning");
@@ -262,15 +258,12 @@ document.getElementById("btnKO").onclick = () => { mode="KO"; render(); };
 
 render();
 
-/* ======================
-   4) 힌트 강조: Korean 버튼 2회만
-   ====================== */
+/* ==========
+   HINT: Korean 버튼 2회 강조
+   ========== */
 const koBtn = document.getElementById("btnKO");
-
-// 로드 후 살짝 지연 → 2회 깜빡임 → 클래스 제거
 setTimeout(() => {
   koBtn.classList.add("hintPulse");
-  // 애니메이션 종료 후 클래스 제거(재진입 시 깔끔)
   setTimeout(() => koBtn.classList.remove("hintPulse"), 1200);
 }, 450);
 </script>
