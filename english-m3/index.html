@@ -1,284 +1,194 @@
 <!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>VAREM · 중3 영어</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>VAREM · 중3 영어</title>
 
-  <style>
-    body{
-      margin:0;
-      min-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background:#0f0f10;
-      color:#fff;
-      font-family: system-ui, -apple-system, Apple SD Gothic Neo, Noto Sans KR, sans-serif;
-    }
+<style>
+body{
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#0f0f10;
+  color:#fff;
+  font-family: system-ui,-apple-system,Apple SD Gothic Neo,Noto Sans KR,sans-serif;
+}
 
-    .wrap{
-      width:min(560px, 92vw);
-      position:relative;
-      padding-top:34px;
-      padding-bottom:30px;
-    }
+.wrap{
+  width:min(560px,92vw);
+  position:relative;
+  padding-top:36px;
+  padding-bottom:28px;
+}
 
-    .brandTop{
-      position:absolute;
-      top:0;
-      left:50%;
-      transform:translateX(-50%);
-      letter-spacing:.28em;
-      font-weight:700;
-      font-size:14px;
-      opacity:.7;
-      user-select:none;
-    }
+.brand{
+  position:absolute;
+  top:0;
+  left:50%;
+  transform:translateX(-50%);
+  letter-spacing:.28em;
+  font-weight:700;
+  font-size:14px;
+  opacity:.7;
+}
 
-    .card{
-      position:relative;
-      width:100%;
-      padding:22px;
-      border:1px solid rgba(255,255,255,.12);
-      border-radius:18px;
-      background:rgba(255,255,255,.02);
-      box-sizing:border-box;
-      overflow:hidden;
-    }
+.card{
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:18px;
+  padding:22px;
+  background:rgba(255,255,255,.02);
+}
 
-    .topRow{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:12px;
-    }
+.top{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+}
 
-    .subtitle{
-      font-size:16px;
-      opacity:.8;
-      line-height:1.3;
-    }
+.subtitle{
+  font-size:16px;
+  opacity:.8;
+}
 
-    .dayPill{
-      border:1px solid rgba(255,255,255,.18);
-      border-radius:999px;
-      padding:6px 10px;
-      font-size:12px;
-      opacity:.75;
-      white-space:nowrap;
-      cursor:pointer;
-      user-select:none;
-    }
+.day{
+  font-size:12px;
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:999px;
+  padding:6px 10px;
+  opacity:.75;
+  cursor:pointer;
+}
 
-    .word{
-      margin-top:14px;
-      font-size:42px;
-      font-weight:800;
-      letter-spacing:.01em;
-      text-transform:none;
-    }
+.word{
+  margin-top:14px;
+  font-size:42px;
+  font-weight:800;
+}
 
-    .meta{
-      margin-top:14px;
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-      align-items:center;
-      font-size:12px;
-      opacity:.85;
-    }
-    .pill{
-      border:1px solid rgba(255,255,255,.18);
-      border-radius:999px;
-      padding:6px 10px;
-      opacity:.75;
-    }
+.meta{
+  margin-top:14px;
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
 
-    .langBtn{
-      background:transparent;
-      color:#fff;
-      cursor:pointer;
-      border:1px solid rgba(255,255,255,.18);
-      border-radius:999px;
-      padding:6px 10px;
-      opacity:.45;
-      transition: opacity .2s ease, border-color .2s ease, transform .2s ease;
-    }
-    .langBtn.active{
-      opacity:1;
-      border-color:rgba(255,255,255,.65);
-    }
+.pill{
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:999px;
+  padding:6px 10px;
+  font-size:12px;
+  opacity:.75;
+}
 
-    @keyframes hintPulse {
-      0%   { opacity:.45; border-color:rgba(255,255,255,.18); transform:translateY(0); }
-      50%  { opacity:1;   border-color:rgba(255,255,255,.75); transform:translateY(-1px); }
-      100% { opacity:.45; border-color:rgba(255,255,255,.18); transform:translateY(0); }
-    }
-    .hintPulse{
-      animation: hintPulse .55s ease-in-out 0s 2;
-    }
+.lang{
+  border:1px solid rgba(255,255,255,.18);
+  background:none;
+  color:#fff;
+  padding:6px 10px;
+  border-radius:999px;
+  font-size:12px;
+  opacity:.45;
+  cursor:pointer;
+}
+.lang.active{ opacity:1; border-color:rgba(255,255,255,.6); }
 
-    .meaning{
-      margin-top:18px;
-      font-size:18px;
-      line-height:1.6;
-      opacity:.95;
-    }
-    .example{
-      margin-top:10px;
-      font-size:16px;
-      line-height:1.6;
-      opacity:.88;
-    }
+.meaning{
+  margin-top:18px;
+  font-size:18px;
+  line-height:1.6;
+}
+.example{
+  margin-top:10px;
+  font-size:16px;
+  opacity:.88;
+}
 
-    .hintOutside{
-      position:absolute;
-      left:0;
-      bottom:0;
-      transform:translateY(50%);
-      font-size:12px;
-      opacity:.35;
-      user-select:none;
-      padding-left:4px;
-    }
-  </style>
+.hint{
+  position:absolute;
+  left:0;
+  bottom:0;
+  transform:translateY(120%);
+  font-size:12px;
+  opacity:.35;
+}
+
+@keyframes pulse{
+  0%{opacity:.4}
+  50%{opacity:1}
+  100%{opacity:.4}
+}
+.hintPulse{ animation:pulse .6s ease-in-out 0s 2; }
+</style>
 </head>
 
 <body>
-  <div class="wrap">
-    <div class="brandTop">VAREM</div>
+<div class="wrap">
+  <div class="brand">VAREM</div>
 
-    <div class="card">
-      <div class="topRow">
-        <div class="subtitle" id="subtitle">중3 영어 · 매일 한 단어</div>
-        <div class="dayPill" id="daypill" title="Archive">Day -</div>
-      </div>
-
-      <div class="word" id="word">loading</div>
-
-      <div class="meta">
-        <div class="pill" id="pospill">POS</div>
-        <div class="pill" id="levelpill">M3</div>
-
-        <button class="langBtn active" id="btnEN" type="button">English</button>
-        <button class="langBtn" id="btnKO" type="button">Korean</button>
-      </div>
-
-      <div class="meaning" id="meaning"></div>
-      <div class="example" id="example"></div>
+  <div class="card">
+    <div class="top">
+      <div class="subtitle">중3 영어 · 매일 한 단어</div>
+      <div class="day" onclick="location.href='archive.html'">Day <span id="dayNum"></span></div>
     </div>
 
-    <div class="hintOutside">내일 다시 키링을 터치하세요.</div>
+    <div class="word" id="word"></div>
+
+    <div class="meta">
+      <div class="pill" id="pos"></div>
+      <div class="pill">M3</div>
+      <button class="lang active" id="btnEN">English</button>
+      <button class="lang" id="btnKO">Korean</button>
+    </div>
+
+    <div class="meaning" id="meaning"></div>
+    <div class="example" id="example"></div>
   </div>
 
+  <div class="hint">내일 다시 키링을 터치하세요.</div>
+</div>
+
 <script>
-/* ==========
-   DATA
-   ========== */
-const LIST = [
-  { w:"anxious", p:"adj", l:"M3", m_ko:"불안한, 걱정되는", m_en:"worried and nervous", e_en:"She felt anxious before the exam.", e_ko:"그녀는 시험 전에 불안해했다." },
-  { w:"improve", p:"v", l:"M3", m_ko:"개선하다, 향상시키다", m_en:"to make something better", e_en:"He wants to improve his English.", e_ko:"그는 영어 실력을 향상시키고 싶어한다." },
-  { w:"decide", p:"v", l:"M3", m_ko:"결정하다", m_en:"to choose; to make a decision", e_en:"She decided to study harder.", e_ko:"그녀는 더 열심히 공부하기로 결정했다." }
+const LIST=[
+ {w:"anxious",p:"adj",m_en:"worried and nervous",m_ko:"불안한, 걱정되는",e_en:"She felt anxious before the exam.",e_ko:"그녀는 시험 전에 불안해했다."},
+ {w:"improve",p:"v",m_en:"to make something better",m_ko:"개선하다, 향상시키다",e_en:"He wants to improve his English.",e_ko:"그는 영어 실력을 향상시키고 싶어한다."},
+ {w:"decide",p:"v",m_en:"to choose; to make a decision",m_ko:"결정하다",e_en:"She decided to study harder.",e_ko:"그녀는 더 열심히 공부하기로 결정했다."}
 ];
 
-/* ==========
-   DATE (KST)
-   ========== */
-function getKST(){
-  const now = new Date();
-  const utc = now.getTime() + now.getTimezoneOffset() * 60000;
-  return new Date(utc + 9 * 3600000);
+function kst(){
+ const n=new Date();
+ return new Date(n.getTime()+n.getTimezoneOffset()*60000+9*3600000);
 }
 function dayOfYear(d){
-  const start = new Date(d.getFullYear(), 0, 1);
-  return Math.floor((d - start) / 86400000); // 0-based
+ return Math.floor((d-new Date(d.getFullYear(),0,1))/86400000);
 }
 
-const today = getKST();
-const todayIndex = dayOfYear(today); // 0-based (오늘)
+const day=dayOfYear(kst());
+const item=LIST[day%LIST.length];
 
-/* ==========
-   URL ?day= 처리
-   - day는 1-based로 받음 (Day 1..)
-   - 오늘보다 큰 값은 오늘로 보정
-   - 1 미만은 오늘로 보정
-   ========== */
-const params = new URLSearchParams(location.search);
-let requestedDay = parseInt(params.get("day") || "", 10); // 1-based
+document.getElementById("dayNum").innerText=day+1;
+document.getElementById("word").innerText=item.w.toLowerCase();
+document.getElementById("pos").innerText=item.p;
 
-let viewingIndex = todayIndex; // 기본: 오늘
-let isViewingPast = false;
-
-if(Number.isFinite(requestedDay)){
-  // 유효 범위 보정
-  if(requestedDay >= 1 && requestedDay <= (todayIndex + 1)){
-    viewingIndex = requestedDay - 1; // 0-based
-    isViewingPast = (viewingIndex !== todayIndex);
-  }
-}
-
-const item = LIST[viewingIndex % LIST.length];
-
-/* ==========
-   UI SETUP
-   ========== */
-const dayPill = document.getElementById("daypill");
-dayPill.innerText = "Day " + (viewingIndex + 1);
-
-// Day pill 클릭 행동
-// - 과거 Day 보고 있으면: 오늘로 돌아가기
-// - 오늘 보고 있으면: archive로
-dayPill.onclick = () => {
-  if(isViewingPast){
-    location.href = "./";
-  }else{
-    location.href = "archive.html";
-  }
-};
-
-// subtitle도 과거 Day면 살짝 표시(선택)
-const subtitleEl = document.getElementById("subtitle");
-if(isViewingPast){
-  subtitleEl.innerText = "중3 영어 · 아카이브";
-}
-
-document.getElementById("pospill").innerText = item.p;
-document.getElementById("levelpill").innerText = item.l;
-document.getElementById("word").innerText = (item.w ?? "").toLowerCase();
-
-let mode = "EN"; // English default
-
+let mode="EN";
 function render(){
-  const meaningEl = document.getElementById("meaning");
-  const exampleEl = document.getElementById("example");
-
-  if(mode === "EN"){
-    meaningEl.innerText = "Meaning: " + (item.m_en ?? item.m_ko ?? "");
-    exampleEl.innerText = "Example: " + (item.e_en ?? item.e_ko ?? "");
-  } else {
-    meaningEl.innerText = "뜻: " + (item.m_ko ?? item.m_en ?? "");
-    exampleEl.innerText = "예문: " + (item.e_ko ?? item.e_en ?? "");
-  }
-
-  document.getElementById("btnEN").classList.toggle("active", mode==="EN");
-  document.getElementById("btnKO").classList.toggle("active", mode==="KO");
+ if(mode==="EN"){
+  meaning.innerText="Meaning: "+item.m_en;
+  example.innerText="Example: "+item.e_en;
+ }else{
+  meaning.innerText="뜻: "+item.m_ko;
+  example.innerText="예문: "+item.e_ko;
+ }
+ btnEN.classList.toggle("active",mode==="EN");
+ btnKO.classList.toggle("active",mode==="KO");
 }
-
-document.getElementById("btnEN").onclick = () => { mode="EN"; render(); };
-document.getElementById("btnKO").onclick = () => { mode="KO"; render(); };
+btnEN.onclick=()=>{mode="EN";render();}
+btnKO.onclick=()=>{mode="KO";render();}
 
 render();
-
-/* ==========
-   HINT: Korean 버튼 2회 강조
-   - (과거 Day에서도 동작)
-   ========== */
-const koBtn = document.getElementById("btnKO");
-setTimeout(() => {
-  koBtn.classList.add("hintPulse");
-  setTimeout(() => koBtn.classList.remove("hintPulse"), 1200);
-}, 450);
+btnKO.classList.add("hintPulse");
 </script>
 </body>
 </html>
