@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>VAREM · 중3 영어</title>
+  <style>
+    body{
+      margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+      font-family: system-ui, -apple-system, Apple SD Gothic Neo, Noto Sans KR, sans-serif;
+      background:#0f0f10; color:#fff;
+    }
+    .card{
+      width:min(520px, 92vw);
+      padding:28px 22px;
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:18px;
+      background:rgba(255,255,255,.02);
+      box-sizing:border-box;
+    }
+    .brand{
+      letter-spacing:.28em;
+      font-weight:700;
+      font-size:14px;
+      opacity:.7;
+    }
+    .title{
+      margin-top:10px;
+      font-size:18px;
+      opacity:.85;
+    }
+    .word{
+      margin-top:18px;
+      font-size:42px;
+      font-weight:800;
+      letter-spacing:.02em;
+    }
+    .meta{
+      margin-top:10px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      opacity:.7;
+      font-size:13px;
+    }
+    .pill{
+      border:1px solid rgba(255,255,255,.18);
+      border-radius:999px;
+      padding:6px 10px;
+    }
+    .meaning{
+      margin-top:18px;
+      font-size:18px;
+      line-height:1.6;
+      opacity:.9;
+    }
+    .example{
+      margin-top:14px;
+      font-size:16px;
+      line-height:1.6;
+      opacity:.85;
+    }
+    .hint{
+      margin-top:18px;
+      font-size:12px;
+      opacity:.45;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="brand">VAREM</div>
+    <div class="title">중3 영어 · 매일 한 단어</div>
+
+    <div class="word" id="word">LOADING</div>
+
+    <div class="meta">
+      <div class="pill" id="daypill">Day -</div>
+      <div class="pill" id="pospill">품사</div>
+      <div class="pill" id="levelpill">M3</div>
+    </div>
+
+    <div class="meaning" id="meaning"></div>
+    <div class="example" id="example"></div>
+
+    <div class="hint">내일 다시 키링을 터치하세요.</div>
+  </div>
+
+<script>
+  const LIST = [
+    {w:"achieve", p:"verb", m:"달성하다, 이루다", e:"You can achieve your goal with practice."},
+    {w:"adapt", p:"verb", m:"적응하다", e:"Students adapt to new environments."},
+    {w:"anxious", p:"adj", m:"불안한, 걱정되는", e:"She felt anxious before the exam."},
+    {w:"benefit", p:"noun", m:"이점, 혜택", e:"Reading daily has many benefits."},
+    {w:"confirm", p:"verb", m:"확인하다", e:"Please confirm your answer."}
+  ];
+
+  function getKST(){
+    const now = new Date();
+    const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+    return new Date(utc + 9 * 3600000);
+  }
+  function dayOfYear(d){
+    const start = new Date(d.getFullYear(), 0, 1);
+    return Math.floor((d - start) / 86400000);
+  }
+
+  const d = getKST();
+  const idx = dayOfYear(d) % LIST.length;
+  const item = LIST[idx];
+
+  document.getElementById("word").innerText = item.w.toUpperCase();
+  document.getElementById("meaning").innerText = "뜻: " + item.m;
+  document.getElementById("example").innerText = "예문: " + item.e;
+  document.getElementById("daypill").innerText = `Day ${dayOfYear(d)+1}`;
+  document.getElementById("pospill").innerText = item.p;
+</script>
+</body>
+</html>
