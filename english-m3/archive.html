@@ -34,10 +34,18 @@ body{
   background:rgba(255,255,255,.02);
 }
 
-/* 목록(최근 5개만 “보이게”) */
+/* ✅ 목록은 "5개 높이"만 보이게 + 스크롤은 전체 */
+.list{
+  max-height: 270px;      /* 대략 5줄 높이 */
+  overflow:auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 목록 줄 */
 .row{
   display:flex; justify-content:space-between; align-items:center;
-  padding:14px 16px; border-top:1px solid rgba(255,255,255,.08);
+  padding:14px 16px;
+  border-top:1px solid rgba(255,255,255,.08);
   cursor:pointer;
 }
 .row:first-child{ border-top:none; }
@@ -86,12 +94,12 @@ body{
   <div class="brand">VAREM</div>
 
   <div class="header">
-    <div class="title">Archive · 최근 5일</div>
+    <div class="title">Archive · Day 1 ~ 어제</div>
     <div class="back" onclick="location.href='./'">← Today</div>
   </div>
 
   <div class="panel">
-    <div id="list"></div>
+    <div class="list" id="list"></div>
 
     <div class="detail" id="detail">
       <div class="detailTop">
@@ -110,12 +118,13 @@ body{
 
       <div class="meaning" id="dMeaning"></div>
       <div class="example" id="dExample"></div>
-      <div class="hint">목록에서 다른 단어를 눌러 바꿀 수 있어요.</div>
+      <div class="hint">목록에서 다른 Day를 눌러 바꿀 수 있어요.</div>
     </div>
   </div>
 </div>
 
 <script>
+/* ✅ index.html과 동일 데이터 유지 */
 const LIST = [
   {w:"anxious", p:"adj", m_en:"worried and nervous", m_ko:"불안한, 걱정되는", e_en:"She felt anxious before the exam.", e_ko:"그녀는 시험 전에 불안해했다."},
   {w:"improve", p:"v",   m_en:"to make something better", m_ko:"개선하다, 향상시키다", e_en:"He wants to improve his English.", e_ko:"그는 영어 실력을 향상시키고 싶어한다."},
@@ -130,7 +139,7 @@ function dayOfYear(d){
   return Math.floor((d-new Date(d.getFullYear(),0,1))/86400000);
 }
 
-const todayIndex = dayOfYear(kst()); // 0-based
+const todayIndex = dayOfYear(kst()); // 0-based (오늘)
 const listEl = document.getElementById("list");
 const detailEl = document.getElementById("detail");
 
@@ -141,7 +150,7 @@ function itemForDayIndex(i){
   return LIST[i % LIST.length];
 }
 
-/* 최근 5개만 목록에 출력 (오늘 제외, 어제부터) */
+/* ✅ Day 1 ~ 어제까지 "전부" 생성 (스크롤) */
 function renderList(){
   listEl.innerHTML = "";
 
@@ -154,11 +163,8 @@ function renderList(){
     return;
   }
 
-  const COUNT = 5;
-  const end = todayIndex - 1;               // 어제
-  const start = Math.max(0, todayIndex - COUNT); // 최근 5개 범위 시작
-
-  for(let i=end; i>=start; i--){
+  // 최신(어제) → 과거(Day1) 역순
+  for(let i = todayIndex - 1; i >= 0; i--){
     const dayNum = i + 1;
     const it = itemForDayIndex(i);
 
@@ -170,7 +176,7 @@ function renderList(){
   }
 }
 
-/* 상세(투데이처럼) 표시 */
+/* 상세(투데이처럼) */
 function renderDetail(){
   if(currentIndex === null) return;
   const it = itemForDayIndex(currentIndex);
@@ -196,7 +202,6 @@ function showDetail(dayIndex){
   mode = "EN"; // 상세는 EN 기본
   detailEl.style.display = "block";
   renderDetail();
-  // 모바일에서 상세로 자연스럽게 내려가기
   detailEl.scrollIntoView({behavior:"smooth", block:"start"});
 }
 
@@ -204,9 +209,6 @@ btnEN.onclick = () => { mode="EN"; renderDetail(); };
 btnKO.onclick = () => { mode="KO"; renderDetail(); };
 
 renderList();
-
-// 처음 들어오면 "어제" 상세를 자동으로 보여주고 싶으면 아래 줄 주석 해제
-// if(todayIndex > 0) showDetail(todayIndex - 1);
 </script>
 </body>
 </html>
