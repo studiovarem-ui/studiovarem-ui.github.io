@@ -17,34 +17,31 @@
     }
 
     .wrap{
-      width:min(680px, 94vw);
+      width:min(560px, 92vw);
       position:relative;
       padding:34px 0 28px;
     }
 
     .brandTop{
-      position:sticky;
-      top:0;
-      padding:10px 0 8px;
-      background:linear-gradient(#0f0f10 70%, rgba(15,15,16,0));
       letter-spacing:.28em;
       font-weight:700;
       font-size:14px;
       opacity:.7;
       text-align:center;
       user-select:none;
+      margin-bottom:14px;
     }
 
     .header{
-      margin:8px 0 14px;
+      margin:0 0 12px;
       display:flex;
       justify-content:space-between;
       align-items:flex-end;
       gap:12px;
     }
     .title{
-      font-size:16px;
-      opacity:.85;
+      font-size:14px;
+      opacity:.75;
     }
     .back{
       font-size:12px;
@@ -64,11 +61,6 @@
       overflow:hidden;
     }
 
-    .list{
-      max-height:52vh;
-      overflow:auto;
-    }
-
     .row{
       display:flex;
       justify-content:space-between;
@@ -80,92 +72,20 @@
     .row:first-child{ border-top:none; }
     .row:hover{ background:rgba(255,255,255,.03); }
 
-    .left{
-      display:flex;
-      gap:10px;
-      align-items:baseline;
-      min-width:0;
-    }
     .day{
       font-size:12px;
       opacity:.6;
       white-space:nowrap;
     }
-    .w{
-      font-size:14px;
-      opacity:.92;
+    .word{
+      font-size:16px;
+      font-weight:700;
+      opacity:.95;
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
-      max-width:360px;
-    }
-    .tag{
-      font-size:12px;
-      opacity:.55;
-      white-space:nowrap;
-    }
-
-    /* 상세 카드 */
-    .detail{
-      padding:16px;
-      border-top:1px solid rgba(255,255,255,.10);
-    }
-    .detailTop{
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-start;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-    .detailWord{
-      font-size:28px;
-      font-weight:800;
-      letter-spacing:.01em;
-    }
-    .pill{
-      border:1px solid rgba(255,255,255,.18);
-      border-radius:999px;
-      padding:6px 10px;
-      font-size:12px;
-      opacity:.75;
-      white-space:nowrap;
-    }
-
-    .meta{
-      margin-top:10px;
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-      align-items:center;
-      font-size:12px;
-      opacity:.85;
-    }
-
-    .langBtn{
-      background:transparent;
-      color:#fff;
-      cursor:pointer;
-      border:1px solid rgba(255,255,255,.18);
-      border-radius:999px;
-      padding:6px 10px;
-      opacity:.45;
-    }
-    .langBtn.active{
-      opacity:1;
-      border-color:rgba(255,255,255,.65);
-    }
-
-    .meaning{
-      margin-top:14px;
-      font-size:16px;
-      line-height:1.6;
-      opacity:.95;
-    }
-    .example{
-      margin-top:8px;
-      font-size:15px;
-      line-height:1.6;
-      opacity:.88;
+      max-width:70%;
+      text-transform:none;
     }
 
     .hint{
@@ -181,33 +101,12 @@
     <div class="brandTop">VAREM</div>
 
     <div class="header">
-      <div class="title">Archive · 중3 영어 (Day 1 ~ 어제)</div>
+      <div class="title">Archive · 최근 5일</div>
       <div class="back" onclick="location.href='./'">← Today</div>
     </div>
 
-    <div class="panel">
-      <div class="list" id="list"></div>
-
-      <div class="detail" id="detail" style="display:none;">
-        <div class="detailTop">
-          <div>
-            <div class="detailWord" id="dWord">word</div>
-            <div class="meta">
-              <div class="pill" id="dDay">Day -</div>
-              <div class="pill" id="dPos">POS</div>
-              <div class="pill" id="dLevel">M3</div>
-
-              <button class="langBtn active" id="btnEN" type="button">English</button>
-              <button class="langBtn" id="btnKO" type="button">Korean</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="meaning" id="dMeaning"></div>
-        <div class="example" id="dExample"></div>
-        <div class="hint">목록에서 다른 Day를 눌러 이동할 수 있어요.</div>
-      </div>
-    </div>
+    <div class="panel" id="list"></div>
+    <div class="hint">목록을 누르면 해당 Day로 이동합니다.</div>
   </div>
 
 <script>
@@ -215,33 +114,9 @@
    DATA (index.html과 동일하게 유지)
    ========== */
 const LIST = [
-  {
-    w:"anxious",
-    p:"adj",
-    l:"M3",
-    m_ko:"불안한, 걱정되는",
-    m_en:"worried and nervous",
-    e_en:"She felt anxious before the exam.",
-    e_ko:"그녀는 시험 전에 불안해했다."
-  },
-  {
-    w:"improve",
-    p:"v",
-    l:"M3",
-    m_ko:"개선하다, 향상시키다",
-    m_en:"to make something better",
-    e_en:"He wants to improve his English.",
-    e_ko:"그는 영어 실력을 향상시키고 싶어한다."
-  },
-  {
-    w:"decide",
-    p:"v",
-    l:"M3",
-    m_ko:"결정하다",
-    m_en:"to choose; to make a decision",
-    e_en:"She decided to study harder.",
-    e_ko:"그녀는 더 열심히 공부하기로 결정했다."
-  }
+  { w:"anxious", p:"adj", l:"M3", m_ko:"불안한, 걱정되는", m_en:"worried and nervous", e_en:"She felt anxious before the exam.", e_ko:"그녀는 시험 전에 불안해했다." },
+  { w:"improve", p:"v", l:"M3", m_ko:"개선하다, 향상시키다", m_en:"to make something better", e_en:"He wants to improve his English.", e_ko:"그는 영어 실력을 향상시키고 싶어한다." },
+  { w:"decide", p:"v", l:"M3", m_ko:"결정하다", m_en:"to choose; to make a decision", e_en:"She decided to study harder.", e_ko:"그녀는 더 열심히 공부하기로 결정했다." }
 ];
 
 /* ==========
@@ -254,96 +129,53 @@ function getKST(){
 }
 function dayOfYear(d){
   const start = new Date(d.getFullYear(), 0, 1);
-  return Math.floor((d - start) / 86400000);
+  return Math.floor((d - start) / 86400000); // 0-based
 }
 
 const today = getKST();
-const doy = dayOfYear(today); // 오늘 (0-based)
+const doy = dayOfYear(today); // 오늘 index (0-based)
 const listEl = document.getElementById("list");
 
-function itemForDayIndex(i){ // i: 0-based dayIndex
+function itemForDayIndex(i){
   return LIST[i % LIST.length];
 }
 
 /* ==========
-   LIST RENDER
-   - 오늘(doy)은 제외
-   - 어제(doy-1)부터 Day1까지
+   최근 5개만 (오늘 제외, 어제부터)
    ========== */
-function renderList(){
+const COUNT = 5;
+const start = Math.max(0, doy - COUNT); // 최소 0
+const end = doy - 1; // 어제
+
+function render(){
   listEl.innerHTML = "";
 
   if(doy <= 0){
-    listEl.innerHTML = `<div class="row"><div class="left"><div class="day">No archive yet</div></div><div class="tag"></div></div>`;
+    listEl.innerHTML = `<div class="row" style="cursor:default;"><div class="day">No archive yet</div><div class="word"></div></div>`;
     return;
   }
 
-  for(let i = doy - 1; i >= 0; i--){
+  for(let i = end; i >= start; i--){
     const dayNum = i + 1; // 표시용 Day (1-based)
     const item = itemForDayIndex(i);
 
     const row = document.createElement("div");
     row.className = "row";
-    row.dataset.dayIndex = String(i);
-
     row.innerHTML = `
-      <div class="left">
-        <div class="day">Day ${dayNum}</div>
-        <div class="w">${(item.w ?? "").toLowerCase()}</div>
-      </div>
-      <div class="tag">${item.p} · ${item.l}</div>
+      <div class="day">Day ${dayNum}</div>
+      <div class="word">${(item.w ?? "").toLowerCase()}</div>
     `;
 
-    row.onclick = () => showDetail(i);
+    // 해당 Day를 query로 넘겨서 상세로 열기(오늘 페이지가 처리)
+    row.onclick = () => {
+      location.href = `./?day=${dayNum}`;
+    };
+
     listEl.appendChild(row);
   }
 }
 
-let mode = "EN";
-let currentDayIndex = null;
-
-function renderDetail(){
-  if(currentDayIndex === null) return;
-
-  const item = itemForDayIndex(currentDayIndex);
-  const dayNum = currentDayIndex + 1;
-
-  document.getElementById("dWord").innerText = (item.w ?? "").toLowerCase();
-  document.getElementById("dDay").innerText = "Day " + dayNum;
-  document.getElementById("dPos").innerText = item.p;
-  document.getElementById("dLevel").innerText = item.l;
-
-  const meaningEl = document.getElementById("dMeaning");
-  const exampleEl = document.getElementById("dExample");
-
-  if(mode === "EN"){
-    meaningEl.innerText = "Meaning: " + (item.m_en ?? item.m_ko ?? "");
-    exampleEl.innerText = "Example: " + (item.e_en ?? item.e_ko ?? "");
-  }else{
-    meaningEl.innerText = "뜻: " + (item.m_ko ?? item.m_en ?? "");
-    exampleEl.innerText = "예문: " + (item.e_ko ?? item.e_en ?? "");
-  }
-
-  document.getElementById("btnEN").classList.toggle("active", mode==="EN");
-  document.getElementById("btnKO").classList.toggle("active", mode==="KO");
-}
-
-function showDetail(dayIndex){
-  currentDayIndex = dayIndex;
-  document.getElementById("detail").style.display = "block";
-  renderDetail();
-
-  // 상세로 스크롤 (모바일에서 바로 보이게)
-  document.getElementById("detail").scrollIntoView({ behavior: "smooth", block: "start" });
-}
-
-document.getElementById("btnEN").onclick = () => { mode="EN"; renderDetail(); };
-document.getElementById("btnKO").onclick = () => { mode="KO"; renderDetail(); };
-
-renderList();
-
-// 기본으로 "어제" 상세를 자동 표시하고 싶으면 아래 2줄 주석 해제
-// if(doy > 0) showDetail(doy - 1);
+render();
 </script>
 </body>
 </html>
