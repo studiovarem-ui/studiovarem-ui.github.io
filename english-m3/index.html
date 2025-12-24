@@ -1,4 +1,4 @@
-<div style="opacity:.35;font-size:12px;margin-top:8px;">VER: TOGGLE-OK</div><!doctype html>
+<!doctype html>
 <html lang="ko">
 <head>
   <meta charset="utf-8" />
@@ -16,31 +16,74 @@
       color:#fff;
       font-family: system-ui, -apple-system, Apple SD Gothic Neo, Noto Sans KR, sans-serif;
     }
-    .card{
+
+    /* 전체 레이아웃 */
+    .wrap{
       width:min(560px, 92vw);
-      padding:28px 22px;
-      border:1px solid rgba(255,255,255,.12);
-      border-radius:18px;
-      background:rgba(255,255,255,.02);
-      box-sizing:border-box;
+      position:relative;
+      padding-top:34px; /* VAREM을 박스 밖 위에 놓을 공간 */
+      padding-bottom:30px; /* 하단 힌트 공간 */
     }
-    .brand{
+
+    /* VAREM: 박스 밖 상단 중앙 */
+    .brandTop{
+      position:absolute;
+      top:0;
+      left:50%;
+      transform:translateX(-50%);
       letter-spacing:.28em;
       font-weight:700;
       font-size:14px;
       opacity:.7;
+      user-select:none;
     }
+
+    /* 카드 */
+    .card{
+      position:relative;
+      width:100%;
+      padding:22px 22px 22px 22px;
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:18px;
+      background:rgba(255,255,255,.02);
+      box-sizing:border-box;
+      overflow:hidden;
+    }
+
+    /* 카드 내부 상단 줄: 왼쪽 제목, 오른쪽 Day */
+    .topRow{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+    }
+
     .subtitle{
-      margin-top:6px;
       font-size:16px;
       opacity:.8;
+      line-height:1.3;
     }
+
+    /* Day: 박스 안 상단 오른쪽 */
+    .dayPill{
+      border:1px solid rgba(255,255,255,.18);
+      border-radius:999px;
+      padding:6px 10px;
+      font-size:12px;
+      opacity:.75;
+      white-space:nowrap;
+    }
+
+    /* 메인 단어: 소문자 */
     .word{
-      margin-top:18px;
-      font-size:40px;
+      margin-top:14px;
+      font-size:42px;
       font-weight:800;
-      letter-spacing:.02em;
+      letter-spacing:.01em;
+      text-transform:none; /* 소문자 유지 */
     }
+
+    /* 품사/레벨/언어 버튼 */
     .meta{
       margin-top:14px;
       display:flex;
@@ -48,70 +91,87 @@
       flex-wrap:wrap;
       align-items:center;
       font-size:12px;
-      opacity:.75;
+      opacity:.85;
     }
     .pill{
       border:1px solid rgba(255,255,255,.18);
       border-radius:999px;
       padding:6px 10px;
+      opacity:.75;
     }
-    .pillBtn{
+
+    .langBtn{
       background:transparent;
       color:#fff;
       cursor:pointer;
       border:1px solid rgba(255,255,255,.18);
       border-radius:999px;
       padding:6px 10px;
-      opacity:.5;
+      opacity:.45;
     }
-    .pillBtn.active{
+    .langBtn.active{
       opacity:1;
       border-color:rgba(255,255,255,.65);
     }
+
     .meaning{
-      margin-top:22px;
+      margin-top:18px;
       font-size:18px;
       line-height:1.6;
+      opacity:.95;
     }
     .example{
       margin-top:10px;
       font-size:16px;
       line-height:1.6;
-      opacity:.85;
+      opacity:.88;
     }
-    .hint{
-      margin-top:18px;
+
+    /* 하단 힌트: 박스 밖 + 박스에 붙여서 하단 왼쪽 */
+    .hintOutside{
+      position:absolute;
+      left:0;
+      bottom:0;
+      transform:translateY(50%); /* 박스에 "붙어있는" 느낌 */
       font-size:12px;
       opacity:.35;
+      user-select:none;
+      padding-left:4px;
     }
   </style>
 </head>
 
 <body>
-  <div class="card">
-    <div class="brand">VAREM</div>
-    <div class="subtitle">중3 영어 · 매일 한 단어</div>
+  <div class="wrap">
+    <div class="brandTop">VAREM</div>
 
-    <div class="word" id="word">WORD</div>
+    <div class="card">
+      <div class="topRow">
+        <div class="subtitle">중3 영어 · 매일 한 단어</div>
+        <div class="dayPill" id="daypill">Day -</div>
+      </div>
 
-    <div class="meta">
-      <div class="pill" id="daypill">Day -</div>
-      <div class="pill" id="pospill">POS</div>
-      <div class="pill" id="levelpill">M3</div>
+      <div class="word" id="word">loading</div>
 
-      <button class="pillBtn active" id="btnKO" type="button">한글</button>
-      <button class="pillBtn" id="btnEN" type="button">영어</button>
+      <div class="meta">
+        <div class="pill" id="pospill">POS</div>
+        <div class="pill" id="levelpill">M3</div>
+
+        <!-- 기본은 영어(active) -->
+        <button class="langBtn" id="btnKO" type="button">한글</button>
+        <button class="langBtn active" id="btnEN" type="button">English</button>
+      </div>
+
+      <div class="meaning" id="meaning"></div>
+      <div class="example" id="example"></div>
     </div>
 
-    <div class="meaning" id="meaning"></div>
-    <div class="example" id="example"></div>
-
-    <div class="hint">내일 다시 키링을 터치하세요.</div>
+    <div class="hintOutside">내일 다시 키링을 터치하세요.</div>
   </div>
 
 <script>
 /* ======================
-   1. 단어 데이터 (샘플)
+   1) 단어 데이터 (샘플)
    ====================== */
 const LIST = [
   {
@@ -137,14 +197,14 @@ const LIST = [
     p:"v",
     l:"M3",
     m_ko:"결정하다",
-    m_en:"to choose something",
+    m_en:"to choose; to make a decision",
     e_en:"She decided to study harder.",
     e_ko:"그녀는 더 열심히 공부하기로 결정했다."
   }
 ];
 
 /* ======================
-   2. 날짜 기반 인덱스
+   2) KST 기준 오늘 인덱스
    ====================== */
 function getKST(){
   const now = new Date();
@@ -153,40 +213,43 @@ function getKST(){
 }
 function dayOfYear(d){
   const start = new Date(d.getFullYear(), 0, 1);
-  return Math.floor((d - start) / 86400000);
+  return Math.floor((d - start) / 86400000); // 0-based
 }
+
 const today = getKST();
-const dayIndex = dayOfYear(today);
-const item = LIST[ dayIndex % LIST.length ];
+const doy = dayOfYear(today);
+const item = LIST[doy % LIST.length];
 
 /* ======================
-   3. 화면 기본 세팅
+   3) 기본 렌더 (영어 디폴트)
    ====================== */
-document.getElementById("word").innerText = item.w.toUpperCase();
-document.getElementById("daypill").innerText = "Day " + (dayIndex + 1);
+document.getElementById("daypill").innerText = "Day " + (doy + 1);
 document.getElementById("pospill").innerText = item.p;
 document.getElementById("levelpill").innerText = item.l;
 
-let mode = "KO"; // 기본: 한글
+// 메인 단어는 소문자 유지
+document.getElementById("word").innerText = (item.w ?? "").toLowerCase();
+
+let mode = "EN"; // ✅ 영어가 기본
 
 function render(){
   const meaningEl = document.getElementById("meaning");
   const exampleEl = document.getElementById("example");
 
-  if(mode === "KO"){
-    meaningEl.innerText = "뜻: " + (item.m_ko ?? "");
-    exampleEl.innerText = "예문: " + (item.e_ko ?? item.e_en ?? "");
-  }else{
+  if(mode === "EN"){
     meaningEl.innerText = "Meaning: " + (item.m_en ?? item.m_ko ?? "");
     exampleEl.innerText = "Example: " + (item.e_en ?? item.e_ko ?? "");
+  } else {
+    meaningEl.innerText = "뜻: " + (item.m_ko ?? item.m_en ?? "");
+    exampleEl.innerText = "예문: " + (item.e_ko ?? item.e_en ?? "");
   }
 
-  document.getElementById("btnKO").classList.toggle("active", mode==="KO");
   document.getElementById("btnEN").classList.toggle("active", mode==="EN");
+  document.getElementById("btnKO").classList.toggle("active", mode==="KO");
 }
 
-document.getElementById("btnKO").onclick = () => { mode="KO"; render(); };
 document.getElementById("btnEN").onclick = () => { mode="EN"; render(); };
+document.getElementById("btnKO").onclick = () => { mode="KO"; render(); };
 
 render();
 </script>
