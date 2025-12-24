@@ -1,181 +1,109 @@
 <!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>VAREM · Archive · 중3 영어</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>VAREM · Archive</title>
 
-  <style>
-    body{
-      margin:0;
-      min-height:100vh;
-      background:#0f0f10;
-      color:#fff;
-      font-family: system-ui, -apple-system, Apple SD Gothic Neo, Noto Sans KR, sans-serif;
-      display:flex;
-      justify-content:center;
-    }
+<style>
+body{
+ margin:0;
+ min-height:100vh;
+ background:#0f0f10;
+ color:#fff;
+ font-family: system-ui,-apple-system,Apple SD Gothic Neo,Noto Sans KR,sans-serif;
+ display:flex;
+ justify-content:center;
+}
 
-    .wrap{
-      width:min(560px, 92vw);
-      position:relative;
-      padding:34px 0 28px;
-    }
+.wrap{
+ width:min(560px,92vw);
+ padding:32px 0;
+}
 
-    .brandTop{
-      letter-spacing:.28em;
-      font-weight:700;
-      font-size:14px;
-      opacity:.7;
-      text-align:center;
-      user-select:none;
-      margin-bottom:14px;
-    }
+.brand{
+ text-align:center;
+ letter-spacing:.28em;
+ font-weight:700;
+ font-size:14px;
+ opacity:.7;
+ margin-bottom:14px;
+}
 
-    .header{
-      margin:0 0 12px;
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-end;
-      gap:12px;
-    }
-    .title{
-      font-size:14px;
-      opacity:.75;
-    }
-    .back{
-      font-size:12px;
-      opacity:.55;
-      border:1px solid rgba(255,255,255,.16);
-      padding:6px 10px;
-      border-radius:999px;
-      cursor:pointer;
-      user-select:none;
-      white-space:nowrap;
-    }
+.header{
+ display:flex;
+ justify-content:space-between;
+ margin-bottom:12px;
+ font-size:14px;
+ opacity:.75;
+}
 
-    .panel{
-      border:1px solid rgba(255,255,255,.12);
-      border-radius:18px;
-      background:rgba(255,255,255,.02);
-      overflow:hidden;
-    }
+.back{
+ font-size:12px;
+ border:1px solid rgba(255,255,255,.18);
+ padding:6px 10px;
+ border-radius:999px;
+ cursor:pointer;
+}
 
-    .row{
-      display:flex;
-      justify-content:space-between;
-      gap:12px;
-      padding:14px 16px;
-      border-top:1px solid rgba(255,255,255,.08);
-      cursor:pointer;
-    }
-    .row:first-child{ border-top:none; }
-    .row:hover{ background:rgba(255,255,255,.03); }
+.panel{
+ border:1px solid rgba(255,255,255,.12);
+ border-radius:18px;
+ overflow:hidden;
+}
 
-    .day{
-      font-size:12px;
-      opacity:.6;
-      white-space:nowrap;
-    }
-    .word{
-      font-size:16px;
-      font-weight:700;
-      opacity:.95;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      max-width:70%;
-      text-transform:none;
-    }
+.row{
+ display:flex;
+ justify-content:space-between;
+ padding:14px 16px;
+ border-top:1px solid rgba(255,255,255,.08);
+}
 
-    .hint{
-      margin-top:10px;
-      font-size:12px;
-      opacity:.35;
-    }
-  </style>
+.row:first-child{border-top:none;}
+
+.day{
+ font-size:12px;
+ opacity:.6;
+}
+.word{
+ font-size:16px;
+ font-weight:700;
+}
+</style>
 </head>
 
 <body>
-  <div class="wrap">
-    <div class="brandTop">VAREM</div>
+<div class="wrap">
+ <div class="brand">VAREM</div>
 
-    <div class="header">
-      <div class="title">Archive · 최근 5일</div>
-      <div class="back" onclick="location.href='./'">← Today</div>
-    </div>
+ <div class="header">
+  <div>Archive · 최근 5일</div>
+  <div class="back" onclick="location.href='./'">← Today</div>
+ </div>
 
-    <div class="panel" id="list"></div>
-    <div class="hint">목록을 누르면 해당 Day로 이동합니다.</div>
-  </div>
+ <div class="panel" id="list"></div>
+</div>
 
 <script>
-/* ==========
-   DATA (index.html과 동일하게 유지)
-   ========== */
-const LIST = [
-  { w:"anxious", p:"adj", l:"M3", m_ko:"불안한, 걱정되는", m_en:"worried and nervous", e_en:"She felt anxious before the exam.", e_ko:"그녀는 시험 전에 불안해했다." },
-  { w:"improve", p:"v", l:"M3", m_ko:"개선하다, 향상시키다", m_en:"to make something better", e_en:"He wants to improve his English.", e_ko:"그는 영어 실력을 향상시키고 싶어한다." },
-  { w:"decide", p:"v", l:"M3", m_ko:"결정하다", m_en:"to choose; to make a decision", e_en:"She decided to study harder.", e_ko:"그녀는 더 열심히 공부하기로 결정했다." }
-];
+const LIST=["anxious","improve","decide"];
 
-/* ==========
-   DATE (KST)
-   ========== */
-function getKST(){
-  const now = new Date();
-  const utc = now.getTime() + now.getTimezoneOffset() * 60000;
-  return new Date(utc + 9 * 3600000);
+function kst(){
+ const n=new Date();
+ return new Date(n.getTime()+n.getTimezoneOffset()*60000+9*3600000);
 }
 function dayOfYear(d){
-  const start = new Date(d.getFullYear(), 0, 1);
-  return Math.floor((d - start) / 86400000); // 0-based
+ return Math.floor((d-new Date(d.getFullYear(),0,1))/86400000);
 }
 
-const today = getKST();
-const doy = dayOfYear(today); // 오늘 index (0-based)
-const listEl = document.getElementById("list");
+const today=dayOfYear(kst());
+const list=document.getElementById("list");
 
-function itemForDayIndex(i){
-  return LIST[i % LIST.length];
+for(let i=Math.max(0,today-5);i<today;i++){
+ const row=document.createElement("div");
+ row.className="row";
+ row.innerHTML=`<div class="day">Day ${i+1}</div><div class="word">${LIST[i%LIST.length]}</div>`;
+ list.appendChild(row);
 }
-
-/* ==========
-   최근 5개만 (오늘 제외, 어제부터)
-   ========== */
-const COUNT = 5;
-const start = Math.max(0, doy - COUNT); // 최소 0
-const end = doy - 1; // 어제
-
-function render(){
-  listEl.innerHTML = "";
-
-  if(doy <= 0){
-    listEl.innerHTML = `<div class="row" style="cursor:default;"><div class="day">No archive yet</div><div class="word"></div></div>`;
-    return;
-  }
-
-  for(let i = end; i >= start; i--){
-    const dayNum = i + 1; // 표시용 Day (1-based)
-    const item = itemForDayIndex(i);
-
-    const row = document.createElement("div");
-    row.className = "row";
-    row.innerHTML = `
-      <div class="day">Day ${dayNum}</div>
-      <div class="word">${(item.w ?? "").toLowerCase()}</div>
-    `;
-
-    // 해당 Day를 query로 넘겨서 상세로 열기(오늘 페이지가 처리)
-    row.onclick = () => {
-      location.href = `./?day=${dayNum}`;
-    };
-
-    listEl.appendChild(row);
-  }
-}
-
-render();
 </script>
 </body>
 </html>
