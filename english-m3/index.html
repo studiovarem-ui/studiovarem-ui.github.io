@@ -7,119 +7,44 @@
 
 <style>
 body{
-  margin:0;
-  min-height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:#0f0f10;
-  color:#fff;
+  margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+  background:#0f0f10; color:#fff;
   font-family: system-ui,-apple-system,Apple SD Gothic Neo,Noto Sans KR,sans-serif;
 }
-
-.wrap{
-  width:min(560px,92vw);
-  position:relative;
-  padding-top:36px;
-  padding-bottom:28px;
-}
-
+.wrap{ width:min(560px,92vw); position:relative; padding-top:36px; padding-bottom:28px; }
 .brand{
-  position:absolute;
-  top:0;
-  left:50%;
-  transform:translateX(-50%);
-  letter-spacing:.28em;
-  font-weight:700;
-  font-size:14px;
-  opacity:.7;
+  position:absolute; top:0; left:50%; transform:translateX(-50%);
+  letter-spacing:.28em; font-weight:700; font-size:14px; opacity:.7;
 }
-
 .card{
   border:1px solid rgba(255,255,255,.12);
-  border-radius:18px;
-  padding:22px;
-  background:rgba(255,255,255,.02);
+  border-radius:18px; padding:22px; background:rgba(255,255,255,.02);
 }
-
-.top{
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-start;
-}
-
-.subtitle{
-  font-size:16px;
-  opacity:.8;
-}
-
+.top{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+.subtitle{ font-size:16px; opacity:.8; }
 .day{
-  font-size:12px;
-  border:1px solid rgba(255,255,255,.18);
-  border-radius:999px;
-  padding:6px 10px;
-  opacity:.75;
-  cursor:pointer;
+  font-size:12px; border:1px solid rgba(255,255,255,.18); border-radius:999px;
+  padding:6px 10px; opacity:.75; cursor:pointer; user-select:none;
 }
-
-.word{
-  margin-top:14px;
-  font-size:42px;
-  font-weight:800;
-}
-
-.meta{
-  margin-top:14px;
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-}
-
+.word{ margin-top:14px; font-size:42px; font-weight:800; }
+.meta{ margin-top:14px; display:flex; gap:8px; flex-wrap:wrap; }
 .pill{
-  border:1px solid rgba(255,255,255,.18);
-  border-radius:999px;
-  padding:6px 10px;
-  font-size:12px;
-  opacity:.75;
+  border:1px solid rgba(255,255,255,.18); border-radius:999px;
+  padding:6px 10px; font-size:12px; opacity:.75;
 }
-
 .lang{
   border:1px solid rgba(255,255,255,.18);
-  background:none;
-  color:#fff;
-  padding:6px 10px;
-  border-radius:999px;
-  font-size:12px;
-  opacity:.45;
-  cursor:pointer;
+  background:none; color:#fff; padding:6px 10px; border-radius:999px;
+  font-size:12px; opacity:.45; cursor:pointer;
 }
 .lang.active{ opacity:1; border-color:rgba(255,255,255,.6); }
-
-.meaning{
-  margin-top:18px;
-  font-size:18px;
-  line-height:1.6;
-}
-.example{
-  margin-top:10px;
-  font-size:16px;
-  opacity:.88;
-}
-
+.meaning{ margin-top:18px; font-size:18px; line-height:1.6; }
+.example{ margin-top:10px; font-size:16px; opacity:.88; line-height:1.6; }
 .hint{
-  position:absolute;
-  left:0;
-  bottom:0;
-  transform:translateY(120%);
-  font-size:12px;
-  opacity:.35;
+  position:absolute; left:0; bottom:0; transform:translateY(120%);
+  font-size:12px; opacity:.35;
 }
-
-@keyframes pulse{
-  0%{opacity:.4}
-  50%{opacity:1}
-  100%{opacity:.4}
-}
+@keyframes pulse{0%{opacity:.4}50%{opacity:1}100%{opacity:.4}}
 .hintPulse{ animation:pulse .6s ease-in-out 0s 2; }
 </style>
 </head>
@@ -139,8 +64,8 @@ body{
     <div class="meta">
       <div class="pill" id="pos"></div>
       <div class="pill">M3</div>
-      <button class="lang active" id="btnEN">English</button>
-      <button class="lang" id="btnKO">Korean</button>
+      <button class="lang active" id="btnEN" type="button">English</button>
+      <button class="lang" id="btnKO" type="button">Korean</button>
     </div>
 
     <div class="meaning" id="meaning"></div>
@@ -151,43 +76,44 @@ body{
 </div>
 
 <script>
-const LIST=[
- {w:"anxious",p:"adj",m_en:"worried and nervous",m_ko:"불안한, 걱정되는",e_en:"She felt anxious before the exam.",e_ko:"그녀는 시험 전에 불안해했다."},
- {w:"improve",p:"v",m_en:"to make something better",m_ko:"개선하다, 향상시키다",e_en:"He wants to improve his English.",e_ko:"그는 영어 실력을 향상시키고 싶어한다."},
- {w:"decide",p:"v",m_en:"to choose; to make a decision",m_ko:"결정하다",e_en:"She decided to study harder.",e_ko:"그녀는 더 열심히 공부하기로 결정했다."}
+const LIST = [
+  {w:"anxious", p:"adj", m_en:"worried and nervous", m_ko:"불안한, 걱정되는", e_en:"She felt anxious before the exam.", e_ko:"그녀는 시험 전에 불안해했다."},
+  {w:"improve", p:"v",   m_en:"to make something better", m_ko:"개선하다, 향상시키다", e_en:"He wants to improve his English.", e_ko:"그는 영어 실력을 향상시키고 싶어한다."},
+  {w:"decide",  p:"v",   m_en:"to choose; to make a decision", m_ko:"결정하다", e_en:"She decided to study harder.", e_ko:"그녀는 더 열심히 공부하기로 결정했다."}
 ];
 
 function kst(){
- const n=new Date();
- return new Date(n.getTime()+n.getTimezoneOffset()*60000+9*3600000);
+  const n=new Date();
+  return new Date(n.getTime()+n.getTimezoneOffset()*60000+9*3600000);
 }
 function dayOfYear(d){
- return Math.floor((d-new Date(d.getFullYear(),0,1))/86400000);
+  return Math.floor((d-new Date(d.getFullYear(),0,1))/86400000);
 }
 
-const day=dayOfYear(kst());
-const item=LIST[day%LIST.length];
+const day = dayOfYear(kst());
+const item = LIST[day % LIST.length];
 
-document.getElementById("dayNum").innerText=day+1;
-document.getElementById("word").innerText=item.w.toLowerCase();
-document.getElementById("pos").innerText=item.p;
+dayNum.innerText = day + 1;
+word.innerText = item.w.toLowerCase();
+pos.innerText = item.p;
 
 let mode="EN";
 function render(){
- if(mode==="EN"){
-  meaning.innerText="Meaning: "+item.m_en;
-  example.innerText="Example: "+item.e_en;
- }else{
-  meaning.innerText="뜻: "+item.m_ko;
-  example.innerText="예문: "+item.e_ko;
- }
- btnEN.classList.toggle("active",mode==="EN");
- btnKO.classList.toggle("active",mode==="KO");
+  if(mode==="EN"){
+    meaning.innerText="Meaning: " + (item.m_en ?? item.m_ko ?? "");
+    example.innerText="Example: " + (item.e_en ?? item.e_ko ?? "");
+  }else{
+    meaning.innerText="뜻: " + (item.m_ko ?? item.m_en ?? "");
+    example.innerText="예문: " + (item.e_ko ?? item.e_en ?? "");
+  }
+  btnEN.classList.toggle("active", mode==="EN");
+  btnKO.classList.toggle("active", mode==="KO");
 }
 btnEN.onclick=()=>{mode="EN";render();}
 btnKO.onclick=()=>{mode="KO";render();}
-
 render();
+
+// 토글 힌트(2회)
 btnKO.classList.add("hintPulse");
 </script>
 </body>
