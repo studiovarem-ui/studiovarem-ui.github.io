@@ -60,7 +60,6 @@
       line-height:1.3;
     }
 
-    /* Day: 박스 안 상단 오른쪽 + 클릭 가능 */
     .dayPill{
       border:1px solid rgba(255,255,255,.18);
       border-radius:999px;
@@ -152,7 +151,7 @@
 
     <div class="card">
       <div class="topRow">
-        <div class="subtitle">중3 영어 · 매일 한 단어</div>
+        <div class="subtitle" id="subtitle">중3 영어 · 매일 한 단어</div>
         <div class="dayPill" id="daypill" title="Archive">Day -</div>
       </div>
 
@@ -178,33 +177,9 @@
    DATA
    ========== */
 const LIST = [
-  {
-    w:"anxious",
-    p:"adj",
-    l:"M3",
-    m_ko:"불안한, 걱정되는",
-    m_en:"worried and nervous",
-    e_en:"She felt anxious before the exam.",
-    e_ko:"그녀는 시험 전에 불안해했다."
-  },
-  {
-    w:"improve",
-    p:"v",
-    l:"M3",
-    m_ko:"개선하다, 향상시키다",
-    m_en:"to make something better",
-    e_en:"He wants to improve his English.",
-    e_ko:"그는 영어 실력을 향상시키고 싶어한다."
-  },
-  {
-    w:"decide",
-    p:"v",
-    l:"M3",
-    m_ko:"결정하다",
-    m_en:"to choose; to make a decision",
-    e_en:"She decided to study harder.",
-    e_ko:"그녀는 더 열심히 공부하기로 결정했다."
-  }
+  { w:"anxious", p:"adj", l:"M3", m_ko:"불안한, 걱정되는", m_en:"worried and nervous", e_en:"She felt anxious before the exam.", e_ko:"그녀는 시험 전에 불안해했다." },
+  { w:"improve", p:"v", l:"M3", m_ko:"개선하다, 향상시키다", m_en:"to make something better", e_en:"He wants to improve his English.", e_ko:"그는 영어 실력을 향상시키고 싶어한다." },
+  { w:"decide", p:"v", l:"M3", m_ko:"결정하다", m_en:"to choose; to make a decision", e_en:"She decided to study harder.", e_ko:"그녀는 더 열심히 공부하기로 결정했다." }
 ];
 
 /* ==========
@@ -217,19 +192,56 @@ function getKST(){
 }
 function dayOfYear(d){
   const start = new Date(d.getFullYear(), 0, 1);
-  return Math.floor((d - start) / 86400000);
+  return Math.floor((d - start) / 86400000); // 0-based
 }
 
 const today = getKST();
-const doy = dayOfYear(today);
-const item = LIST[doy % LIST.length];
+const todayIndex = dayOfYear(today); // 0-based (오늘)
+
+/* ==========
+   URL ?day= 처리
+   - day는 1-based로 받음 (Day 1..)
+   - 오늘보다 큰 값은 오늘로 보정
+   - 1 미만은 오늘로 보정
+   ========== */
+const params = new URLSearchParams(location.search);
+let requestedDay = parseInt(params.get("day") || "", 10); // 1-based
+
+let viewingIndex = todayIndex; // 기본: 오늘
+let isViewingPast = false;
+
+if(Number.isFinite(requestedDay)){
+  // 유효 범위 보정
+  if(requestedDay >= 1 && requestedDay <= (todayIndex + 1)){
+    viewingIndex = requestedDay - 1; // 0-based
+    isViewingPast = (viewingIndex !== todayIndex);
+  }
+}
+
+const item = LIST[viewingIndex % LIST.length];
 
 /* ==========
    UI SETUP
    ========== */
 const dayPill = document.getElementById("daypill");
-dayPill.innerText = "Day " + (doy + 1);
-dayPill.onclick = () => location.href = "archive.html"; // ✅ 아카이브로
+dayPill.innerText = "Day " + (viewingIndex + 1);
+
+// Day pill 클릭 행동
+// - 과거 Day 보고 있으면: 오늘로 돌아가기
+// - 오늘 보고 있으면: archive로
+dayPill.onclick = () => {
+  if(isViewingPast){
+    location.href = "./";
+  }else{
+    location.href = "archive.html";
+  }
+};
+
+// subtitle도 과거 Day면 살짝 표시(선택)
+const subtitleEl = document.getElementById("subtitle");
+if(isViewingPast){
+  subtitleEl.innerText = "중3 영어 · 아카이브";
+}
 
 document.getElementById("pospill").innerText = item.p;
 document.getElementById("levelpill").innerText = item.l;
@@ -260,6 +272,7 @@ render();
 
 /* ==========
    HINT: Korean 버튼 2회 강조
+   - (과거 Day에서도 동작)
    ========== */
 const koBtn = document.getElementById("btnKO");
 setTimeout(() => {
