@@ -7,103 +7,206 @@
 
 <style>
 body{
- margin:0;
- min-height:100vh;
- background:#0f0f10;
- color:#fff;
- font-family: system-ui,-apple-system,Apple SD Gothic Neo,Noto Sans KR,sans-serif;
- display:flex;
- justify-content:center;
+  margin:0; min-height:100vh; background:#0f0f10; color:#fff;
+  font-family: system-ui,-apple-system,Apple SD Gothic Neo,Noto Sans KR,sans-serif;
+  display:flex; justify-content:center;
 }
-
-.wrap{
- width:min(560px,92vw);
- padding:32px 0;
-}
+.wrap{ width:min(560px,92vw); padding:32px 0; }
 
 .brand{
- text-align:center;
- letter-spacing:.28em;
- font-weight:700;
- font-size:14px;
- opacity:.7;
- margin-bottom:14px;
+  text-align:center; letter-spacing:.28em; font-weight:700; font-size:14px;
+  opacity:.7; margin-bottom:14px;
 }
 
 .header{
- display:flex;
- justify-content:space-between;
- margin-bottom:12px;
- font-size:14px;
- opacity:.75;
+  display:flex; justify-content:space-between; align-items:flex-end;
+  margin-bottom:12px;
 }
-
+.title{ font-size:14px; opacity:.75; }
 .back{
- font-size:12px;
- border:1px solid rgba(255,255,255,.18);
- padding:6px 10px;
- border-radius:999px;
- cursor:pointer;
+  font-size:12px; border:1px solid rgba(255,255,255,.18);
+  padding:6px 10px; border-radius:999px; cursor:pointer; opacity:.75; user-select:none;
 }
 
 .panel{
- border:1px solid rgba(255,255,255,.12);
- border-radius:18px;
- overflow:hidden;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:18px; overflow:hidden;
+  background:rgba(255,255,255,.02);
 }
 
+/* 목록(최근 5개만 “보이게”) */
 .row{
- display:flex;
- justify-content:space-between;
- padding:14px 16px;
- border-top:1px solid rgba(255,255,255,.08);
+  display:flex; justify-content:space-between; align-items:center;
+  padding:14px 16px; border-top:1px solid rgba(255,255,255,.08);
+  cursor:pointer;
 }
+.row:first-child{ border-top:none; }
+.row:hover{ background:rgba(255,255,255,.03); }
 
-.row:first-child{border-top:none;}
+.day{ font-size:12px; opacity:.6; }
+.word{ font-size:16px; font-weight:700; }
 
-.day{
- font-size:12px;
- opacity:.6;
+/* 상세(투데이 카드 스타일) */
+.detail{
+  border-top:1px solid rgba(255,255,255,.10);
+  padding:18px 16px 18px;
+  display:none;
 }
-.word{
- font-size:16px;
- font-weight:700;
+.detailTop{
+  display:flex; justify-content:space-between; align-items:flex-start; gap:10px;
 }
+.detailTitle{ font-size:14px; opacity:.75; }
+.detailDay{
+  font-size:12px; border:1px solid rgba(255,255,255,.18);
+  border-radius:999px; padding:6px 10px; opacity:.75; white-space:nowrap;
+}
+.bigWord{ margin-top:10px; font-size:38px; font-weight:800; }
+
+.meta{ margin-top:12px; display:flex; gap:8px; flex-wrap:wrap; }
+.pill{
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:999px; padding:6px 10px; font-size:12px; opacity:.75;
+}
+.lang{
+  border:1px solid rgba(255,255,255,.18);
+  background:none; color:#fff; padding:6px 10px; border-radius:999px;
+  font-size:12px; opacity:.45; cursor:pointer;
+}
+.lang.active{ opacity:1; border-color:rgba(255,255,255,.6); }
+
+.meaning{ margin-top:16px; font-size:18px; line-height:1.6; }
+.example{ margin-top:10px; font-size:16px; opacity:.88; line-height:1.6; }
+
+.hint{ margin-top:10px; font-size:12px; opacity:.35; }
 </style>
 </head>
 
 <body>
 <div class="wrap">
- <div class="brand">VAREM</div>
+  <div class="brand">VAREM</div>
 
- <div class="header">
-  <div>Archive · 최근 5일</div>
-  <div class="back" onclick="location.href='./'">← Today</div>
- </div>
+  <div class="header">
+    <div class="title">Archive · 최근 5일</div>
+    <div class="back" onclick="location.href='./'">← Today</div>
+  </div>
 
- <div class="panel" id="list"></div>
+  <div class="panel">
+    <div id="list"></div>
+
+    <div class="detail" id="detail">
+      <div class="detailTop">
+        <div class="detailTitle">중3 영어 · 아카이브</div>
+        <div class="detailDay" id="dDay">Day -</div>
+      </div>
+
+      <div class="bigWord" id="dWord">word</div>
+
+      <div class="meta">
+        <div class="pill" id="dPos">POS</div>
+        <div class="pill">M3</div>
+        <button class="lang active" id="btnEN" type="button">English</button>
+        <button class="lang" id="btnKO" type="button">Korean</button>
+      </div>
+
+      <div class="meaning" id="dMeaning"></div>
+      <div class="example" id="dExample"></div>
+      <div class="hint">목록에서 다른 단어를 눌러 바꿀 수 있어요.</div>
+    </div>
+  </div>
 </div>
 
 <script>
-const LIST=["anxious","improve","decide"];
+const LIST = [
+  {w:"anxious", p:"adj", m_en:"worried and nervous", m_ko:"불안한, 걱정되는", e_en:"She felt anxious before the exam.", e_ko:"그녀는 시험 전에 불안해했다."},
+  {w:"improve", p:"v",   m_en:"to make something better", m_ko:"개선하다, 향상시키다", e_en:"He wants to improve his English.", e_ko:"그는 영어 실력을 향상시키고 싶어한다."},
+  {w:"decide",  p:"v",   m_en:"to choose; to make a decision", m_ko:"결정하다", e_en:"She decided to study harder.", e_ko:"그녀는 더 열심히 공부하기로 결정했다."}
+];
 
 function kst(){
- const n=new Date();
- return new Date(n.getTime()+n.getTimezoneOffset()*60000+9*3600000);
+  const n=new Date();
+  return new Date(n.getTime()+n.getTimezoneOffset()*60000+9*3600000);
 }
 function dayOfYear(d){
- return Math.floor((d-new Date(d.getFullYear(),0,1))/86400000);
+  return Math.floor((d-new Date(d.getFullYear(),0,1))/86400000);
 }
 
-const today=dayOfYear(kst());
-const list=document.getElementById("list");
+const todayIndex = dayOfYear(kst()); // 0-based
+const listEl = document.getElementById("list");
+const detailEl = document.getElementById("detail");
 
-for(let i=Math.max(0,today-5);i<today;i++){
- const row=document.createElement("div");
- row.className="row";
- row.innerHTML=`<div class="day">Day ${i+1}</div><div class="word">${LIST[i%LIST.length]}</div>`;
- list.appendChild(row);
+let currentIndex = null; // 0-based day index (과거)
+let mode = "EN";
+
+function itemForDayIndex(i){
+  return LIST[i % LIST.length];
 }
+
+/* 최근 5개만 목록에 출력 (오늘 제외, 어제부터) */
+function renderList(){
+  listEl.innerHTML = "";
+
+  if(todayIndex <= 0){
+    const row = document.createElement("div");
+    row.className = "row";
+    row.style.cursor = "default";
+    row.innerHTML = `<div class="day">No archive yet</div><div class="word"></div>`;
+    listEl.appendChild(row);
+    return;
+  }
+
+  const COUNT = 5;
+  const end = todayIndex - 1;               // 어제
+  const start = Math.max(0, todayIndex - COUNT); // 최근 5개 범위 시작
+
+  for(let i=end; i>=start; i--){
+    const dayNum = i + 1;
+    const it = itemForDayIndex(i);
+
+    const row = document.createElement("div");
+    row.className = "row";
+    row.innerHTML = `<div class="day">Day ${dayNum}</div><div class="word">${it.w.toLowerCase()}</div>`;
+    row.onclick = () => showDetail(i);
+    listEl.appendChild(row);
+  }
+}
+
+/* 상세(투데이처럼) 표시 */
+function renderDetail(){
+  if(currentIndex === null) return;
+  const it = itemForDayIndex(currentIndex);
+
+  dDay.innerText = "Day " + (currentIndex + 1);
+  dWord.innerText = it.w.toLowerCase();
+  dPos.innerText = it.p;
+
+  if(mode === "EN"){
+    dMeaning.innerText = "Meaning: " + (it.m_en ?? it.m_ko ?? "");
+    dExample.innerText = "Example: " + (it.e_en ?? it.e_ko ?? "");
+  }else{
+    dMeaning.innerText = "뜻: " + (it.m_ko ?? it.m_en ?? "");
+    dExample.innerText = "예문: " + (it.e_ko ?? it.e_en ?? "");
+  }
+
+  btnEN.classList.toggle("active", mode==="EN");
+  btnKO.classList.toggle("active", mode==="KO");
+}
+
+function showDetail(dayIndex){
+  currentIndex = dayIndex;
+  mode = "EN"; // 상세는 EN 기본
+  detailEl.style.display = "block";
+  renderDetail();
+  // 모바일에서 상세로 자연스럽게 내려가기
+  detailEl.scrollIntoView({behavior:"smooth", block:"start"});
+}
+
+btnEN.onclick = () => { mode="EN"; renderDetail(); };
+btnKO.onclick = () => { mode="KO"; renderDetail(); };
+
+renderList();
+
+// 처음 들어오면 "어제" 상세를 자동으로 보여주고 싶으면 아래 줄 주석 해제
+// if(todayIndex > 0) showDetail(todayIndex - 1);
 </script>
 </body>
 </html>
