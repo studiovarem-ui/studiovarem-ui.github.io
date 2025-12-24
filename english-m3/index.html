@@ -4,14 +4,20 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>VAREM · 중3 영어</title>
+
   <style>
     body{
-      margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+      margin:0;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:#0f0f10;
+      color:#fff;
       font-family: system-ui, -apple-system, Apple SD Gothic Neo, Noto Sans KR, sans-serif;
-      background:#0f0f10; color:#fff;
     }
     .card{
-      width:min(520px, 92vw);
+      width:min(560px, 92vw);
       padding:28px 22px;
       border:1px solid rgba(255,255,255,.12);
       border-radius:18px;
@@ -24,38 +30,51 @@
       font-size:14px;
       opacity:.7;
     }
-    .title{
-      margin-top:10px;
-      font-size:18px;
-      opacity:.85;
+    .subtitle{
+      margin-top:6px;
+      font-size:16px;
+      opacity:.8;
     }
     .word{
       margin-top:18px;
-      font-size:42px;
+      font-size:40px;
       font-weight:800;
       letter-spacing:.02em;
     }
     .meta{
-      margin-top:10px;
+      margin-top:14px;
       display:flex;
-      gap:10px;
+      gap:8px;
       flex-wrap:wrap;
-      opacity:.7;
-      font-size:13px;
+      align-items:center;
+      font-size:12px;
+      opacity:.75;
     }
     .pill{
       border:1px solid rgba(255,255,255,.18);
       border-radius:999px;
       padding:6px 10px;
     }
+    .pillBtn{
+      background:transparent;
+      color:#fff;
+      cursor:pointer;
+      border:1px solid rgba(255,255,255,.18);
+      border-radius:999px;
+      padding:6px 10px;
+      opacity:.5;
+    }
+    .pillBtn.active{
+      opacity:1;
+      border-color:rgba(255,255,255,.65);
+    }
     .meaning{
-      margin-top:18px;
+      margin-top:22px;
       font-size:18px;
       line-height:1.6;
-      opacity:.9;
     }
     .example{
-      margin-top:14px;
+      margin-top:10px;
       font-size:16px;
       line-height:1.6;
       opacity:.85;
@@ -63,21 +82,25 @@
     .hint{
       margin-top:18px;
       font-size:12px;
-      opacity:.45;
+      opacity:.35;
     }
   </style>
 </head>
+
 <body>
   <div class="card">
     <div class="brand">VAREM</div>
-    <div class="title">중3 영어 · 매일 한 단어</div>
+    <div class="subtitle">중3 영어 · 매일 한 단어</div>
 
-    <div class="word" id="word">LOADING</div>
+    <div class="word" id="word">WORD</div>
 
     <div class="meta">
       <div class="pill" id="daypill">Day -</div>
-      <div class="pill" id="pospill">품사</div>
+      <div class="pill" id="pospill">POS</div>
       <div class="pill" id="levelpill">M3</div>
+
+      <button class="pillBtn active" id="btnKO" type="button">한글</button>
+      <button class="pillBtn" id="btnEN" type="button">영어</button>
     </div>
 
     <div class="meaning" id="meaning"></div>
@@ -87,33 +110,85 @@
   </div>
 
 <script>
-  const LIST = [
-    {w:"achieve", p:"verb", m:"달성하다, 이루다", e:"You can achieve your goal with practice."},
-    {w:"adapt", p:"verb", m:"적응하다", e:"Students adapt to new environments."},
-    {w:"anxious", p:"adj", m:"불안한, 걱정되는", e:"She felt anxious before the exam."},
-    {w:"benefit", p:"noun", m:"이점, 혜택", e:"Reading daily has many benefits."},
-    {w:"confirm", p:"verb", m:"확인하다", e:"Please confirm your answer."}
-  ];
-
-  function getKST(){
-    const now = new Date();
-    const utc = now.getTime() + now.getTimezoneOffset() * 60000;
-    return new Date(utc + 9 * 3600000);
+/* ======================
+   1. 단어 데이터 (샘플)
+   ====================== */
+const LIST = [
+  {
+    w:"anxious",
+    p:"adj",
+    l:"M3",
+    m_ko:"불안한, 걱정되는",
+    m_en:"worried and nervous",
+    e_en:"She felt anxious before the exam.",
+    e_ko:"그녀는 시험 전에 불안해했다."
+  },
+  {
+    w:"improve",
+    p:"v",
+    l:"M3",
+    m_ko:"개선하다, 향상시키다",
+    m_en:"to make something better",
+    e_en:"He wants to improve his English.",
+    e_ko:"그는 영어 실력을 향상시키고 싶어한다."
+  },
+  {
+    w:"decide",
+    p:"v",
+    l:"M3",
+    m_ko:"결정하다",
+    m_en:"to choose something",
+    e_en:"She decided to study harder.",
+    e_ko:"그녀는 더 열심히 공부하기로 결정했다."
   }
-  function dayOfYear(d){
-    const start = new Date(d.getFullYear(), 0, 1);
-    return Math.floor((d - start) / 86400000);
+];
+
+/* ======================
+   2. 날짜 기반 인덱스
+   ====================== */
+function getKST(){
+  const now = new Date();
+  const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+  return new Date(utc + 9 * 3600000);
+}
+function dayOfYear(d){
+  const start = new Date(d.getFullYear(), 0, 1);
+  return Math.floor((d - start) / 86400000);
+}
+const today = getKST();
+const dayIndex = dayOfYear(today);
+const item = LIST[ dayIndex % LIST.length ];
+
+/* ======================
+   3. 화면 기본 세팅
+   ====================== */
+document.getElementById("word").innerText = item.w.toUpperCase();
+document.getElementById("daypill").innerText = "Day " + (dayIndex + 1);
+document.getElementById("pospill").innerText = item.p;
+document.getElementById("levelpill").innerText = item.l;
+
+let mode = "KO"; // 기본: 한글
+
+function render(){
+  const meaningEl = document.getElementById("meaning");
+  const exampleEl = document.getElementById("example");
+
+  if(mode === "KO"){
+    meaningEl.innerText = "뜻: " + (item.m_ko ?? "");
+    exampleEl.innerText = "예문: " + (item.e_ko ?? item.e_en ?? "");
+  }else{
+    meaningEl.innerText = "Meaning: " + (item.m_en ?? item.m_ko ?? "");
+    exampleEl.innerText = "Example: " + (item.e_en ?? item.e_ko ?? "");
   }
 
-  const d = getKST();
-  const idx = dayOfYear(d) % LIST.length;
-  const item = LIST[idx];
+  document.getElementById("btnKO").classList.toggle("active", mode==="KO");
+  document.getElementById("btnEN").classList.toggle("active", mode==="EN");
+}
 
-  document.getElementById("word").innerText = item.w.toUpperCase();
-  document.getElementById("meaning").innerText = "뜻: " + item.m;
-  document.getElementById("example").innerText = "예문: " + item.e;
-  document.getElementById("daypill").innerText = `Day ${dayOfYear(d)+1}`;
-  document.getElementById("pospill").innerText = item.p;
+document.getElementById("btnKO").onclick = () => { mode="KO"; render(); };
+document.getElementById("btnEN").onclick = () => { mode="EN"; render(); };
+
+render();
 </script>
 </body>
 </html>
