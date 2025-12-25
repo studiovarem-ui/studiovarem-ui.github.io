@@ -1,0 +1,526 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>VAREM • Word Fall Quiz</title>
+  <style>
+    :root{
+      --blue:#557CF3; --teal:#4BACC6; --gray:#A6A6A6;
+      --bg:#0b0f1a; --card:#121a2b; --text:#e9eefc; --muted:#9fb0d6;
+      --danger:#ff4d4f; --ok:#22c55e;
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Apple SD Gothic Neo,Malgun Gothic,sans-serif;
+      background: radial-gradient(1200px 700px at 50% -10%, rgba(85,124,243,.35), transparent 60%),
+                  radial-gradient(900px 500px at 0% 30%, rgba(75,172,198,.25), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+      -webkit-font-smoothing:antialiased;
+      padding: 18px 14px 20px;
+    }
+    .wrap{max-width:520px;margin:0 auto}
+    .brand{
+      text-align:center; letter-spacing:.22em; font-weight:800; font-size:14px; color:rgba(233,238,252,.9);
+      margin-top:8px; margin-bottom:10px;
+    }
+    .board{
+      position:relative;
+      background: linear-gradient(180deg, rgba(18,26,43,.92), rgba(18,26,43,.75));
+      border:1px solid rgba(166,166,166,.25);
+      border-radius: var(--radius);
+      overflow:hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:10px 12px;
+      border-bottom:1px solid rgba(166,166,166,.18);
+    }
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:7px 10px; border-radius:999px;
+      background: rgba(85,124,243,.16);
+      border:1px solid rgba(85,124,243,.35);
+      font-weight:700; font-size:12px;
+    }
+    .stats{display:flex; gap:8px; align-items:center}
+    .stat{
+      padding:7px 10px; border-radius:999px;
+      background: rgba(166,166,166,.12);
+      border:1px solid rgba(166,166,166,.22);
+      font-weight:700; font-size:12px; color:rgba(233,238,252,.92);
+    }
+    .stage{
+      position:relative;
+      height: 360px;
+      background:
+        radial-gradient(700px 260px at 50% 0%, rgba(85,124,243,.10), transparent 65%),
+        radial-gradient(600px 220px at 20% 20%, rgba(75,172,198,.10), transparent 62%);
+    }
+    .floor{
+      position:absolute; left:0; right:0; bottom:0;
+      height:14px;
+      background: linear-gradient(90deg, rgba(85,124,243,.25), rgba(75,172,198,.20));
+      opacity:.6;
+    }
+    .wordCard{
+      position:absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      top: 24px;
+      min-width: 220px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: rgba(11,15,26,.55);
+      border: 2px solid rgba(85,124,243,.55);
+      box-shadow: 0 12px 26px rgba(0,0,0,.35);
+      text-align:center;
+      user-select:none;
+    }
+    .wordCard .label{font-size:12px;color:var(--muted);font-weight:700;letter-spacing:.1em}
+    .wordCard .word{margin-top:6px;font-size:32px;font-weight:900; letter-spacing:.02em}
+    .wordCard.good{border-color: rgba(34,197,94,.7)}
+    .wordCard.bad{border-color: rgba(255,77,79,.75)}
+    .controls{
+      padding: 12px;
+      display:flex; flex-direction:column; gap:10px;
+    }
+    .choices{display:grid; grid-template-columns: 1fr 1fr; gap:10px}
+    button.choice{
+      appearance:none; border:1px solid rgba(166,166,166,.28);
+      background: rgba(166,166,166,.10);
+      color: rgba(233,238,252,.95);
+      border-radius: 14px;
+      padding: 12px 12px;
+      font-size: 15px;
+      font-weight: 800;
+      cursor:pointer;
+      transition: transform .06s ease, background .2s ease, border-color .2s ease;
+      text-align:center;
+      min-height: 50px;
+    }
+    button.choice:active{transform: scale(.985)}
+    button.choice.correct{
+      background: rgba(34,197,94,.18);
+      border-color: rgba(34,197,94,.55);
+    }
+    button.choice.wrong{
+      background: rgba(255,77,79,.16);
+      border-color: rgba(255,77,79,.55);
+    }
+    .row{
+      display:flex; gap:10px; align-items:center; justify-content:space-between;
+    }
+    .btn{
+      border-radius: 12px;
+      padding: 10px 12px;
+      background: rgba(85,124,243,.18);
+      border: 1px solid rgba(85,124,243,.45);
+      color: rgba(233,238,252,.95);
+      font-weight: 900;
+      cursor:pointer;
+    }
+    .btn.secondary{
+      background: rgba(166,166,166,.10);
+      border-color: rgba(166,166,166,.25);
+      color: rgba(233,238,252,.9);
+      font-weight: 800;
+    }
+    .hint{
+      color: rgba(233,238,252,.78);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+    .overlay{
+      position:fixed; inset:0;
+      display:none;
+      align-items:center; justify-content:center;
+      background: rgba(0,0,0,.55);
+      padding: 18px 14px;
+    }
+    .modal{
+      width:min(520px, 100%);
+      background: rgba(18,26,43,.96);
+      border: 1px solid rgba(166,166,166,.28);
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.45);
+    }
+    .modal h2{margin:0 0 8px; font-size:20px}
+    .modal .sub{color:rgba(233,238,252,.75); font-size:13px; margin-bottom:12px}
+    .scores{
+      margin-top:10px; border-top:1px solid rgba(166,166,166,.18); padding-top:10px;
+      color:rgba(233,238,252,.9); font-size:13px;
+    }
+    .scores ol{margin:8px 0 0; padding-left:18px}
+    .kbd{font-family: ui-monospace,SFMono-Regular,Menlo,monospace; font-weight:800; font-size:12px;
+      background: rgba(166,166,166,.14); border:1px solid rgba(166,166,166,.22);
+      padding:2px 6px; border-radius:8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="brand">VAREM</div>
+
+    <div class="board">
+      <div class="topbar">
+        <div class="pill" id="dayPill">DAY <span id="dayNum">—</span></div>
+        <div class="stats">
+          <div class="stat">Score <span id="score">0</span></div>
+          <div class="stat">Combo <span id="combo">0</span></div>
+          <div class="stat">♥ <span id="life">3</span></div>
+        </div>
+      </div>
+
+      <div class="stage" id="stage" aria-label="Game stage">
+        <div class="wordCard" id="wordCard" role="group" aria-label="Falling word">
+          <div class="label">WORD</div>
+          <div class="word" id="wordText">ready</div>
+        </div>
+        <div class="floor"></div>
+      </div>
+
+      <div class="controls">
+        <div class="choices" id="choices"></div>
+        <div class="row">
+          <button class="btn" id="startBtn">Start</button>
+          <button class="btn secondary" id="restartBtn">Restart</button>
+        </div>
+        <div class="hint">
+          규칙: 떨어지는 영단어의 <b>올바른 뜻</b>을 터치하세요. 놓치면 ♥ 감소.<br/>
+          데스크탑은 <span class="kbd">1</span>~<span class="kbd">4</span> 키로 보기 선택 가능.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="overlay">
+    <div class="modal">
+      <h2 id="modalTitle">Game Over</h2>
+      <div class="sub" id="modalSub">Your score: 0</div>
+      <div class="row">
+        <button class="btn" id="playAgainBtn">Play again</button>
+        <button class="btn secondary" id="closeBtn">Close</button>
+      </div>
+      <div class="scores" id="scoreBox"></div>
+    </div>
+  </div>
+
+  <script src="./data.js"></script>
+  <script>
+    // ---------- KST day-of-year seed ----------
+    function getKSTDate() {
+      // KST = UTC+9
+      const now = new Date();
+      const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+      return new Date(utc + 9 * 3600000);
+    }
+    function dayOfYearKST(d) {
+      const start = new Date(d.getFullYear(), 0, 0);
+      const diff = d - start;
+      const oneDay = 86400000;
+      return Math.floor(diff / oneDay);
+    }
+
+    // ---------- simple seeded RNG ----------
+    function mulberry32(seed) {
+      let t = seed >>> 0;
+      return function() {
+        t += 0x6D2B79F5;
+        let x = Math.imul(t ^ (t >>> 15), 1 | t);
+        x ^= x + Math.imul(x ^ (x >>> 7), 61 | x);
+        return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
+      };
+    }
+
+    // ---------- DOM ----------
+    const dayNumEl = document.getElementById("dayNum");
+    const scoreEl = document.getElementById("score");
+    const comboEl = document.getElementById("combo");
+    const lifeEl = document.getElementById("life");
+    const stageEl = document.getElementById("stage");
+    const wordCardEl = document.getElementById("wordCard");
+    const wordTextEl = document.getElementById("wordText");
+    const choicesEl = document.getElementById("choices");
+    const startBtn = document.getElementById("startBtn");
+    const restartBtn = document.getElementById("restartBtn");
+
+    const overlay = document.getElementById("overlay");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalSub = document.getElementById("modalSub");
+    const playAgainBtn = document.getElementById("playAgainBtn");
+    const closeBtn = document.getElementById("closeBtn");
+    const scoreBox = document.getElementById("scoreBox");
+
+    // ---------- Game state ----------
+    const WORDS = (window.WORDS || []).slice();
+    if (!WORDS.length) {
+      alert("data.js에 WORDS가 비어있어요.");
+    }
+
+    const kst = getKSTDate();
+    const day = dayOfYearKST(kst);
+    dayNumEl.textContent = String(day);
+
+    // daily seeded order
+    const rng = mulberry32((kst.getFullYear() * 1000) + day);
+    function shuffleWithRng(arr) {
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(rng() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+    const dailyList = shuffleWithRng(WORDS);
+
+    let idx = 0;
+    let running = false;
+    let score = 0;
+    let combo = 0;
+    let life = 3;
+
+    // physics
+    let y = 24; // px
+    let v = 0.55; // px per ms-ish scale using dt
+    let lastTs = null;
+
+    // current question
+    let current = null; // [eng, kor]
+    let currentCorrect = null;
+    let choiceButtons = [];
+
+    function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
+
+    function pickNextWord() {
+      current = dailyList[idx % dailyList.length];
+      idx++;
+
+      // build 4 choices: 1 correct + 3 wrong
+      const correct = current[1];
+      const seen = new Set([correct]);
+
+      const options = [correct];
+      // pull wrong meanings
+      while (options.length < 4 && seen.size < WORDS.length) {
+        const r = WORDS[Math.floor(rng() * WORDS.length)][1];
+        if (!seen.has(r)) {
+          seen.add(r);
+          options.push(r);
+        }
+      }
+      // shuffle options
+      for (let i = options.length - 1; i > 0; i--) {
+        const j = Math.floor(rng() * (i + 1));
+        [options[i], options[j]] = [options[j], options[i]];
+      }
+
+      currentCorrect = correct;
+
+      // render
+      wordTextEl.textContent = String(current[0]).toLowerCase();
+      y = 24;
+      v = speedForScore(score);
+      wordCardEl.classList.remove("good","bad");
+      renderChoices(options);
+    }
+
+    function speedForScore(s) {
+      // gentle ramp
+      const base = 0.55;
+      const add = Math.min(0.55, Math.floor(s / 80) * 0.08);
+      return base + add;
+    }
+
+    function renderChoices(options) {
+      choicesEl.innerHTML = "";
+      choiceButtons = options.map((text, i) => {
+        const b = document.createElement("button");
+        b.className = "choice";
+        b.type = "button";
+        b.textContent = text;
+        b.addEventListener("click", () => choose(text, b));
+        choicesEl.appendChild(b);
+        return b;
+      });
+    }
+
+    function setHUD() {
+      scoreEl.textContent = String(score);
+      comboEl.textContent = String(combo);
+      lifeEl.textContent = String(life);
+    }
+
+    function lockChoices(lock=true) {
+      choiceButtons.forEach(b => b.disabled = lock);
+    }
+
+    function choose(text, btn) {
+      if (!running) return;
+      lockChoices(true);
+
+      const ok = (text === currentCorrect);
+      if (ok) {
+        combo += 1;
+        const bonus = clamp(combo - 1, 0, 20);
+        score += 10 + bonus;
+        wordCardEl.classList.add("good");
+        btn.classList.add("correct");
+        // speed up slightly as feedback
+      } else {
+        combo = 0;
+        life -= 1;
+        wordCardEl.classList.add("bad");
+        btn.classList.add("wrong");
+        // show which one was correct
+        choiceButtons.forEach(b => {
+          if (b.textContent === currentCorrect) b.classList.add("correct");
+        });
+      }
+
+      setHUD();
+
+      if (life <= 0) {
+        endGame();
+        return;
+      }
+
+      // next word after short delay
+      setTimeout(() => {
+        if (!running) return;
+        pickNextWord();
+        setHUD();
+        lockChoices(false);
+      }, 520);
+    }
+
+    function endGame() {
+      running = false;
+      lockChoices(true);
+      showModal("Game Over", `Your score: ${score}`);
+      saveScore(score);
+      renderTopScores();
+    }
+
+    function showModal(title, sub) {
+      modalTitle.textContent = title;
+      modalSub.textContent = sub;
+      overlay.style.display = "flex";
+    }
+
+    function hideModal() {
+      overlay.style.display = "none";
+    }
+
+    // Top5 local scores
+    const SCORE_KEY = "vareM_wordfall_top5_v1";
+    function loadScores() {
+      try {
+        return JSON.parse(localStorage.getItem(SCORE_KEY) || "[]");
+      } catch {
+        return [];
+      }
+    }
+    function saveScore(s) {
+      const arr = loadScores();
+      arr.push({ score: s, at: new Date().toISOString() });
+      arr.sort((a,b)=>b.score-a.score);
+      const top5 = arr.slice(0,5);
+      localStorage.setItem(SCORE_KEY, JSON.stringify(top5));
+    }
+    function renderTopScores() {
+      const arr = loadScores();
+      if (!arr.length) {
+        scoreBox.innerHTML = "<b>Top 5</b><div style='margin-top:6px;color:rgba(233,238,252,.7)'>No records yet.</div>";
+        return;
+      }
+      const items = arr.map(x => `<li><b>${x.score}</b> <span style="color:rgba(233,238,252,.65)">(${x.at.slice(0,10)})</span></li>`).join("");
+      scoreBox.innerHTML = `<b>Top 5</b><ol>${items}</ol>`;
+    }
+
+    // animation loop
+    function tick(ts) {
+      if (!running) { lastTs = ts; requestAnimationFrame(tick); return; }
+      if (lastTs == null) lastTs = ts;
+      const dt = ts - lastTs;
+      lastTs = ts;
+
+      y += v * dt;
+      // update position
+      wordCardEl.style.top = y + "px";
+
+      const stageH = stageEl.clientHeight;
+      const cardH = wordCardEl.offsetHeight;
+      const floorY = stageH - 14; // floor height
+      if (y + cardH >= floorY) {
+        // missed
+        combo = 0;
+        life -= 1;
+        setHUD();
+
+        wordCardEl.classList.add("bad");
+        lockChoices(true);
+
+        if (life <= 0) {
+          endGame();
+        } else {
+          setTimeout(() => {
+            if (!running) return;
+            pickNextWord();
+            lockChoices(false);
+            setHUD();
+          }, 520);
+        }
+      }
+
+      requestAnimationFrame(tick);
+    }
+
+    function startGame() {
+      score = 0; combo = 0; life = 3;
+      idx = 0;
+      running = true;
+      setHUD();
+      pickNextWord();
+      lockChoices(false);
+    }
+
+    function restartGame() {
+      hideModal();
+      startGame();
+    }
+
+    // keyboard shortcuts 1~4 for desktop
+    window.addEventListener("keydown", (e) => {
+      if (!running) return;
+      const k = e.key;
+      if (k >= "1" && k <= "4") {
+        const i = Number(k) - 1;
+        const b = choiceButtons[i];
+        if (b && !b.disabled) b.click();
+      }
+    });
+
+    startBtn.addEventListener("click", () => {
+      hideModal();
+      startGame();
+    });
+    restartBtn.addEventListener("click", restartGame);
+    playAgainBtn.addEventListener("click", restartGame);
+    closeBtn.addEventListener("click", hideModal);
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) hideModal();
+    });
+
+    // init
+    setHUD();
+    renderTopScores();
+    lockChoices(true);
+    requestAnimationFrame(tick);
+  </script>
+</body>
+</html>
