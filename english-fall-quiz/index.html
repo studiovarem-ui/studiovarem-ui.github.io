@@ -286,7 +286,7 @@
 
     // physics
     let y = 24; // px
-    let v = 0.005; // px per ms-ish scale using dt
+    let v = 0.05; // px per ms-ish scale using dt
     let lastTs = null;
 
     // current question
@@ -331,8 +331,8 @@
 
     function speedForScore(s) {
       // gentle ramp
-      const base = 0.55;
-      const add = Math.min(0.55, Math.floor(s / 80) * 0.08);
+      const base = 0.05;
+      const add = Math.min(0.05, Math.floor(s / 80) * 0.08);
       return base + add;
     }
 
