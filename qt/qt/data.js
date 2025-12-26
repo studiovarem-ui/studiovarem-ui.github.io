@@ -1,4 +1,4 @@
-// qt/data.js
+// data.js
 const LIST = [];
 function ADD(items){ LIST.push(...items); }
 
