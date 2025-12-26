@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>VAREM · 말씀 아카이브</title>
+<style>
+body{margin:0;min-height:100vh;background:#0f0f10;color:#fff;font-family:system-ui,-apple-system,Apple SD Gothic Neo,Noto Sans KR,sans-serif;display:flex;justify-content:center;}
+.wrap{width:min(560px,92vw);padding:32px 0;}
+.brand{text-align:center;letter-spacing:.28em;font-weight:700;font-size:14px;opacity:.7;margin-bottom:14px;}
+.header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:12px;}
+.title{font-size:14px;opacity:.75;}
+.back{font-size:12px;border:1px solid rgba(255,255,255,.18);padding:6px 10px;border-radius:999px;cursor:pointer;opacity:.75;user-select:none;}
+.panel{border:1px solid rgba(255,255,255,.12);border-radius:18px;overflow:hidden;background:rgba(255,255,255,.02);}
+.list{max-height:270px;overflow:auto;-webkit-overflow-scrolling:touch;}
+.row{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-top:1px solid rgba(255,255,255,.08);cursor:pointer;}
+.row:first-child{border-top:none;}
+.day{font-size:12px;opacity:.6;white-space:nowrap;}
+.ref{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:70%;}
+.detail{border-top:1px solid rgba(255,255,255,.10);padding:18px 16px;display:none;}
+.detailTop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;}
+.detailDay{font-size:12px;border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:6px 10px;opacity:.75;white-space:nowrap;}
+.detailRef{font-size:14px;opacity:.8;}
+.ko{margin-top:12px;font-size:20px;line-height:1.7;}
+.en{margin-top:10px;font-size:16px;line-height:1.65;opacity:.88;}
+.hint{margin-top:10px;font-size:12px;opacity:.35;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">VAREM</div>
+
+  <div class="header">
+    <div class="title">Archive · Day 1 ~ 어제</div>
+    <div class="back" onclick="location.href='./'">← Today</div>
+  </div>
+
+  <div class="panel">
+    <div class="list" id="list"></div>
+
+    <div class="detail" id="detail">
+      <div class="detailTop">
+        <div class="detailRef" id="dRef">—</div>
+        <div class="detailDay" id="dDay">Day -</div>
+      </div>
+      <div class="ko" id="dKo"></div>
+      <div class="en" id="dEn"></div>
+      <div class="hint">목록에서 Day를 눌러 바꿀 수 있어요.</div>
+    </div>
+  </div>
+</div>
+
+<script src="./data.js"></script>
+<script src="./data/001.js"></script>
+<!-- <script src="./data/002.js"></script> -->
+<!-- ... -->
+<!-- <script src="./data/013.js"></script> -->
+
+<script>
+const todayIndex = dayOfYear(getKST()); // 0-based
+const listEl = document.getElementById("list");
+const detailEl = document.getElementById("detail");
+
+function showDetail(i){
+  const it = LIST[i % LIST.length];
+  dDay.innerText = "Day " + (i + 1);
+  dRef.innerText = `${it.ref_ko} / ${it.ref_en}`;
+  dKo.innerText = it.ko;
+  dEn.innerText = it.en;
+  detailEl.style.display = "block";
+  detailEl.scrollIntoView({behavior:"smooth", block:"start"});
+}
+
+function renderList(){
+  listEl.innerHTML = "";
+  if(LIST.length === 0){
+    listEl.innerHTML = `<div class="row" style="cursor:default;"><div class="day">No data</div><div class="ref">data/001.js부터 추가</div></div>`;
+    return;
+  }
+  if(todayIndex <= 0){
+    listEl.innerHTML = `<div class="row" style="cursor:default;"><div class="day">No archive yet</div><div class="ref"></div></div>`;
+    return;
+  }
+  for(let i=todayIndex-1; i>=0; i--){
+    const it = LIST[i % LIST.length];
+    const row = document.createElement("div");
+    row.className = "row";
+    row.innerHTML = `<div class="day">Day ${i+1}</div><div class="ref">${it.ref_ko}</div>`;
+    row.onclick = () => showDetail(i);
+    listEl.appendChild(row);
+  }
+}
+
+renderList();
+</script>
+</body>
+</html>
