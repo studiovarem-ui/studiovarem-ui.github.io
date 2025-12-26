@@ -5,25 +5,47 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>VAREM · 말씀 아카이브</title>
 <style>
-body{margin:0;min-height:100vh;background:#0f0f10;color:#fff;font-family:system-ui,-apple-system,Apple SD Gothic Neo,Noto Sans KR,sans-serif;display:flex;justify-content:center;}
-.wrap{width:min(560px,92vw);padding:32px 0;}
-.brand{text-align:center;letter-spacing:.28em;font-weight:700;font-size:14px;opacity:.7;margin-bottom:14px;}
-.header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:12px;}
-.title{font-size:14px;opacity:.75;}
-.back{font-size:12px;border:1px solid rgba(255,255,255,.18);padding:6px 10px;border-radius:999px;cursor:pointer;opacity:.75;user-select:none;}
-.panel{border:1px solid rgba(255,255,255,.12);border-radius:18px;overflow:hidden;background:rgba(255,255,255,.02);}
-.list{max-height:270px;overflow:auto;-webkit-overflow-scrolling:touch;}
-.row{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-top:1px solid rgba(255,255,255,.08);cursor:pointer;}
+body{
+  margin:0; min-height:100vh; background:#0f0f10; color:#fff;
+  font-family:system-ui,-apple-system,Apple SD Gothic Neo,Noto Sans KR,sans-serif;
+  display:flex; justify-content:center;
+}
+.wrap{width:min(560px,92vw); padding:32px 0;}
+.brand{text-align:center; letter-spacing:.28em; font-weight:700; font-size:14px; opacity:.7; margin-bottom:14px;}
+
+.header{display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:12px;}
+.title{font-size:14px; opacity:.75;}
+.back{font-size:12px; border:1px solid rgba(255,255,255,.18); padding:6px 10px; border-radius:999px; cursor:pointer; opacity:.75; user-select:none;}
+
+.panel{border:1px solid rgba(255,255,255,.12); border-radius:18px; overflow:hidden; background:rgba(255,255,255,.02);}
+
+/* 목록: 보이는 높이 5개 정도 + 전체 스크롤 */
+.list{max-height:270px; overflow:auto; -webkit-overflow-scrolling:touch;}
+.row{
+  display:flex; justify-content:space-between; align-items:center;
+  padding:14px 16px; border-top:1px solid rgba(255,255,255,.08); cursor:pointer;
+}
 .row:first-child{border-top:none;}
-.day{font-size:12px;opacity:.6;white-space:nowrap;}
-.ref{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:70%;}
-.detail{border-top:1px solid rgba(255,255,255,.10);padding:18px 16px;display:none;}
-.detailTop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;}
-.detailDay{font-size:12px;border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:6px 10px;opacity:.75;white-space:nowrap;}
-.detailRef{font-size:14px;opacity:.8;}
-.ko{margin-top:12px;font-size:20px;line-height:1.7;}
-.en{margin-top:10px;font-size:16px;line-height:1.65;opacity:.88;}
-.hint{margin-top:10px;font-size:12px;opacity:.35;}
+.day{font-size:12px; opacity:.6; white-space:nowrap;}
+.ref{font-size:14px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:72%;}
+
+/* 상세 */
+.detail{border-top:1px solid rgba(255,255,255,.10); padding:18px 16px; display:none;}
+.detailTop{display:flex; justify-content:space-between; gap:10px; align-items:flex-start;}
+.detailTitle{font-size:14px; opacity:.8;}
+.detailDay{font-size:12px; border:1px solid rgba(255,255,255,.18); border-radius:999px; padding:6px 10px; opacity:.75; white-space:nowrap;}
+
+.section{margin-top:14px;}
+.sectionHead{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:8px;}
+.pill{font-size:12px; border:1px solid rgba(255,255,255,.18); border-radius:999px; padding:6px 10px; opacity:.72; user-select:none;}
+.refLine{margin-top:2px; font-size:13px; opacity:.75;}
+
+.textKO{margin-top:10px; font-size:20px; line-height:1.7; opacity:.98; white-space:pre-line;}
+.textEN{margin-top:10px; font-size:16px; line-height:1.65; opacity:.88; white-space:pre-line;}
+
+.divider{margin:16px 0; border-top:1px solid rgba(255,255,255,.10);}
+
+.hint{margin-top:12px; font-size:12px; opacity:.35;}
 </style>
 </head>
 <body>
@@ -38,13 +60,35 @@ body{margin:0;min-height:100vh;background:#0f0f10;color:#fff;font-family:system-
   <div class="panel">
     <div class="list" id="list"></div>
 
+    <!-- ✅ 상세는 index랑 동일 구조 -->
     <div class="detail" id="detail">
       <div class="detailTop">
-        <div class="detailRef" id="dRef">—</div>
+        <div class="detailTitle" id="dTitle">선택한 말씀</div>
         <div class="detailDay" id="dDay">Day -</div>
       </div>
-      <div class="ko" id="dKo"></div>
-      <div class="en" id="dEn"></div>
+
+      <!-- 한글 섹션 -->
+      <div class="section">
+        <div class="sectionHead">
+          <div class="pill">Korean</div>
+          <div class="pill">개역한글</div>
+        </div>
+        <div class="refLine" id="refKO">—</div>
+        <div class="textKO" id="dKo"></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- 영어 섹션 -->
+      <div class="section">
+        <div class="sectionHead">
+          <div class="pill">English</div>
+          <div class="pill">KJV</div>
+        </div>
+        <div class="refLine" id="refEN">—</div>
+        <div class="textEN" id="dEn"></div>
+      </div>
+
       <div class="hint">목록에서 Day를 눌러 바꿀 수 있어요.</div>
     </div>
   </div>
@@ -64,28 +108,45 @@ const detailEl = document.getElementById("detail");
 function showDetail(i){
   const it = LIST[i % LIST.length];
   dDay.innerText = "Day " + (i + 1);
-  dRef.innerText = `${it.ref_ko} / ${it.ref_en}`;
-  dKo.innerText = it.ko;
-  dEn.innerText = it.en;
+
+  // ref 분리
+  refKO.innerText = it.ref_ko || "";
+  refEN.innerText = it.ref_en || "";
+
+  dKo.innerText = it.ko || "";
+  dEn.innerText = it.en || "";
+
   detailEl.style.display = "block";
   detailEl.scrollIntoView({behavior:"smooth", block:"start"});
 }
 
 function renderList(){
   listEl.innerHTML = "";
+
   if(LIST.length === 0){
-    listEl.innerHTML = `<div class="row" style="cursor:default;"><div class="day">No data</div><div class="ref">data/001.js부터 추가</div></div>`;
+    listEl.innerHTML =
+      `<div class="row" style="cursor:default;">
+        <div class="day">No data</div>
+        <div class="ref">data/001.js부터 추가</div>
+      </div>`;
     return;
   }
+
   if(todayIndex <= 0){
-    listEl.innerHTML = `<div class="row" style="cursor:default;"><div class="day">No archive yet</div><div class="ref"></div></div>`;
+    listEl.innerHTML =
+      `<div class="row" style="cursor:default;">
+        <div class="day">No archive yet</div>
+        <div class="ref"></div>
+      </div>`;
     return;
   }
+
+  // Day 1 ~ 어제까지 전부 생성(스크롤 가능)
   for(let i=todayIndex-1; i>=0; i--){
     const it = LIST[i % LIST.length];
     const row = document.createElement("div");
     row.className = "row";
-    row.innerHTML = `<div class="day">Day ${i+1}</div><div class="ref">${it.ref_ko}</div>`;
+    row.innerHTML = `<div class="day">Day ${i+1}</div><div class="ref">${it.ref_ko || ""}</div>`;
     row.onclick = () => showDetail(i);
     listEl.appendChild(row);
   }
