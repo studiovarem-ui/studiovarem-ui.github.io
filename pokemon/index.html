@@ -364,8 +364,8 @@
         </div>
         <button id="startBtn" class="btn">START</button>
         <div class="foot">
-          * 배경은 완전 흰색(#fff)<br/>
-          * 볼은 룰렛처럼 빠르게 돌다가 탭하면 랜덤 선택
+          /* 배경은 완전 흰색(#fff)<br/>/
+         / * 볼은 룰렛처럼 빠르게 돌다가 탭하면 랜덤 선택/
         </div>
       </div>
     </section>
@@ -456,7 +456,7 @@
      * 3) 포켓몬: poke_01 ~ poke_30 자동
      ************************/
 
-    // ✅ 포켓몬 01~30 자동 생성
+    /// ✅ 포켓몬 01~30 자동 생성/
     const pokemonList = [];
     for (let i = 1; i <= 30; i++) {
       pokemonList.push(`images/poke_${String(i).padStart(2, "0")}.png`);
