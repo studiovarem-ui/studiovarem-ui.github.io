@@ -13,16 +13,17 @@ font-family:system-ui,-apple-system,Apple SD Gothic Neo,Noto Sans KR,sans-serif;
 .top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
 .subtitle{font-size:16px;opacity:.8;}
 .day{font-size:12px;border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:6px 10px;opacity:.75;cursor:pointer;user-select:none;}
-.ref{margin-top:14px;font-size:13px;opacity:.75}
 
-/* 섹션 구조 */
+/* 섹션 */
 .section{margin-top:14px;}
-.sectionHead{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px;}
+.sectionHead{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:8px;}
 .pill{font-size:12px;border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:6px 10px;opacity:.72;user-select:none;}
-.textKO{font-size:20px;line-height:1.7;opacity:.98;white-space:pre-line;}
-.textEN{font-size:16px;line-height:1.65;opacity:.88;white-space:pre-line;}
+.refLine{margin-top:2px;font-size:13px;opacity:.75;}
 
-/* 한/영 사이 가느다란 구분선 */
+.textKO{margin-top:10px;font-size:20px;line-height:1.7;opacity:.98;white-space:pre-line;}
+.textEN{margin-top:10px;font-size:16px;line-height:1.65;opacity:.88;white-space:pre-line;}
+
+/* 구분선 */
 .divider{margin:16px 0;border-top:1px solid rgba(255,255,255,.10);}
 
 /* 하단 힌트 */
@@ -39,18 +40,16 @@ font-family:system-ui,-apple-system,Apple SD Gothic Neo,Noto Sans KR,sans-serif;
       <div class="day" onclick="location.href='archive.html'">Day <span id="dayNum"></span></div>
     </div>
 
-    <div class="ref" id="refLine">—</div>
-
     <!-- ✅ 한글 섹션 -->
     <div class="section">
       <div class="sectionHead">
         <div class="pill">Korean</div>
         <div class="pill">개역한글</div>
       </div>
+      <div class="refLine" id="refKO">—</div>
       <div class="textKO" id="koText">loading</div>
     </div>
 
-    <!-- ✅ 한/영 구분선 -->
     <div class="divider"></div>
 
     <!-- ✅ 영어 섹션 -->
@@ -59,6 +58,7 @@ font-family:system-ui,-apple-system,Apple SD Gothic Neo,Noto Sans KR,sans-serif;
         <div class="pill">English</div>
         <div class="pill">KJV</div>
       </div>
+      <div class="refLine" id="refEN">—</div>
       <div class="textEN" id="enText"></div>
     </div>
   </div>
@@ -79,11 +79,15 @@ dayNum.innerText = t.dayNum;
 if(!t.item){
   koText.innerText = "data/001.js부터 ADD([...])로 말씀 데이터를 넣어주세요.";
   enText.innerText = "";
-  refLine.innerText = "";
+  refKO.innerText = "";
+  refEN.innerText = "";
 } else {
-  refLine.innerText = `${t.item.ref_ko} / ${t.item.ref_en}`;
-  koText.innerText = t.item.ko;
-  enText.innerText = t.item.en;
+  // ✅ 주소도 분리 표시
+  refKO.innerText = t.item.ref_ko || "";
+  refEN.innerText = t.item.ref_en || "";
+
+  koText.innerText = t.item.ko || "";
+  enText.innerText = t.item.en || "";
 }
 </script>
 </body>
