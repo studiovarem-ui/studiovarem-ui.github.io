@@ -7,11 +7,9 @@
 
   <style>
     :root{
-      /* ✅ WHITE THEME */
-      --bg:#f5f6f8;
+      --bg:#ffffff;             /* ✅ 전체 배경 흰색 */
       --fg:#0f172a;
       --muted:rgba(15,23,42,.55);
-      --card:#ffffff;
       --line:rgba(15,23,42,.10);
       --accent:#557CF3;
     }
@@ -27,23 +25,14 @@
       -webkit-tap-highlight-color: transparent;
       user-select:none;
     }
-    body::before{
-      content:"";
-      position:fixed; inset:0;
-      background:
-        radial-gradient(900px 600px at 50% 35%, rgba(85,124,243,.10), transparent 60%),
-        radial-gradient(700px 450px at 20% 70%, rgba(15,23,42,.05), transparent 55%);
-      pointer-events:none;
-      opacity:.9;
-    }
 
     .frame{
       width:min(560px, 94vw);
       padding:22px 18px;
       border:1px solid var(--line);
       border-radius:18px;
-      background: linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,255,255,.90));
-      box-shadow: 0 18px 50px rgba(15,23,42,.18);
+      background:#fff;
+      box-shadow: 0 18px 50px rgba(15,23,42,.12);
       position:relative;
       overflow:hidden;
     }
@@ -69,7 +58,7 @@
       line-height:1.1;
       letter-spacing:.08em;
       text-transform:uppercase;
-      text-shadow: 0 0 18px rgba(85,124,243,.12);
+      text-shadow: 0 0 18px rgba(85,124,243,.10);
     }
     .subtitle{
       margin:0 0 18px;
@@ -106,7 +95,7 @@
     }
     .btn:active{
       transform: translateY(1px) scale(.99);
-      box-shadow: 0 0 28px rgba(85,124,243,.22);
+      box-shadow: 0 0 28px rgba(85,124,243,.18);
     }
 
     .blink{ animation: blink 1.1s steps(2,end) infinite; }
@@ -120,6 +109,7 @@
       line-height:1.5;
     }
 
+    /* toast */
     .toast{
       position:absolute;
       top:14px;
@@ -128,8 +118,7 @@
       padding:10px 12px;
       border-radius:12px;
       border:1px solid var(--line);
-      background: rgba(255,255,255,.75);
-      backdrop-filter: blur(6px);
+      background: rgba(255,255,255,.92);
       font-size:11px;
       letter-spacing:.12em;
       text-transform:uppercase;
@@ -140,50 +129,62 @@
     }
     .toast.on{ opacity:1; }
 
-    /* Screen 2 balls */
-    .ball-grid{
+    /* Screen 2: roulette (빠르게 돌다가 탭하면 선택) */
+    .roulette-wrap{
       width:100%;
-      display:grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap:14px;
-      padding:18px 8px;
-      opacity:0;
-      transform: translateY(6px);
-      transition: opacity .25s ease, transform .25s ease;
-    }
-    .ball-grid.show{
-      opacity:1;
-      transform: translateY(0);
-    }
-
-    .ball{
-      aspect-ratio: 1 / 1;
+      height:420px;
       border-radius:18px;
       border:1px solid var(--line);
-      background: rgba(255,255,255,.70);
+      background:#fff;
+      box-shadow: inset 0 0 0 1px rgba(15,23,42,.03);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:14px;
+      position:relative;
+      overflow:hidden;
+      touch-action: manipulation;
+    }
+    .roulette-title{
+      font-size:12px;
+      color:var(--muted);
+      letter-spacing:.16em;
+      text-transform:uppercase;
+    }
+    .roulette-ball{
+      width:180px;
+      height:180px;
+      border-radius:999px;
       display:flex;
       align-items:center;
       justify-content:center;
       position:relative;
-      overflow:hidden;
-      cursor:pointer;
-      transition: transform .12s ease, border-color .12s ease, box-shadow .12s ease;
-      box-shadow: 0 10px 20px rgba(15,23,42,.08);
+      filter: drop-shadow(0 14px 18px rgba(15,23,42,.12));
+      transform: translateZ(0);
     }
-    .ball:active{
-      transform: scale(.985);
-      border-color: rgba(85,124,243,.55);
-      box-shadow: 0 14px 26px rgba(15,23,42,.12);
-    }
-    .ball img{
-      width:72%;
+    .roulette-ball img{
+      width:100%;
       height:auto;
-      filter: drop-shadow(0 10px 14px rgba(15,23,42,.18));
-      animation: float 1.2s ease-in-out infinite;
+      user-select:none;
+      -webkit-user-drag:none;
     }
-    @keyframes float{
-      0%,100%{ transform: translateY(0) }
-      50%{ transform: translateY(-4px) }
+    .roulette-ring{
+      position:absolute;
+      inset:-24px;
+      border-radius:999px;
+      border:1px solid rgba(85,124,243,.22);
+      animation: spin 1.1s linear infinite;
+      opacity:.9;
+      pointer-events:none;
+    }
+    @keyframes spin{ to{ transform: rotate(360deg) } }
+
+    .tap-anywhere{
+      font-size:12px;
+      color:var(--muted);
+      letter-spacing:.14em;
+      text-transform:uppercase;
     }
 
     .row{
@@ -197,7 +198,7 @@
       padding:10px 14px;
       border-radius:12px;
       border:1px solid var(--line);
-      background: rgba(255,255,255,.70);
+      background: rgba(255,255,255,.92);
       color:var(--fg);
       font-weight:900;
       letter-spacing:.12em;
@@ -213,7 +214,7 @@
       height:420px;
       border-radius:18px;
       border:1px dashed rgba(15,23,42,.18);
-      background: rgba(255,255,255,.65);
+      background:#fff;
       position:relative;
       overflow:hidden;
       display:flex;
@@ -240,7 +241,9 @@
     .throw-ball img{
       width:100%;
       height:auto;
-      filter: drop-shadow(0 14px 16px rgba(15,23,42,.20));
+      filter: drop-shadow(0 14px 16px rgba(15,23,42,.16));
+      user-select:none;
+      -webkit-user-drag:none;
     }
 
     /* Screen 4 capture */
@@ -249,7 +252,7 @@
       height:420px;
       border-radius:18px;
       border:1px solid var(--line);
-      background: rgba(255,255,255,.65);
+      background:#fff;
       position:relative;
       display:flex;
       align-items:center;
@@ -266,8 +269,6 @@
       animation: spin 1.1s linear infinite;
       opacity:.9;
     }
-    @keyframes spin{ to{ transform: rotate(360deg) } }
-
     .cap-ball{
       width:140px;
       height:140px;
@@ -275,13 +276,13 @@
       align-items:center;
       justify-content:center;
       animation: wobble .36s ease-in-out infinite;
-      filter: drop-shadow(0 16px 18px rgba(15,23,42,.22));
+      filter: drop-shadow(0 16px 18px rgba(15,23,42,.18));
     }
     @keyframes wobble{
       0%,100%{ transform: rotate(-6deg) }
       50%{ transform: rotate(6deg) }
     }
-    .cap-ball img{ width:100%; height:auto; }
+    .cap-ball img{ width:100%; height:auto; user-select:none; -webkit-user-drag:none; }
 
     .count{
       position:absolute;
@@ -290,7 +291,7 @@
       font-size:42px;
       font-weight:900;
       letter-spacing:.08em;
-      text-shadow: 0 0 18px rgba(85,124,243,.14);
+      text-shadow: 0 0 18px rgba(85,124,243,.12);
     }
 
     /* Screen 5 reveal */
@@ -299,8 +300,7 @@
       height:420px;
       border-radius:18px;
       border:1px solid var(--line);
-      background: radial-gradient(220px 180px at 50% 40%, rgba(85,124,243,.16), transparent 70%),
-                  rgba(255,255,255,.65);
+      background:#fff;
       position:relative;
       display:flex;
       align-items:center;
@@ -310,10 +310,11 @@
     }
     .flash{
       position:absolute; inset:-40%;
-      background: radial-gradient(circle, rgba(255,255,255,.55), transparent 55%);
+      background: radial-gradient(circle, rgba(85,124,243,.22), transparent 55%);
       opacity:0;
       transform: scale(.85);
       transition: opacity .18s ease, transform .18s ease;
+      pointer-events:none;
     }
     .flash.on{
       opacity:1;
@@ -322,11 +323,12 @@
     .poke{
       width:min(320px, 70vw);
       height:auto;
-      filter: drop-shadow(0 18px 24px rgba(15,23,42,.22));
+      filter: drop-shadow(0 18px 24px rgba(15,23,42,.18));
       transform: translateY(6px) scale(.98);
       opacity:0;
       transition: opacity .22s ease, transform .22s ease;
-      background:transparent;
+      user-select:none;
+      -webkit-user-drag:none;
     }
     .poke.show{
       opacity:1;
@@ -343,7 +345,7 @@
       letter-spacing:.18em;
       text-transform:uppercase;
       color:#0f172a;
-      text-shadow: 0 0 18px rgba(85,124,243,.12);
+      text-shadow: 0 0 18px rgba(85,124,243,.10);
     }
   </style>
 </head>
@@ -362,19 +364,28 @@
         </div>
         <button id="startBtn" class="btn">START</button>
         <div class="foot">
-          * 배경: 화이트 테마(가독성↑)<br/>
-          * 이미지는 /pokemon/images 폴더에 넣기
+          * 배경은 완전 흰색(#fff)<br/>
+          * 볼은 룰렛처럼 빠르게 돌다가 탭하면 랜덤 선택
         </div>
       </div>
     </section>
 
-    <!-- Screen 2 -->
+    <!-- Screen 2 (Roulette) -->
     <section id="s2" class="screen">
       <div class="center" style="gap:10px;">
         <div class="title" style="font-size:18px;margin:8px 0 0;">CHOOSE ONE!</div>
-        <div class="subtitle" id="s2Sub">loading balls…</div>
+        <div class="subtitle" id="s2Sub">starting roulette…</div>
 
-        <div id="ballGrid" class="ball-grid" aria-label="Poké Balls"></div>
+        <div id="rouletteWrap" class="roulette-wrap" aria-label="Ball Roulette">
+          <div class="roulette-title">balls are spinning…</div>
+
+          <div class="roulette-ball" id="rouletteBall">
+            <div class="roulette-ring"></div>
+            <img id="rouletteImg" alt="ball" src="images/Poke_ball.png" />
+          </div>
+
+          <div class="tap-anywhere blink">tap anywhere to stop</div>
+        </div>
 
         <div class="row">
           <button id="back1" class="mini">BACK</button>
@@ -404,7 +415,7 @@
     <section id="s4" class="screen">
       <div class="center" style="gap:10px;">
         <div class="title" style="font-size:18px;margin:8px 0 0;">CATCHING…</div>
-        <div class="subtitle">hold your breath</div>
+        <div class="subtitle">3, 2, 1</div>
 
         <div class="capture-stage">
           <div class="orbit"></div>
@@ -439,9 +450,10 @@
 
   <script>
     /***********************
-     * ✅ 너의 실제 파일명에 맞춘 버전
-     * - 볼: images/Beast_ball.png ... (대소문자 그대로)
-     * - 포켓몬: images/poke_01.png ~ images/poke_30.png
+     * ✅ 네 파일명/요구사항 반영
+     * 1) 배경: 흰색
+     * 2) 볼 선택: 순서대로 빠르게 바뀌는 "룰렛" -> 탭하면 그 순간의 볼로 선택(랜덤 느낌)
+     * 3) 포켓몬: poke_01 ~ poke_30 자동
      ************************/
 
     // ✅ 포켓몬 01~30 자동 생성
@@ -461,7 +473,13 @@
         "images/Ultra_ball.png",
       ],
       pokemons: pokemonList,
-      ballsAppearDelayMs: 2000,
+
+      // 룰렛 속도 (숫자 작을수록 더 빠름)
+      rouletteIntervalMs: 80,
+
+      // 시작 후 2초 지나면 룰렛 시작(네가 원한 2초 느낌)
+      rouletteStartDelayMs: 600,
+
       countdownMs: 900
     };
 
@@ -476,8 +494,9 @@
     const again = $("#again");
     const home = $("#home");
 
-    const ballGrid = $("#ballGrid");
     const s2Sub = $("#s2Sub");
+    const rouletteWrap = $("#rouletteWrap");
+    const rouletteImg = $("#rouletteImg");
 
     const throwArea = $("#throwArea");
     const throwBall = $("#throwBall");
@@ -490,7 +509,14 @@
 
     let chosenBallSrc = "images/Poke_ball.png";
     let chosenPokemonSrc = "";
-    let ballShowTimer = null;
+
+    // roulette state
+    let rouletteTimer = null;
+    let rouletteIndex = 0;
+    let rouletteArmed = false;     // 탭 가능 상태
+    let rouletteStartTimer = null;
+
+    // swipe state
     let countdownTimer = null;
     let touch = { active:false, startY:0, startX:0, startT:0 };
 
@@ -504,65 +530,80 @@
       screens.forEach((el,i)=> el.classList.toggle("active", i===n));
     }
 
-    function resetRun(){
+    function pickRandom(arr){
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function resetAll(){
       chosenBallSrc = "images/Poke_ball.png";
       chosenPokemonSrc = "";
+
+      // reset roulette
+      stopRoulette();
+      rouletteIndex = 0;
+      rouletteImg.src = chosenBallSrc;
+      s2Sub.textContent = "starting roulette…";
+
+      // reset throw/capture imgs
       throwBallImg.src = chosenBallSrc;
       capBallImg.src = chosenBallSrc;
 
-      ballGrid.classList.remove("show");
-      ballGrid.innerHTML = "";
-      s2Sub.textContent = "loading balls…";
-
+      // reset reveal
       flash.classList.remove("on");
       pokeImg.classList.remove("show");
       pokeImg.src = "";
     }
 
-    function pickRandom(arr){
-      return arr[Math.floor(Math.random() * arr.length)];
+    /*************** Screen2 Roulette ***************/
+    function startRoulette(){
+      rouletteArmed = true;
+      rouletteIndex = 0;
+
+      rouletteTimer = setInterval(() => {
+        rouletteIndex = (rouletteIndex + 1) % CONFIG.balls.length;
+        rouletteImg.src = CONFIG.balls[rouletteIndex];
+      }, CONFIG.rouletteIntervalMs);
+
+      s2Sub.textContent = "tap to stop!";
+      showToast("TAP!");
     }
 
-    function buildBallGrid(){
-      ballGrid.innerHTML = "";
-      const list = (CONFIG.balls && CONFIG.balls.length) ? CONFIG.balls : ["images/Poke_ball.png"];
-
-      list.forEach((src, idx) => {
-        const b = document.createElement("div");
-        b.className = "ball";
-        b.setAttribute("role","button");
-        b.setAttribute("aria-label", "ball "+(idx+1));
-        b.innerHTML = `<img alt="ball" src="${src}">`;
-        b.addEventListener("click", () => onChooseBall(src));
-        ballGrid.appendChild(b);
-      });
+    function stopRoulette(){
+      rouletteArmed = false;
+      if (rouletteTimer) clearInterval(rouletteTimer);
+      rouletteTimer = null;
+      if (rouletteStartTimer) clearTimeout(rouletteStartTimer);
+      rouletteStartTimer = null;
     }
 
     function enterScreen2(){
       go(1);
-      resetRun();
-      buildBallGrid();
+      resetAll();
 
-      clearTimeout(ballShowTimer);
-      ballShowTimer = setTimeout(() => {
-        s2Sub.textContent = "tap the first ball!";
-        ballGrid.classList.add("show");
-        showToast("CHOOSE ONE!");
-      }, CONFIG.ballsAppearDelayMs);
+      // 약간 텀 준 뒤 룰렛 시작(연출)
+      stopRoulette();
+      s2Sub.textContent = "ready…";
+      rouletteStartTimer = setTimeout(() => startRoulette(), CONFIG.rouletteStartDelayMs);
     }
 
-    function onChooseBall(src){
-      if (!ballGrid.classList.contains("show")) return;
+    function onRouletteTap(){
+      if (!rouletteArmed) return;
 
-      chosenBallSrc = src;
+      // 그 순간의 볼이 선택됨(랜덤 느낌)
+      chosenBallSrc = CONFIG.balls[rouletteIndex];
+      stopRoulette();
+
+      // 다음 화면에서 이 볼 사용
       throwBallImg.src = chosenBallSrc;
       capBallImg.src = chosenBallSrc;
 
       showToast("SELECTED!");
-      go(2);
+      go(2); // Screen3
     }
 
-    // swipe
+    rouletteWrap.addEventListener("click", onRouletteTap);
+
+    /*************** Screen3 Swipe Throw ***************/
     function onTouchStart(e){
       if (e.touches && e.touches.length){
         touch.active = true;
@@ -591,6 +632,7 @@
 
       throwBall.style.transform = `translateX(-50%)`;
 
+      // 위로 70px 이상 스와이프
       if (dyTotal < -70){
         const speed = Math.min(1.6, Math.max(0.6, (-dyTotal) / dt * 2.2));
         animateThrow(speed);
@@ -613,6 +655,7 @@
       }, 420);
     }
 
+    /*************** Screen4 Countdown ***************/
     function enterScreen4(){
       go(3);
       countEl.textContent = "3";
@@ -629,6 +672,7 @@
       }, CONFIG.countdownMs);
     }
 
+    /*************** Screen5 Reveal ***************/
     function enterScreen5(){
       go(4);
       chosenPokemonSrc = pickRandom(CONFIG.pokemons);
@@ -638,7 +682,6 @@
 
       pokeImg.src = chosenPokemonSrc;
       pokeImg.onerror = () => {
-        pokeImg.alt = "이미지 파일을 찾을 수 없어요: " + chosenPokemonSrc;
         showToast("IMG NOT FOUND");
       };
 
@@ -648,19 +691,19 @@
       }, 120);
     }
 
-    // buttons
+    /*************** Buttons ***************/
     startBtn.addEventListener("click", () => { showToast("START!"); enterScreen2(); });
-    back1.addEventListener("click", () => { clearTimeout(ballShowTimer); go(0); });
+    back1.addEventListener("click", () => { stopRoulette(); go(0); });
     restart.addEventListener("click", () => { showToast("RESTART"); enterScreen2(); });
     again.addEventListener("click", () => { showToast("AGAIN"); enterScreen2(); });
-    home.addEventListener("click", () => { showToast("HOME"); go(0); });
+    home.addEventListener("click", () => { showToast("HOME"); stopRoulette(); go(0); });
 
-    // swipe listeners
+    /*************** Swipe listeners ***************/
     throwArea.addEventListener("touchstart", onTouchStart, {passive:false});
     throwArea.addEventListener("touchmove", onTouchMove, {passive:false});
     throwArea.addEventListener("touchend", onTouchEnd, {passive:true});
 
-    // desktop test
+    // desktop test (mouse)
     let mouseDown = false;
     throwArea.addEventListener("mousedown", (e)=>{
       mouseDown = true;
