@@ -4,43 +4,37 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>POKÉMON RANDOM GAME</title>
+
   <style>
     :root{
-      --bg:#0b0f1a;
-      --fg:#eaf0ff;
-      --muted:rgba(234,240,255,.65);
-      --card:rgba(255,255,255,.06);
-      --line:rgba(255,255,255,.14);
-      --accent:#57a6ff;
+      /* ✅ WHITE THEME */
+      --bg:#f5f6f8;
+      --fg:#0f172a;
+      --muted:rgba(15,23,42,.55);
+      --card:#ffffff;
+      --line:rgba(15,23,42,.10);
+      --accent:#557CF3;
     }
+
     *{box-sizing:border-box}
     body{
       margin:0; min-height:100vh;
       display:flex; align-items:center; justify-content:center;
-      background: radial-gradient(900px 600px at 50% 35%, rgba(87,166,255,.14), transparent 60%),
-                  radial-gradient(700px 450px at 20% 70%, rgba(255,255,255,.06), transparent 55%),
-                  var(--bg);
+      background: var(--bg);
       color:var(--fg);
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
       overflow:hidden;
       -webkit-tap-highlight-color: transparent;
       user-select:none;
     }
-
-    /* subtle CRT scanlines */
     body::before{
       content:"";
       position:fixed; inset:0;
-      background: repeating-linear-gradient(
-        to bottom,
-        rgba(255,255,255,.035),
-        rgba(255,255,255,.035) 1px,
-        rgba(0,0,0,0) 2px,
-        rgba(0,0,0,0) 4px
-      );
+      background:
+        radial-gradient(900px 600px at 50% 35%, rgba(85,124,243,.10), transparent 60%),
+        radial-gradient(700px 450px at 20% 70%, rgba(15,23,42,.05), transparent 55%);
       pointer-events:none;
-      mix-blend-mode: overlay;
-      opacity:.35;
+      opacity:.9;
     }
 
     .frame{
@@ -48,15 +42,15 @@
       padding:22px 18px;
       border:1px solid var(--line);
       border-radius:18px;
-      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
-      box-shadow: 0 18px 50px rgba(0,0,0,.5);
+      background: linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,255,255,.90));
+      box-shadow: 0 18px 50px rgba(15,23,42,.18);
       position:relative;
       overflow:hidden;
     }
 
     .brand{
       letter-spacing:.38em;
-      font-weight:700;
+      font-weight:900;
       font-size:12px;
       opacity:.7;
     }
@@ -75,7 +69,7 @@
       line-height:1.1;
       letter-spacing:.08em;
       text-transform:uppercase;
-      text-shadow: 0 0 14px rgba(87,166,255,.22);
+      text-shadow: 0 0 18px rgba(85,124,243,.12);
     }
     .subtitle{
       margin:0 0 18px;
@@ -101,32 +95,50 @@
       justify-content:center;
       padding:14px 22px;
       border-radius:14px;
-      border:1px solid rgba(87,166,255,.55);
-      background: rgba(87,166,255,.10);
+      border:1px solid rgba(85,124,243,.55);
+      background: rgba(85,124,243,.10);
       color:var(--fg);
-      font-weight:800;
+      font-weight:900;
       letter-spacing:.18em;
       text-transform:uppercase;
       cursor:pointer;
-      box-shadow: 0 0 0 rgba(87,166,255,0);
       transition: transform .08s ease, box-shadow .12s ease;
     }
     .btn:active{
       transform: translateY(1px) scale(.99);
-      box-shadow: 0 0 28px rgba(87,166,255,.25);
+      box-shadow: 0 0 28px rgba(85,124,243,.22);
     }
 
-    .blink{
-      animation: blink 1.1s steps(2,end) infinite;
-    }
+    .blink{ animation: blink 1.1s steps(2,end) infinite; }
     @keyframes blink{ 50%{opacity:.25} }
 
-    .hint{
-      font-size:12px;
+    .foot{
+      margin-top:10px;
       color:var(--muted);
+      font-size:11px;
+      letter-spacing:.08em;
+      line-height:1.5;
+    }
+
+    .toast{
+      position:absolute;
+      top:14px;
+      left:50%;
+      transform: translateX(-50%);
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.75);
+      backdrop-filter: blur(6px);
+      font-size:11px;
       letter-spacing:.12em;
       text-transform:uppercase;
+      opacity:0;
+      transition: opacity .18s ease;
+      pointer-events:none;
+      box-shadow: 0 12px 30px rgba(15,23,42,.10);
     }
+    .toast.on{ opacity:1; }
 
     /* Screen 2 balls */
     .ball-grid{
@@ -147,21 +159,26 @@
     .ball{
       aspect-ratio: 1 / 1;
       border-radius:18px;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.03);
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.70);
       display:flex;
       align-items:center;
       justify-content:center;
       position:relative;
       overflow:hidden;
       cursor:pointer;
-      transition: transform .12s ease, border-color .12s ease;
+      transition: transform .12s ease, border-color .12s ease, box-shadow .12s ease;
+      box-shadow: 0 10px 20px rgba(15,23,42,.08);
     }
-    .ball:active{ transform: scale(.98); border-color: rgba(87,166,255,.5); }
+    .ball:active{
+      transform: scale(.985);
+      border-color: rgba(85,124,243,.55);
+      box-shadow: 0 14px 26px rgba(15,23,42,.12);
+    }
     .ball img{
       width:72%;
       height:auto;
-      filter: drop-shadow(0 10px 14px rgba(0,0,0,.35));
+      filter: drop-shadow(0 10px 14px rgba(15,23,42,.18));
       animation: float 1.2s ease-in-out infinite;
     }
     @keyframes float{
@@ -169,20 +186,42 @@
       50%{ transform: translateY(-4px) }
     }
 
+    .row{
+      display:flex;
+      gap:10px;
+      justify-content:center;
+      margin-top:12px;
+      flex-wrap:wrap;
+    }
+    .mini{
+      padding:10px 14px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.70);
+      color:var(--fg);
+      font-weight:900;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      cursor:pointer;
+      box-shadow: 0 10px 20px rgba(15,23,42,.08);
+    }
+    .mini:active{ transform: translateY(1px); }
+
     /* Screen 3 throw area */
     .throw-area{
       width:100%;
       height:420px;
       border-radius:18px;
-      border:1px dashed rgba(255,255,255,.18);
-      background: rgba(255,255,255,.02);
+      border:1px dashed rgba(15,23,42,.18);
+      background: rgba(255,255,255,.65);
       position:relative;
       overflow:hidden;
       display:flex;
       align-items:flex-end;
       justify-content:center;
       padding-bottom:26px;
-      touch-action:none; /* for swipe */
+      touch-action:none;
+      box-shadow: inset 0 0 0 1px rgba(15,23,42,.03);
     }
     .throw-ball{
       width:120px;
@@ -201,7 +240,7 @@
     .throw-ball img{
       width:100%;
       height:auto;
-      filter: drop-shadow(0 12px 16px rgba(0,0,0,.45));
+      filter: drop-shadow(0 14px 16px rgba(15,23,42,.20));
     }
 
     /* Screen 4 capture */
@@ -209,22 +248,23 @@
       width:100%;
       height:420px;
       border-radius:18px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.02);
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.65);
       position:relative;
       display:flex;
       align-items:center;
       justify-content:center;
       overflow:hidden;
+      box-shadow: inset 0 0 0 1px rgba(15,23,42,.03);
     }
     .orbit{
       position:absolute;
       width:240px;
       height:240px;
       border-radius:999px;
-      border:1px solid rgba(87,166,255,.18);
+      border:1px solid rgba(85,124,243,.20);
       animation: spin 1.1s linear infinite;
-      opacity:.8;
+      opacity:.9;
     }
     @keyframes spin{ to{ transform: rotate(360deg) } }
 
@@ -235,7 +275,7 @@
       align-items:center;
       justify-content:center;
       animation: wobble .36s ease-in-out infinite;
-      filter: drop-shadow(0 16px 18px rgba(0,0,0,.45));
+      filter: drop-shadow(0 16px 18px rgba(15,23,42,.22));
     }
     @keyframes wobble{
       0%,100%{ transform: rotate(-6deg) }
@@ -250,7 +290,7 @@
       font-size:42px;
       font-weight:900;
       letter-spacing:.08em;
-      text-shadow: 0 0 22px rgba(87,166,255,.20);
+      text-shadow: 0 0 18px rgba(85,124,243,.14);
     }
 
     /* Screen 5 reveal */
@@ -258,18 +298,19 @@
       width:100%;
       height:420px;
       border-radius:18px;
-      border:1px solid rgba(255,255,255,.12);
-      background: radial-gradient(220px 180px at 50% 40%, rgba(87,166,255,.18), transparent 70%),
-                  rgba(255,255,255,.02);
+      border:1px solid var(--line);
+      background: radial-gradient(220px 180px at 50% 40%, rgba(85,124,243,.16), transparent 70%),
+                  rgba(255,255,255,.65);
       position:relative;
       display:flex;
       align-items:center;
       justify-content:center;
       overflow:hidden;
+      box-shadow: inset 0 0 0 1px rgba(15,23,42,.03);
     }
     .flash{
       position:absolute; inset:-40%;
-      background: radial-gradient(circle, rgba(255,255,255,.18), transparent 55%);
+      background: radial-gradient(circle, rgba(255,255,255,.55), transparent 55%);
       opacity:0;
       transform: scale(.85);
       transition: opacity .18s ease, transform .18s ease;
@@ -281,11 +322,11 @@
     .poke{
       width:min(320px, 70vw);
       height:auto;
-      image-rendering: auto;
-      filter: drop-shadow(0 18px 24px rgba(0,0,0,.55));
+      filter: drop-shadow(0 18px 24px rgba(15,23,42,.22));
       transform: translateY(6px) scale(.98);
       opacity:0;
       transition: opacity .22s ease, transform .22s ease;
+      background:transparent;
     }
     .poke.show{
       opacity:1;
@@ -301,56 +342,9 @@
       font-weight:900;
       letter-spacing:.18em;
       text-transform:uppercase;
-      text-shadow: 0 0 18px rgba(87,166,255,.22);
+      color:#0f172a;
+      text-shadow: 0 0 18px rgba(85,124,243,.12);
     }
-
-    .row{
-      display:flex;
-      gap:10px;
-      justify-content:center;
-      margin-top:12px;
-      flex-wrap:wrap;
-    }
-    .mini{
-      padding:10px 14px;
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.03);
-      color:var(--fg);
-      font-weight:800;
-      letter-spacing:.12em;
-      text-transform:uppercase;
-      cursor:pointer;
-    }
-    .mini:active{ transform: translateY(1px); }
-
-    .foot{
-      margin-top:10px;
-      color:var(--muted);
-      font-size:11px;
-      letter-spacing:.08em;
-      line-height:1.5;
-    }
-
-    /* small toast */
-    .toast{
-      position:absolute;
-      top:14px;
-      left:50%;
-      transform: translateX(-50%);
-      padding:10px 12px;
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.35);
-      backdrop-filter: blur(6px);
-      font-size:11px;
-      letter-spacing:.12em;
-      text-transform:uppercase;
-      opacity:0;
-      transition: opacity .18s ease;
-      pointer-events:none;
-    }
-    .toast.on{ opacity:1; }
   </style>
 </head>
 
@@ -368,8 +362,8 @@
         </div>
         <button id="startBtn" class="btn">START</button>
         <div class="foot">
-          * 레트로 느낌 + 랜덤 뽑기<br/>
-          * 이미지는 /images 폴더에 넣어두면 됨
+          * 배경: 화이트 테마(가독성↑)<br/>
+          * 이미지는 /pokemon/images 폴더에 넣기
         </div>
       </div>
     </section>
@@ -380,9 +374,7 @@
         <div class="title" style="font-size:18px;margin:8px 0 0;">CHOOSE ONE!</div>
         <div class="subtitle" id="s2Sub">loading balls…</div>
 
-        <div id="ballGrid" class="ball-grid" aria-label="Poké Balls">
-          <!-- balls injected -->
-        </div>
+        <div id="ballGrid" class="ball-grid" aria-label="Poké Balls"></div>
 
         <div class="row">
           <button id="back1" class="mini">BACK</button>
@@ -398,7 +390,7 @@
 
         <div id="throwArea" class="throw-area">
           <div id="throwBall" class="throw-ball">
-            <img id="throwBallImg" alt="ball" src="images/ball.png" />
+            <img id="throwBallImg" alt="ball" src="images/Poke_ball.png" />
           </div>
         </div>
 
@@ -418,7 +410,7 @@
           <div class="orbit"></div>
           <div class="orbit" style="width:320px;height:320px;opacity:.45;animation-duration:1.6s"></div>
           <div class="cap-ball">
-            <img id="capBallImg" alt="ball" src="images/ball.png" />
+            <img id="capBallImg" alt="ball" src="images/Poke_ball.png" />
           </div>
           <div id="count" class="count">3</div>
         </div>
@@ -447,14 +439,18 @@
 
   <script>
     /***********************
-     * 1) 이미지 파일만 맞추면 바로 동작
-     * - 공(볼): images/ball.png (필수)
-     * - 포켓몬(캐릭터): images/poke_01.png ... 처럼 넣기
+     * ✅ 너의 실제 파일명에 맞춘 버전
+     * - 볼: images/Beast_ball.png ... (대소문자 그대로)
+     * - 포켓몬: images/poke_01.png ~ images/poke_30.png
      ************************/
 
-    // ✅ 여기만 너 파일명에 맞게 수정하면 됨
+    // ✅ 포켓몬 01~30 자동 생성
+    const pokemonList = [];
+    for (let i = 1; i <= 30; i++) {
+      pokemonList.push(`images/poke_${String(i).padStart(2, "0")}.png`);
+    }
+
     const CONFIG = {
-      // 2번 화면에 보여줄 볼 이미지들 (없으면 ball.png 하나로도 OK)
       balls: [
         "images/Beast_ball.png",
         "images/Fast_ball.png",
@@ -464,22 +460,8 @@
         "images/Poke_ball.png",
         "images/Ultra_ball.png",
       ],
-      // 결과로 나올 포켓몬 이미지들(이름 없이)
-      pokemons: [
-        "images/poke_01.png",
-        "images/poke_02.png",
-        "images/poke_03.png",
-        "images/poke_04.png",
-        "images/poke_05.png",
-        "images/poke_06.png",
-        "images/poke_07.png",
-        "images/poke_08.png",
-        "images/poke_09.png",
-        "images/poke_10.png",
-      ],
-      // 2번 화면에서 볼이 등장하기까지 딜레이(너가 말한 2초)
+      pokemons: pokemonList,
       ballsAppearDelayMs: 2000,
-      // 4번 카운트다운 속도
       countdownMs: 900
     };
 
@@ -506,7 +488,7 @@
     const flash = $("#flash");
     const pokeImg = $("#pokeImg");
 
-    let chosenBallSrc = "images/ball.png";
+    let chosenBallSrc = "images/Poke_ball.png";
     let chosenPokemonSrc = "";
     let ballShowTimer = null;
     let countdownTimer = null;
@@ -523,17 +505,15 @@
     }
 
     function resetRun(){
-      chosenBallSrc = "images/ball.png";
+      chosenBallSrc = "images/Poke_ball.png";
       chosenPokemonSrc = "";
       throwBallImg.src = chosenBallSrc;
       capBallImg.src = chosenBallSrc;
 
-      // screen2
       ballGrid.classList.remove("show");
       ballGrid.innerHTML = "";
       s2Sub.textContent = "loading balls…";
 
-      // screen5
       flash.classList.remove("on");
       pokeImg.classList.remove("show");
       pokeImg.src = "";
@@ -543,10 +523,9 @@
       return arr[Math.floor(Math.random() * arr.length)];
     }
 
-    // --- Screen2: create balls after 2s
     function buildBallGrid(){
       ballGrid.innerHTML = "";
-      const list = CONFIG.balls.length ? CONFIG.balls : ["images/ball.png"];
+      const list = (CONFIG.balls && CONFIG.balls.length) ? CONFIG.balls : ["images/Poke_ball.png"];
 
       list.forEach((src, idx) => {
         const b = document.createElement("div");
@@ -564,7 +543,6 @@
       resetRun();
       buildBallGrid();
 
-      // 2초 후 볼 보여주기
       clearTimeout(ballShowTimer);
       ballShowTimer = setTimeout(() => {
         s2Sub.textContent = "tap the first ball!";
@@ -574,7 +552,6 @@
     }
 
     function onChooseBall(src){
-      // 아직 등장 전이면 무시
       if (!ballGrid.classList.contains("show")) return;
 
       chosenBallSrc = src;
@@ -582,10 +559,10 @@
       capBallImg.src = chosenBallSrc;
 
       showToast("SELECTED!");
-      go(2); // Screen3
+      go(2);
     }
 
-    // --- Screen3: swipe up to throw
+    // swipe
     function onTouchStart(e){
       if (e.touches && e.touches.length){
         touch.active = true;
@@ -597,8 +574,7 @@
     function onTouchMove(e){
       if (!touch.active) return;
       const y = e.touches[0].clientY;
-      const dy = Math.min(0, y - touch.startY); // negative when moving up
-      // 조금 따라 움직이는 느낌
+      const dy = Math.min(0, y - touch.startY);
       throwBall.style.transform = `translateX(-50%) translateY(${dy * 0.35}px)`;
       e.preventDefault();
     }
@@ -609,20 +585,13 @@
       const endT = performance.now();
       const dt = Math.max(1, endT - touch.startT);
 
-      // 마지막 이동량 계산 (touchend에는 touches가 없을 수 있어 변화량은 마지막 move에서 대신)
-      // 간단히: startY 대비 마지막 transform 값을 기반으로 판단하기보다,
-      // 사용자 체감용으로 "충분히 위로 스와이프" 여부만 체크
-      // => 터치 종료 시점의 changedTouches 사용
       const ct = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0] : null;
       const endY = ct ? ct.clientY : touch.startY;
-      const dyTotal = endY - touch.startY; // up = negative
+      const dyTotal = endY - touch.startY;
 
-      // reset visual
       throwBall.style.transform = `translateX(-50%)`;
 
-      // 스와이프 판정: 위로 70px 이상
       if (dyTotal < -70){
-        // 던지기 애니메이션 (강하게 스와이프할수록 더 멀리)
         const speed = Math.min(1.6, Math.max(0.6, (-dyTotal) / dt * 2.2));
         animateThrow(speed);
       } else {
@@ -631,14 +600,12 @@
     }
 
     function animateThrow(speed){
-      // 위로 날아가며 작아지는 간단 연출
       throwBall.style.transition = "transform .38s ease";
       const up = -380 * speed;
       const scale = 0.42;
       throwBall.style.transform = `translateX(-50%) translateY(${up}px) scale(${scale}) rotate(${220*speed}deg)`;
 
       showToast("THROW!");
-      // 연출 끝나면 Screen4
       setTimeout(() => {
         throwBall.style.transition = "transform .1s ease";
         throwBall.style.transform = `translateX(-50%)`;
@@ -646,7 +613,6 @@
       }, 420);
     }
 
-    // --- Screen4: 3,2,1 countdown then reveal
     function enterScreen4(){
       go(3);
       countEl.textContent = "3";
@@ -656,10 +622,6 @@
       countdownTimer = setInterval(() => {
         n--;
         countEl.textContent = String(n);
-        if (n <= 1){
-          // 3,2,1 찍고 바로 결과로
-          if (n === 1) showToast("…");
-        }
         if (n <= 0){
           clearInterval(countdownTimer);
           enterScreen5();
@@ -669,16 +631,12 @@
 
     function enterScreen5(){
       go(4);
-
-      // 랜덤 포켓몬 결정
       chosenPokemonSrc = pickRandom(CONFIG.pokemons);
 
-      // flash + show
       flash.classList.add("on");
       setTimeout(() => flash.classList.remove("on"), 220);
 
       pokeImg.src = chosenPokemonSrc;
-      // 이미지 로딩 실패 대비
       pokeImg.onerror = () => {
         pokeImg.alt = "이미지 파일을 찾을 수 없어요: " + chosenPokemonSrc;
         showToast("IMG NOT FOUND");
@@ -690,38 +648,19 @@
       }, 120);
     }
 
-    // --- buttons
-    startBtn.addEventListener("click", () => {
-      showToast("START!");
-      enterScreen2();
-    });
+    // buttons
+    startBtn.addEventListener("click", () => { showToast("START!"); enterScreen2(); });
+    back1.addEventListener("click", () => { clearTimeout(ballShowTimer); go(0); });
+    restart.addEventListener("click", () => { showToast("RESTART"); enterScreen2(); });
+    again.addEventListener("click", () => { showToast("AGAIN"); enterScreen2(); });
+    home.addEventListener("click", () => { showToast("HOME"); go(0); });
 
-    back1.addEventListener("click", () => {
-      clearTimeout(ballShowTimer);
-      go(0);
-    });
-
-    restart.addEventListener("click", () => {
-      showToast("RESTART");
-      enterScreen2();
-    });
-
-    again.addEventListener("click", () => {
-      showToast("AGAIN");
-      enterScreen2();
-    });
-
-    home.addEventListener("click", () => {
-      showToast("HOME");
-      go(0);
-    });
-
-    // swipe listeners (Screen3)
+    // swipe listeners
     throwArea.addEventListener("touchstart", onTouchStart, {passive:false});
     throwArea.addEventListener("touchmove", onTouchMove, {passive:false});
     throwArea.addEventListener("touchend", onTouchEnd, {passive:true});
 
-    // desktop test (mouse drag)
+    // desktop test
     let mouseDown = false;
     throwArea.addEventListener("mousedown", (e)=>{
       mouseDown = true;
@@ -751,7 +690,6 @@
       touch.active = false;
     });
 
-    // initial
     showToast("READY");
   </script>
 </body>
