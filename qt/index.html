@@ -14,9 +14,14 @@ font-family:system-ui,-apple-system,Apple SD Gothic Neo,Noto Sans KR,sans-serif;
 .subtitle{font-size:16px;opacity:.8;}
 .day{font-size:12px;border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:6px 10px;opacity:.75;cursor:pointer;user-select:none;}
 .ref{margin-top:14px;font-size:13px;opacity:.75}
-.ko{margin-top:10px;font-size:20px;line-height:1.7;opacity:.98;}
-.en{margin-top:10px;font-size:16px;line-height:1.65;opacity:.88;}
-.footer{margin-top:14px;font-size:12px;opacity:.35;line-height:1.5;}
+
+/* 새로 추가: 버전/라벨 pill */
+.metaRow{margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;}
+.pill{font-size:12px;border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:6px 10px;opacity:.72;user-select:none;}
+
+.ko{margin-top:14px;font-size:20px;line-height:1.7;opacity:.98;white-space:pre-line;}
+.en{margin-top:12px;font-size:16px;line-height:1.65;opacity:.88;white-space:pre-line;}
+
 .hint{position:absolute;left:0;bottom:0;transform:translateY(120%);font-size:12px;opacity:.35;}
 </style>
 </head>
@@ -31,20 +36,23 @@ font-family:system-ui,-apple-system,Apple SD Gothic Neo,Noto Sans KR,sans-serif;
     </div>
 
     <div class="ref" id="refLine">—</div>
+
+    <!-- 여기! 출처를 본문 위쪽에 pill로 표시 -->
+    <div class="metaRow">
+      <div class="pill" id="koLang">Korean</div>
+      <div class="pill" id="koVer">개역한글</div>
+      <div class="pill" id="enLang">English</div>
+      <div class="pill" id="enVer">KJV</div>
+    </div>
+
     <div class="ko" id="koText">loading</div>
     <div class="en" id="enText"></div>
-
-    <div class="footer">
-      Korean: 개역한글(대한성서공회) · English: KJV<br/>
-      본문은 변형 없이 원문 그대로 사용하세요.
-    </div>
   </div>
 
   <div class="hint">내일 다시 키링을 터치하세요.</div>
 </div>
 
 <script src="./data.js"></script>
-<!-- 데이터 분할 파일들(001~013) -->
 <script src="./data/001.js"></script>
 <!-- <script src="./data/002.js"></script> -->
 <!-- ... -->
@@ -62,6 +70,9 @@ if(!t.item){
   refLine.innerText = `${t.item.ref_ko} / ${t.item.ref_en}`;
   koText.innerText = t.item.ko;
   enText.innerText = t.item.en;
+
+  // (선택) 데이터에 버전/라벨을 나중에 바꾸고 싶으면 여기서 확장 가능
+  // 예: t.item.ko_ver, t.item.en_ver 같은 필드가 있으면 그걸 표시
 }
 </script>
 </body>
