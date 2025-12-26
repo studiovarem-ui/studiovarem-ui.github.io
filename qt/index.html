@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>VAREM · 오늘의 말씀</title>
+<style>
+body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0f0f10;color:#fff;
+font-family:system-ui,-apple-system,Apple SD Gothic Neo,Noto Sans KR,sans-serif;}
+.wrap{width:min(560px,92vw);position:relative;padding-top:36px;padding-bottom:28px;}
+.brand{position:absolute;top:0;left:50%;transform:translateX(-50%);letter-spacing:.28em;font-weight:700;font-size:14px;opacity:.7;}
+.card{border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:22px;background:rgba(255,255,255,.02);}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+.subtitle{font-size:16px;opacity:.8;}
+.day{font-size:12px;border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:6px 10px;opacity:.75;cursor:pointer;user-select:none;}
+.ref{margin-top:14px;font-size:13px;opacity:.75}
+
+/* 새로 추가: 버전/라벨 pill */
+.metaRow{margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;}
+.pill{font-size:12px;border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:6px 10px;opacity:.72;user-select:none;}
+
+.ko{margin-top:14px;font-size:20px;line-height:1.7;opacity:.98;white-space:pre-line;}
+.en{margin-top:12px;font-size:16px;line-height:1.65;opacity:.88;white-space:pre-line;}
+
+.hint{position:absolute;left:0;bottom:0;transform:translateY(120%);font-size:12px;opacity:.35;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">VAREM</div>
+
+  <div class="card">
+    <div class="top">
+      <div class="subtitle">오늘의 말씀</div>
+      <div class="day" onclick="location.href='archive.html'">Day <span id="dayNum"></span></div>
+    </div>
+
+    <div class="ref" id="refLine">—</div>
+
+    <!-- 여기! 출처를 본문 위쪽에 pill로 표시 -->
+    <div class="metaRow">
+      <div class="pill" id="koLang">Korean</div>
+      <div class="pill" id="koVer">개역한글</div>
+      <div class="pill" id="enLang">English</div>
+      <div class="pill" id="enVer">KJV</div>
+    </div>
+
+    <div class="ko" id="koText">loading</div>
+    <div class="en" id="enText"></div>
+  </div>
+
+  <div class="hint">내일 다시 키링을 터치하세요.</div>
+</div>
+
+<script src="./data.js"></script>
+<script src="./data/001.js"></script>
+<!-- <script src="./data/002.js"></script> -->
+<!-- ... -->
+<!-- <script src="./data/013.js"></script> -->
+
+<script>
+const t = getTodayItem();
+dayNum.innerText = t.dayNum;
+
+if(!t.item){
+  koText.innerText = "data/001.js부터 ADD([...])로 말씀 데이터를 넣어주세요.";
+  enText.innerText = "";
+  refLine.innerText = "";
+} else {
+  refLine.innerText = `${t.item.ref_ko} / ${t.item.ref_en}`;
+  koText.innerText = t.item.ko;
+  enText.innerText = t.item.en;
+
+  // (선택) 데이터에 버전/라벨을 나중에 바꾸고 싶으면 여기서 확장 가능
+  // 예: t.item.ko_ver, t.item.en_ver 같은 필드가 있으면 그걸 표시
+}
+</script>
+</body>
+</html>
