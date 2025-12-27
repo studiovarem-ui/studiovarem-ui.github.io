@@ -1,20 +1,35 @@
 ADD([
-  {
-    ref_ko: "시편 23:1-2",
-    ref_en: "Psalm 23:1-2",
-    ko: "여호와는 나의 목자시니 내가 부족함이 없으리로다\n그가 나를 푸른 초장에 누이시며 쉴 만한 물가로 인도하시는도다",
-    en: "The LORD is my shepherd; I shall not want.\nHe maketh me to lie down in green pastures: he leadeth me beside the still waters."
-  },
-  {
-    ref_ko: "잠언 3:5-6",
-    ref_en: "Proverbs 3:5-6",
-    ko: "너는 마음을 다하여 여호와를 의뢰하고 네 명철을 의지하지 말라\n너는 범사에 그를 인정하라 그리하면 네 길을 지도하시리라",
-    en: "Trust in the LORD with all thine heart; and lean not unto thine own understanding.\nIn all thy ways acknowledge him, and he shall direct thy paths."
-  },
-  {
-    ref_ko: "마태복음 6:33",
-    ref_en: "Matthew 6:33",
-    ko: "너희는 먼저 그의 나라와 그의 의를 구하라 그리하면 이 모든 것을 너희에게 더하시리라",
-    en: "But seek ye first the kingdom of God, and his righteousness; and all these things shall be added unto you."
-  }
+  // Day 1~30 (1월: 새해/인도/지혜/말씀/기도)
+  { ref_ko:"시편 90:12", ref_en:"Psalm 90:12", ko:"", en:"" },
+  { ref_ko:"잠언 3:5-6", ref_en:"Proverbs 3:5-6", ko:"", en:"" },
+  { ref_ko:"여호수아 1:9", ref_en:"Joshua 1:9", ko:"", en:"" },
+  { ref_ko:"이사야 41:10", ref_en:"Isaiah 41:10", ko:"", en:"" },
+  { ref_ko:"시편 23:1", ref_en:"Psalm 23:1", ko:"", en:"" },
+  { ref_ko:"시편 37:5", ref_en:"Psalm 37:5", ko:"", en:"" },
+  { ref_ko:"잠언 16:3", ref_en:"Proverbs 16:3", ko:"", en:"" },
+  { ref_ko:"마태복음 6:33", ref_en:"Matthew 6:33", ko:"", en:"" },
+  { ref_ko:"빌립보서 4:6", ref_en:"Philippians 4:6", ko:"", en:"" },
+  { ref_ko:"빌립보서 4:13", ref_en:"Philippians 4:13", ko:"", en:"" },
+
+  { ref_ko:"로마서 8:28", ref_en:"Romans 8:28", ko:"", en:"" },
+  { ref_ko:"요한복음 14:27", ref_en:"John 14:27", ko:"", en:"" },
+  { ref_ko:"시편 46:1", ref_en:"Psalm 46:1", ko:"", en:"" },
+  { ref_ko:"시편 119:105", ref_en:"Psalm 119:105", ko:"", en:"" },
+  { ref_ko:"야고보서 1:5", ref_en:"James 1:5", ko:"", en:"" },
+  { ref_ko:"잠언 1:7", ref_en:"Proverbs 1:7", ko:"", en:"" },
+  { ref_ko:"미가 6:8", ref_en:"Micah 6:8", ko:"", en:"" },
+  { ref_ko:"시편 121:1-2", ref_en:"Psalm 121:1-2", ko:"", en:"" },
+  { ref_ko:"이사야 26:3", ref_en:"Isaiah 26:3", ko:"", en:"" },
+  { ref_ko:"마태복음 11:28", ref_en:"Matthew 11:28", ko:"", en:"" },
+
+  { ref_ko:"요한복음 15:5", ref_en:"John 15:5", ko:"", en:"" },
+  { ref_ko:"갈라디아서 2:20", ref_en:"Galatians 2:20", ko:"", en:"" },
+  { ref_ko:"고린도후서 12:9", ref_en:"2 Corinthians 12:9", ko:"", en:"" },
+  { ref_ko:"시편 34:8", ref_en:"Psalm 34:8", ko:"", en:"" },
+  { ref_ko:"히브리서 12:2", ref_en:"Hebrews 12:2", ko:"", en:"" },
+  { ref_ko:"고린도전서 10:13", ref_en:"1 Corinthians 10:13", ko:"", en:"" },
+  { ref_ko:"베드로전서 5:7", ref_en:"1 Peter 5:7", ko:"", en:"" },
+  { ref_ko:"데살로니가전서 5:16-18", ref_en:"1 Thessalonians 5:16-18", ko:"", en:"" },
+  { ref_ko:"시편 19:14", ref_en:"Psalm 19:14", ko:"", en:"" },
+  { ref_ko:"로마서 12:2", ref_en:"Romans 12:2", ko:"", en:"" },
 ]);
