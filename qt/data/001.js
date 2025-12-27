@@ -118,5 +118,65 @@ ADD([
     ref_en: "Matthew 11:28",
     ko: "수고하고 무거운 짐 진 자들아 다 내게로 오라 내가 너희를 쉬게 하리라",
     en: "Come unto me, all ye that labour and are heavy laden, and I will give you rest."
+  },
+  {
+    ref_ko: "요한복음 15:5",
+    ref_en: "John 15:5",
+    ko: "나는 포도나무요 너희는 가지니 저가 내 안에, 내가 저 안에 있으면 이 사람은 과실을 많이 맺나니 나를 떠나서는 너희가 아무 것도 할 수 없음이라",
+    en: "I am the vine, ye are the branches: He that abideth in me, and I in him, the same bringeth forth much fruit: for without me ye can do nothing."
+  },
+  {
+    ref_ko: "갈라디아서 2:20",
+    ref_en: "Galatians 2:20",
+    ko: "내가 그리스도와 함께 십자가에 못 박혔나니 그런즉 이제는 내가 산 것이 아니요 오직 내 안에 그리스도께서 사신 것이라 이제 내가 육체 가운데 사는 것은 나를 사랑하사 나를 위하여 자기 몸을 버리신 하나님의 아들을 믿는 믿음 안에서 사는 것이라",
+    en: "I am crucified with Christ: nevertheless I live; yet not I, but Christ liveth in me: and the life which I now live in the flesh I live by the faith of the Son of God, who loved me, and gave himself for me."
+  },
+  {
+    ref_ko: "고린도후서 12:9",
+    ref_en: "2 Corinthians 12:9",
+    ko: "내게 이르시기를 내 은혜가 네게 족하도다 이는 내 능력이 약한 데서 온전하여짐이라 하신지라 이러므로 도리어 크게 기뻐함으로 나의 여러 약한 것들에 대하여 자랑하리니 이는 그리스도의 능력이 내게 머물게 하려함이라",
+    en: "And he said unto me, My grace is sufficient for thee: for my strength is made perfect in weakness. Most gladly therefore will I rather glory in my infirmities, that the power of Christ may rest upon me."
+  },
+  {
+    ref_ko: "시편 34:8",
+    ref_en: "Psalm 34:8",
+    ko: "너희는 여호와의 선하심을 맛보아 알지어다 그에게 의지하는 자는 복이 있도다",
+    en: "O taste and see that the LORD is good: blessed is the man that trusteth in him."
+  },
+  {
+    ref_ko: "히브리서 12:2",
+    ref_en: "Hebrews 12:2",
+    ko: "믿음의 주요 또 온전케 하시는 이인 예수를 바라보자 저는 그 앞에 있는 즐거움을 위하여 십자가를 참으사 부끄러움을 개의치 아니하시더니 하나님 보좌 우편에 앉으셨느니라",
+    en: "Looking unto Jesus the author and finisher of our faith; who for the joy that was set before him endured the cross, despising the shame, and is set down at the right hand of the throne of God."
+  },
+  {
+    ref_ko: "고린도전서 10:13",
+    ref_en: "1 Corinthians 10:13",
+    ko: "사람이 감당할 시험 밖에는 너희에게 당한 것이 없나니 오직 하나님은 미쁘사 너희가 감당하지 못할 시험 당함을 허락지 아니하시고 시험 당할 즈음에 또한 피할 길을 내사 너희로 능히 감당하게 하시느니라",
+    en: "There hath no temptation taken you but such as is common to man: but God is faithful, who will not suffer you to be tempted above that ye are able; but will with the temptation also make a way to escape, that ye may be able to bear it."
+  },
+  {
+    ref_ko: "베드로전서 5:7",
+    ref_en: "1 Peter 5:7",
+    ko: "너희 염려를 다 주께 맡겨 버리라 이는 저가 너희를 권고하심이니라",
+    en: "Casting all your care upon him; for he careth for you."
+  },
+  {
+    ref_ko: "데살로니가전서 5:16-18",
+    ref_en: "1 Thessalonians 5:16-18",
+    ko: "항상 기뻐하라\n쉬지 말고 기도하라\n범사에 감사하라 이는 그리스도 예수 안에서 너희를 향하신 하나님의 뜻이니라",
+    en: "Rejoice evermore.\nPray without ceasing.\nIn every thing give thanks: for this is the will of God in Christ Jesus concerning you."
+  },
+  {
+    ref_ko: "시편 19:14",
+    ref_en: "Psalm 19:14",
+    ko: "나의 반석이시요 나의 구속자시요 여호와여 내 입의 말과 마음의 묵상이 주의 앞에 열납되기를 원하나이다",
+    en: "Let the words of my mouth, and the meditation of my heart, be acceptable in thy sight, O LORD, my strength, and my redeemer."
+  },
+  {
+    ref_ko: "로마서 12:2",
+    ref_en: "Romans 12:2",
+    ko: "너희는 이 세대를 본받지 말고 오직 마음을 새롭게 함으로 변화를 받아 하나님의 선하시고 기뻐하시고 온전하신 뜻이 무엇인지 분별하도록 하라",
+    en: "And be not conformed to this world: but be ye transformed by the renewing of your mind, that ye may prove what is that good, and acceptable, and perfect, will of God."
   }
 ]);
