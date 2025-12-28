@@ -34,14 +34,12 @@ body{
   background:rgba(255,255,255,.02);
 }
 
-/* ✅ 목록은 "5개 높이"만 보이게 + 스크롤은 전체 */
 .list{
-  max-height: 270px;      /* 대략 5줄 높이 */
+  max-height: 270px;
   overflow:auto;
   -webkit-overflow-scrolling: touch;
 }
 
-/* 목록 줄 */
 .row{
   display:flex; justify-content:space-between; align-items:center;
   padding:14px 16px;
@@ -54,7 +52,6 @@ body{
 .day{ font-size:12px; opacity:.6; }
 .word{ font-size:16px; font-weight:700; }
 
-/* 상세(투데이 카드 스타일) */
 .detail{
   border-top:1px solid rgba(255,255,255,.10);
   padding:18px 16px 18px;
@@ -84,7 +81,6 @@ body{
 
 .meaning{ margin-top:16px; font-size:18px; line-height:1.6; }
 .example{ margin-top:10px; font-size:16px; opacity:.88; line-height:1.6; }
-
 .hint{ margin-top:10px; font-size:12px; opacity:.35; }
 </style>
 </head>
@@ -123,36 +119,47 @@ body{
   </div>
 </div>
 
+<script src="data/data.js"></script>
+
 <script>
-/* ✅ index.html과 동일 데이터 유지 */
-const LIST = [
-  {w:"anxious", p:"adj", m_en:"worried and nervous", m_ko:"불안한, 걱정되는", e_en:"She felt anxious before the exam.", e_ko:"그녀는 시험 전에 불안해했다."},
-  {w:"improve", p:"v",   m_en:"to make something better", m_ko:"개선하다, 향상시키다", e_en:"He wants to improve his English.", e_ko:"그는 영어 실력을 향상시키고 싶어한다."},
-  {w:"decide",  p:"v",   m_en:"to choose; to make a decision", m_ko:"결정하다", e_en:"She decided to study harder.", e_ko:"그녀는 더 열심히 공부하기로 결정했다."}
-];
-
-function kst(){
-  const n=new Date();
-  return new Date(n.getTime()+n.getTimezoneOffset()*60000+9*3600000);
+function kstTodayMidnight(){
+  const now = new Date();
+  const kst = new Date(now.getTime() + now.getTimezoneOffset()*60000 + 9*3600000);
+  return new Date(kst.getFullYear(), kst.getMonth(), kst.getDate());
 }
-function dayOfYear(d){
-  return Math.floor((d-new Date(d.getFullYear(),0,1))/86400000);
+function kstDayOfYearIndex(){
+  const t = kstTodayMidnight();
+  const y0 = new Date(t.getFullYear(), 0, 1);
+  return Math.floor((t - y0) / 86400000); // 0-based
 }
 
-const todayIndex = dayOfYear(kst()); // 0-based (오늘)
 const listEl = document.getElementById("list");
 const detailEl = document.getElementById("detail");
 
-let currentIndex = null; // 0-based day index (과거)
+let currentIndex = null; // 0-based
 let mode = "EN";
 
 function itemForDayIndex(i){
-  return LIST[i % LIST.length];
+  const LIST = window.VAREM_LIST || [];
+  if(!LIST.length) return null;
+  const idx = ((i % LIST.length) + LIST.length) % LIST.length;
+  return LIST[idx];
 }
 
-/* ✅ Day 1 ~ 어제까지 "전부" 생성 (스크롤) */
 function renderList(){
+  const LIST = window.VAREM_LIST || [];
   listEl.innerHTML = "";
+
+  if(!LIST.length){
+    const row = document.createElement("div");
+    row.className = "row";
+    row.style.cursor = "default";
+    row.innerHTML = `<div class="day">Loading...</div><div class="word"></div>`;
+    listEl.appendChild(row);
+    return;
+  }
+
+  const todayIndex = kstDayOfYearIndex();
 
   if(todayIndex <= 0){
     const row = document.createElement("div");
@@ -163,27 +170,26 @@ function renderList(){
     return;
   }
 
-  // 최신(어제) → 과거(Day1) 역순
   for(let i = todayIndex - 1; i >= 0; i--){
-    const dayNum = i + 1;
     const it = itemForDayIndex(i);
+    const dayNum = i + 1;
 
     const row = document.createElement("div");
     row.className = "row";
-    row.innerHTML = `<div class="day">Day ${dayNum}</div><div class="word">${it.w.toLowerCase()}</div>`;
+    row.innerHTML = `<div class="day">Day ${dayNum}</div><div class="word">${(it?.w||"").toLowerCase()}</div>`;
     row.onclick = () => showDetail(i);
     listEl.appendChild(row);
   }
 }
 
-/* 상세(투데이처럼) */
 function renderDetail(){
   if(currentIndex === null) return;
   const it = itemForDayIndex(currentIndex);
+  if(!it) return;
 
   dDay.innerText = "Day " + (currentIndex + 1);
-  dWord.innerText = it.w.toLowerCase();
-  dPos.innerText = it.p;
+  dWord.innerText = (it.w || "").toLowerCase();
+  dPos.innerText = it.p || "";
 
   if(mode === "EN"){
     dMeaning.innerText = "Meaning: " + (it.m_en ?? it.m_ko ?? "");
@@ -199,7 +205,7 @@ function renderDetail(){
 
 function showDetail(dayIndex){
   currentIndex = dayIndex;
-  mode = "EN"; // 상세는 EN 기본
+  mode = "EN";
   detailEl.style.display = "block";
   renderDetail();
   detailEl.scrollIntoView({behavior:"smooth", block:"start"});
@@ -208,6 +214,9 @@ function showDetail(dayIndex){
 btnEN.onclick = () => { mode="EN"; renderDetail(); };
 btnKO.onclick = () => { mode="KO"; renderDetail(); };
 
+window.VAREM_onReady(() => {
+  renderList();
+});
 renderList();
 </script>
 </body>
