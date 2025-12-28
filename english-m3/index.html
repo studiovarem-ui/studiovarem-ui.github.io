@@ -3,34 +3,74 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>VAREM · 중3 영어</title>
+<title>VAREM · Archive</title>
 
 <style>
 body{
-  margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
-  background:#0f0f10; color:#fff;
+  margin:0; min-height:100vh; background:#0f0f10; color:#fff;
   font-family: system-ui,-apple-system,Apple SD Gothic Neo,Noto Sans KR,sans-serif;
+  display:flex; justify-content:center;
 }
-.wrap{ width:min(560px,92vw); position:relative; padding-top:36px; padding-bottom:28px; }
+.wrap{ width:min(560px,92vw); padding:32px 0; }
+
 .brand{
-  position:absolute; top:0; left:50%; transform:translateX(-50%);
-  letter-spacing:.28em; font-weight:700; font-size:14px; opacity:.7;
+  text-align:center; letter-spacing:.28em; font-weight:700; font-size:14px;
+  opacity:.7; margin-bottom:14px;
 }
-.card{
+
+.header{
+  display:flex; justify-content:space-between; align-items:flex-end;
+  margin-bottom:12px;
+}
+.title{ font-size:14px; opacity:.75; }
+.back{
+  font-size:12px; border:1px solid rgba(255,255,255,.18);
+  padding:6px 10px; border-radius:999px; cursor:pointer; opacity:.75; user-select:none;
+}
+
+.panel{
   border:1px solid rgba(255,255,255,.12);
-  border-radius:18px; padding:22px; background:rgba(255,255,255,.02);
+  border-radius:18px; overflow:hidden;
+  background:rgba(255,255,255,.02);
 }
-.top{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
-.subtitle{ font-size:16px; opacity:.8; }
-.day{
-  font-size:12px; border:1px solid rgba(255,255,255,.18); border-radius:999px;
-  padding:6px 10px; opacity:.75; cursor:pointer; user-select:none;
+
+.list{
+  max-height: 270px;
+  overflow:auto;
+  -webkit-overflow-scrolling: touch;
 }
-.word{ margin-top:14px; font-size:42px; font-weight:800; }
-.meta{ margin-top:14px; display:flex; gap:8px; flex-wrap:wrap; }
+
+.row{
+  display:flex; justify-content:space-between; align-items:center;
+  padding:14px 16px;
+  border-top:1px solid rgba(255,255,255,.08);
+  cursor:pointer;
+}
+.row:first-child{ border-top:none; }
+.row:hover{ background:rgba(255,255,255,.03); }
+
+.day{ font-size:12px; opacity:.6; }
+.word{ font-size:16px; font-weight:700; }
+
+.detail{
+  border-top:1px solid rgba(255,255,255,.10);
+  padding:18px 16px 18px;
+  display:none;
+}
+.detailTop{
+  display:flex; justify-content:space-between; align-items:flex-start; gap:10px;
+}
+.detailTitle{ font-size:14px; opacity:.75; }
+.detailDay{
+  font-size:12px; border:1px solid rgba(255,255,255,.18);
+  border-radius:999px; padding:6px 10px; opacity:.75; white-space:nowrap;
+}
+.bigWord{ margin-top:10px; font-size:38px; font-weight:800; }
+
+.meta{ margin-top:12px; display:flex; gap:8px; flex-wrap:wrap; }
 .pill{
-  border:1px solid rgba(255,255,255,.18); border-radius:999px;
-  padding:6px 10px; font-size:12px; opacity:.75;
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:999px; padding:6px 10px; font-size:12px; opacity:.75;
 }
 .lang{
   border:1px solid rgba(255,255,255,.18);
@@ -38,14 +78,10 @@ body{
   font-size:12px; opacity:.45; cursor:pointer;
 }
 .lang.active{ opacity:1; border-color:rgba(255,255,255,.6); }
-.meaning{ margin-top:18px; font-size:18px; line-height:1.6; }
+
+.meaning{ margin-top:16px; font-size:18px; line-height:1.6; }
 .example{ margin-top:10px; font-size:16px; opacity:.88; line-height:1.6; }
-.hint{
-  position:absolute; left:0; bottom:0; transform:translateY(120%);
-  font-size:12px; opacity:.35;
-}
-@keyframes pulse{0%{opacity:.4}50%{opacity:1}100%{opacity:.4}}
-.hintPulse{ animation:pulse .6s ease-in-out 0s 2; }
+.hint{ margin-top:10px; font-size:12px; opacity:.35; }
 </style>
 </head>
 
@@ -53,68 +89,135 @@ body{
 <div class="wrap">
   <div class="brand">VAREM</div>
 
-  <div class="card">
-    <div class="top">
-      <div class="subtitle">중3 영어 · 매일 한 단어</div>
-      <div class="day" onclick="location.href='archive.html'">Day <span id="dayNum"></span></div>
-    </div>
-
-    <div class="word" id="word"></div>
-
-    <div class="meta">
-      <div class="pill" id="pos"></div>
-      <div class="pill">M3</div>
-      <button class="lang active" id="btnEN" type="button">English</button>
-      <button class="lang" id="btnKO" type="button">Korean</button>
-    </div>
-
-    <div class="meaning" id="meaning"></div>
-    <div class="example" id="example"></div>
+  <div class="header">
+    <div class="title">Archive · Day 1 ~ 어제</div>
+    <div class="back" onclick="location.href='./'">← Today</div>
   </div>
 
-  <div class="hint">내일 다시 키링을 터치하세요.</div>
+  <div class="panel">
+    <div class="list" id="list"></div>
+
+    <div class="detail" id="detail">
+      <div class="detailTop">
+        <div class="detailTitle">중3 영어 · 아카이브</div>
+        <div class="detailDay" id="dDay">Day -</div>
+      </div>
+
+      <div class="bigWord" id="dWord">word</div>
+
+      <div class="meta">
+        <div class="pill" id="dPos">POS</div>
+        <div class="pill">M3</div>
+        <button class="lang active" id="btnEN" type="button">English</button>
+        <button class="lang" id="btnKO" type="button">Korean</button>
+      </div>
+
+      <div class="meaning" id="dMeaning"></div>
+      <div class="example" id="dExample"></div>
+      <div class="hint">목록에서 다른 Day를 눌러 바꿀 수 있어요.</div>
+    </div>
+  </div>
 </div>
 
+<script src="data/data.js"></script>
+
 <script>
-const LIST = [
-  {w:"anxious", p:"adj", m_en:"worried and nervous", m_ko:"불안한, 걱정되는", e_en:"She felt anxious before the exam.", e_ko:"그녀는 시험 전에 불안해했다."},
-  {w:"improve", p:"v",   m_en:"to make something better", m_ko:"개선하다, 향상시키다", e_en:"He wants to improve his English.", e_ko:"그는 영어 실력을 향상시키고 싶어한다."},
-  {w:"decide",  p:"v",   m_en:"to choose; to make a decision", m_ko:"결정하다", e_en:"She decided to study harder.", e_ko:"그녀는 더 열심히 공부하기로 결정했다."}
-];
-
-function kst(){
-  const n=new Date();
-  return new Date(n.getTime()+n.getTimezoneOffset()*60000+9*3600000);
+function kstTodayMidnight(){
+  const now = new Date();
+  const kst = new Date(now.getTime() + now.getTimezoneOffset()*60000 + 9*3600000);
+  return new Date(kst.getFullYear(), kst.getMonth(), kst.getDate());
 }
-function dayOfYear(d){
-  return Math.floor((d-new Date(d.getFullYear(),0,1))/86400000);
+function kstDayOfYearIndex(){
+  const t = kstTodayMidnight();
+  const y0 = new Date(t.getFullYear(), 0, 1);
+  return Math.floor((t - y0) / 86400000); // 0-based
 }
 
-const day = dayOfYear(kst());
-const item = LIST[day % LIST.length];
+const listEl = document.getElementById("list");
+const detailEl = document.getElementById("detail");
 
-dayNum.innerText = day + 1;
-word.innerText = item.w.toLowerCase();
-pos.innerText = item.p;
+let currentIndex = null; // 0-based
+let mode = "EN";
 
-let mode="EN";
-function render(){
-  if(mode==="EN"){
-    meaning.innerText="Meaning: " + (item.m_en ?? item.m_ko ?? "");
-    example.innerText="Example: " + (item.e_en ?? item.e_ko ?? "");
-  }else{
-    meaning.innerText="뜻: " + (item.m_ko ?? item.m_en ?? "");
-    example.innerText="예문: " + (item.e_ko ?? item.e_en ?? "");
+function itemForDayIndex(i){
+  const LIST = window.VAREM_LIST || [];
+  if(!LIST.length) return null;
+  const idx = ((i % LIST.length) + LIST.length) % LIST.length;
+  return LIST[idx];
+}
+
+function renderList(){
+  const LIST = window.VAREM_LIST || [];
+  listEl.innerHTML = "";
+
+  if(!LIST.length){
+    const row = document.createElement("div");
+    row.className = "row";
+    row.style.cursor = "default";
+    row.innerHTML = `<div class="day">Loading...</div><div class="word"></div>`;
+    listEl.appendChild(row);
+    return;
   }
+
+  const todayIndex = kstDayOfYearIndex();
+
+  if(todayIndex <= 0){
+    const row = document.createElement("div");
+    row.className = "row";
+    row.style.cursor = "default";
+    row.innerHTML = `<div class="day">No archive yet</div><div class="word"></div>`;
+    listEl.appendChild(row);
+    return;
+  }
+
+  for(let i = todayIndex - 1; i >= 0; i--){
+    const it = itemForDayIndex(i);
+    const dayNum = i + 1;
+
+    const row = document.createElement("div");
+    row.className = "row";
+    row.innerHTML = `<div class="day">Day ${dayNum}</div><div class="word">${(it?.w||"").toLowerCase()}</div>`;
+    row.onclick = () => showDetail(i);
+    listEl.appendChild(row);
+  }
+}
+
+function renderDetail(){
+  if(currentIndex === null) return;
+  const it = itemForDayIndex(currentIndex);
+  if(!it) return;
+
+  dDay.innerText = "Day " + (currentIndex + 1);
+  dWord.innerText = (it.w || "").toLowerCase();
+  dPos.innerText = it.p || "";
+
+  if(mode === "EN"){
+    dMeaning.innerText = "Meaning: " + (it.m_en ?? it.m_ko ?? "");
+    dExample.innerText = "Example: " + (it.e_en ?? it.e_ko ?? "");
+  }else{
+    dMeaning.innerText = "뜻: " + (it.m_ko ?? it.m_en ?? "");
+    dExample.innerText = "예문: " + (it.e_ko ?? it.e_en ?? "");
+  }
+
   btnEN.classList.toggle("active", mode==="EN");
   btnKO.classList.toggle("active", mode==="KO");
 }
-btnEN.onclick=()=>{mode="EN";render();}
-btnKO.onclick=()=>{mode="KO";render();}
-render();
 
-// 토글 힌트(2회)
-btnKO.classList.add("hintPulse");
+function showDetail(dayIndex){
+  currentIndex = dayIndex;
+  mode = "EN";
+  detailEl.style.display = "block";
+  renderDetail();
+  detailEl.scrollIntoView({behavior:"smooth", block:"start"});
+}
+
+btnEN.onclick = () => { mode="EN"; renderDetail(); };
+btnKO.onclick = () => { mode="KO"; renderDetail(); };
+
+window.VAREM_onReady(() => {
+  renderList();
+});
+renderList();
 </script>
 </body>
 </html>
