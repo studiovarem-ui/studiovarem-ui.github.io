@@ -122,7 +122,7 @@ body{
   </div>
 </div>
 
-<!-- ✅ data/data.js 로드 (LIST + add() + 로더 포함) -->
+<!-- ✅ data/data.js 로드 -->
 <script src="data/data.js"></script>
 
 <script>
@@ -134,6 +134,9 @@ function dayOfYear(d){
   return Math.floor((d-new Date(d.getFullYear(),0,1))/86400000);
 }
 
+const listEl = document.getElementById("list");
+const detailEl = document.getElementById("detail");
+
 let currentIndex = null;
 let mode = "EN";
 
@@ -142,7 +145,6 @@ function itemForDayIndex(i){
 }
 
 function renderList(todayIndex){
-  const listEl = document.getElementById("list");
   listEl.innerHTML = "";
 
   if(todayIndex <= 0){
@@ -189,9 +191,9 @@ function renderDetail(){
 function showDetail(dayIndex){
   currentIndex = dayIndex;
   mode = "EN";
-  detail.style.display = "block";
+  detailEl.style.display = "block";
   renderDetail();
-  detail.scrollIntoView({behavior:"smooth", block:"start"});
+  detailEl.scrollIntoView({behavior:"smooth", block:"start"});
 }
 
 btnEN.onclick = () => { mode="EN"; renderDetail(); };
