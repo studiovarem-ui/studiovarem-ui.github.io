@@ -4,164 +4,236 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>VAREM • Word Fall Quiz</title>
+
   <style>
     :root{
       --blue:#557CF3; --teal:#4BACC6; --gray:#A6A6A6;
-      --bg:#0b0f1a; --card:#121a2b; --text:#e9eefc; --muted:#9fb0d6;
+      --bg:#000; --text:#fff; --muted:#c9c9c9;
       --danger:#ff4d4f; --ok:#22c55e;
       --radius:18px;
     }
     *{box-sizing:border-box}
     body{
-      margin:0; font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Apple SD Gothic Neo,Malgun Gothic,sans-serif;
-      background: radial-gradient(1200px 700px at 50% -10%, rgba(85,124,243,.35), transparent 60%),
-                  radial-gradient(900px 500px at 0% 30%, rgba(75,172,198,.25), transparent 55%),
-                  var(--bg);
+      margin:0;
+      font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Apple SD Gothic Neo,Malgun Gothic,sans-serif;
+      background: var(--bg);
       color:var(--text);
       -webkit-font-smoothing:antialiased;
       padding: 18px 14px 20px;
     }
     .wrap{max-width:520px;margin:0 auto}
     .brand{
-      text-align:center; letter-spacing:.22em; font-weight:800; font-size:14px; color:rgba(233,238,252,.9);
-      margin-top:8px; margin-bottom:10px;
+      text-align:center;
+      letter-spacing:.22em;
+      font-weight:900;
+      font-size:14px;
+      margin-top:8px;
+      margin-bottom:12px;
+      opacity:.9;
     }
+
+    /* board: minimal for sticker vibe */
     .board{
-      position:relative;
-      background: linear-gradient(180deg, rgba(18,26,43,.92), rgba(18,26,43,.75));
-      border:1px solid rgba(166,166,166,.25);
+      background: transparent;
+      border: none;
       border-radius: var(--radius);
-      overflow:hidden;
-      box-shadow: 0 10px 30px rgba(0,0,0,.35);
     }
+
     .topbar{
-      display:flex; align-items:center; justify-content:space-between;
-      padding:10px 12px;
-      border-bottom:1px solid rgba(166,166,166,.18);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:12px;
+      flex-wrap:wrap;
     }
-    .pill{
-      display:inline-flex; align-items:center; gap:8px;
-      padding:7px 10px; border-radius:999px;
-      background: rgba(85,124,243,.16);
-      border:1px solid rgba(85,124,243,.35);
-      font-weight:700; font-size:12px;
+
+    /* HUD sticker pills */
+    .pill, .stat{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 10px;
+      border-radius:999px;
+      background:#fff;
+      color:#111;
+      border:4px solid #000;
+      box-shadow: 0 10px 0 rgba(0,0,0,.85);
+      font-weight: 900;
+      font-size:12px;
+      white-space:nowrap;
     }
-    .stats{display:flex; gap:8px; align-items:center}
-    .stat{
-      padding:7px 10px; border-radius:999px;
-      background: rgba(166,166,166,.12);
-      border:1px solid rgba(166,166,166,.22);
-      font-weight:700; font-size:12px; color:rgba(233,238,252,.92);
-    }
+    .stats{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+
+    /* stage bigger */
     .stage{
       position:relative;
-      height: 360px;
-      background:
-        radial-gradient(700px 260px at 50% 0%, rgba(85,124,243,.10), transparent 65%),
-        radial-gradient(600px 220px at 20% 20%, rgba(75,172,198,.10), transparent 62%);
+      height: 520px;  /* 더 크게 */
+      border-radius: 22px;
+      overflow:hidden;
+      background: transparent;
     }
+
     .floor{
       position:absolute; left:0; right:0; bottom:0;
       height:14px;
-      background: linear-gradient(90deg, rgba(85,124,243,.25), rgba(75,172,198,.20));
-      opacity:.6;
+      background: #111;
+      border-top:4px solid #000;
     }
+
+    /* word card sticker */
     .wordCard{
       position:absolute;
       left: 50%;
       transform: translateX(-50%);
-      top: 24px;
-      min-width: 220px;
-      padding: 14px 16px;
-      border-radius: 16px;
-      background: rgba(11,15,26,.55);
-      border: 2px solid rgba(85,124,243,.55);
-      box-shadow: 0 12px 26px rgba(0,0,0,.35);
+      top: 0px;
+      min-width: 240px;
+      padding: 16px 18px;
+      border-radius: 22px;
+      background: #111;
+      border: 4px solid #000;
+      box-shadow: 0 16px 0 rgba(0,0,0,.85), 0 26px 60px rgba(0,0,0,.45);
       text-align:center;
       user-select:none;
+      will-change: top, transform;
     }
-    .wordCard .label{font-size:12px;color:var(--muted);font-weight:700;letter-spacing:.1em}
-    .wordCard .word{margin-top:6px;font-size:32px;font-weight:900; letter-spacing:.02em}
-    .wordCard.good{border-color: rgba(34,197,94,.7)}
-    .wordCard.bad{border-color: rgba(255,77,79,.75)}
+    .wordCard .label{
+      font-size:12px;
+      color:#fff;
+      font-weight:900;
+      letter-spacing:.18em;
+      opacity:1;
+    }
+    .wordCard .word{
+      margin-top:8px;
+      font-size:42px;
+      font-weight:900;
+      letter-spacing:.01em;
+      color:#fff;
+    }
+    .wordCard.good{
+      outline: 4px solid rgba(34,197,94,.85);
+      outline-offset: 2px;
+    }
+    .wordCard.bad{
+      outline: 4px solid rgba(255,77,79,.85);
+      outline-offset: 2px;
+    }
+
     .controls{
-      padding: 12px;
-      display:flex; flex-direction:column; gap:10px;
+      margin-top:14px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
     }
-    .choices{display:grid; grid-template-columns: 1fr 1fr; gap:10px}
+
+    /* choices: 1-column sticker labels */
+    .choices{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
     button.choice{
-      appearance:none; border:1px solid rgba(166,166,166,.28);
-      background: rgba(166,166,166,.10);
-      color: rgba(233,238,252,.95);
-      border-radius: 14px;
-      padding: 12px 12px;
-      font-size: 15px;
-      font-weight: 800;
+      appearance:none;
+      border: 4px solid #000;
+      border-radius: 999px;
+      padding: 14px 18px;
+      font-size: 18px;
+      font-weight: 900;
+      color:#111;
       cursor:pointer;
-      transition: transform .06s ease, background .2s ease, border-color .2s ease;
-      text-align:center;
-      min-height: 50px;
+      box-shadow: 0 12px 0 rgba(0,0,0,.85), 0 18px 40px rgba(0,0,0,.35);
+      transform-origin: center;
+      min-height: 54px;
+      text-align:left;
+      letter-spacing: .01em;
     }
-    button.choice:active{transform: scale(.985)}
+    button.choice:active{
+      transform: translateY(6px) scale(.99) !important;
+      box-shadow: 0 6px 0 rgba(0,0,0,.85), 0 12px 26px rgba(0,0,0,.35);
+    }
+    button.choice[disabled]{
+      cursor: default;
+      opacity:.95;
+    }
     button.choice.correct{
-      background: rgba(34,197,94,.18);
-      border-color: rgba(34,197,94,.55);
+      outline: 3px solid rgba(255,255,255,.9);
+      outline-offset: 3px;
     }
     button.choice.wrong{
-      background: rgba(255,77,79,.16);
-      border-color: rgba(255,77,79,.55);
+      opacity:.88;
+      filter: grayscale(.25);
     }
+
     .row{
-      display:flex; gap:10px; align-items:center; justify-content:space-between;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
     }
     .btn{
-      border-radius: 12px;
-      padding: 10px 12px;
-      background: rgba(85,124,243,.18);
-      border: 1px solid rgba(85,124,243,.45);
-      color: rgba(233,238,252,.95);
+      border-radius: 999px;
+      padding: 10px 14px;
+      background:#fff;
+      border:4px solid #000;
+      color:#111;
       font-weight: 900;
       cursor:pointer;
+      box-shadow: 0 10px 0 rgba(0,0,0,.85);
     }
-    .btn.secondary{
-      background: rgba(166,166,166,.10);
-      border-color: rgba(166,166,166,.25);
-      color: rgba(233,238,252,.9);
-      font-weight: 800;
+    .btn:active{
+      transform: translateY(6px);
+      box-shadow: 0 4px 0 rgba(0,0,0,.85);
     }
+
     .hint{
-      color: rgba(233,238,252,.78);
+      color: rgba(255,255,255,.72);
       font-size: 12px;
       line-height: 1.35;
+      padding: 2px 2px 0;
     }
+    .kbd{
+      font-family: ui-monospace,SFMono-Regular,Menlo,monospace;
+      font-weight:900;
+      font-size:12px;
+      background:#111;
+      border:2px solid #000;
+      padding:2px 6px;
+      border-radius:10px;
+      color:#fff;
+    }
+
+    /* overlay */
     .overlay{
       position:fixed; inset:0;
       display:none;
       align-items:center; justify-content:center;
-      background: rgba(0,0,0,.55);
+      background: rgba(0,0,0,.72);
       padding: 18px 14px;
     }
     .modal{
       width:min(520px, 100%);
-      background: rgba(18,26,43,.96);
-      border: 1px solid rgba(166,166,166,.28);
+      background:#fff;
+      color:#111;
+      border:4px solid #000;
       border-radius: 18px;
       padding: 16px;
-      box-shadow: 0 20px 60px rgba(0,0,0,.45);
+      box-shadow: 0 18px 0 rgba(0,0,0,.85), 0 34px 80px rgba(0,0,0,.45);
     }
-    .modal h2{margin:0 0 8px; font-size:20px}
-    .modal .sub{color:rgba(233,238,252,.75); font-size:13px; margin-bottom:12px}
+    .modal h2{margin:0 0 8px; font-size:20px; font-weight: 900;}
+    .modal .sub{color:rgba(0,0,0,.72); font-size:13px; margin-bottom:12px; font-weight:800;}
     .scores{
-      margin-top:10px; border-top:1px solid rgba(166,166,166,.18); padding-top:10px;
-      color:rgba(233,238,252,.9); font-size:13px;
+      margin-top:10px;
+      border-top:2px solid rgba(0,0,0,.15);
+      padding-top:10px;
+      font-size:13px;
+      font-weight:800;
     }
-    .scores ol{margin:8px 0 0; padding-left:18px}
-    .kbd{font-family: ui-monospace,SFMono-Regular,Menlo,monospace; font-weight:800; font-size:12px;
-      background: rgba(166,166,166,.14); border:1px solid rgba(166,166,166,.22);
-      padding:2px 6px; border-radius:8px;
-    }
+    .scores ol{margin:8px 0 0; padding-left:18px; font-weight:800;}
   </style>
 </head>
+
 <body>
   <div class="wrap">
     <div class="brand">VAREM</div>
@@ -186,13 +258,15 @@
 
       <div class="controls">
         <div class="choices" id="choices"></div>
+
         <div class="row">
           <button class="btn" id="startBtn">Start</button>
-          <button class="btn secondary" id="restartBtn">Restart</button>
+          <button class="btn" id="restartBtn">Restart</button>
         </div>
+
         <div class="hint">
-          규칙: 떨어지는 영단어의 <b>올바른 뜻</b>을 터치하세요. 놓치면 ♥ 감소.<br/>
-          데스크탑은 <span class="kbd">1</span>~<span class="kbd">4</span> 키로 보기 선택 가능.
+          규칙: 떨어지는 영단어의 <b>올바른 뜻</b> 스티커를 터치하세요. 바닥에 닿으면 ♥ 감소.<br/>
+          데스크탑: <span class="kbd">1</span>~<span class="kbd">4</span> 키 선택 가능.
         </div>
       </div>
     </div>
@@ -204,7 +278,7 @@
       <div class="sub" id="modalSub">Your score: 0</div>
       <div class="row">
         <button class="btn" id="playAgainBtn">Play again</button>
-        <button class="btn secondary" id="closeBtn">Close</button>
+        <button class="btn" id="closeBtn">Close</button>
       </div>
       <div class="scores" id="scoreBox"></div>
     </div>
@@ -214,7 +288,6 @@
   <script>
     // ---------- KST day-of-year seed ----------
     function getKSTDate() {
-      // KST = UTC+9
       const now = new Date();
       const utc = now.getTime() + now.getTimezoneOffset() * 60000;
       return new Date(utc + 9 * 3600000);
@@ -226,7 +299,7 @@
       return Math.floor(diff / oneDay);
     }
 
-    // ---------- simple seeded RNG ----------
+    // ---------- seeded RNG ----------
     function mulberry32(seed) {
       let t = seed >>> 0;
       return function() {
@@ -258,16 +331,14 @@
 
     // ---------- Game state ----------
     const WORDS = (window.WORDS || []).slice();
-    if (!WORDS.length) {
-      alert("data.js에 WORDS가 비어있어요.");
-    }
+    if (!WORDS.length) alert("data.js에 WORDS가 비어있어요.");
 
     const kst = getKSTDate();
     const day = dayOfYearKST(kst);
     dayNumEl.textContent = String(day);
 
-    // daily seeded order
     const rng = mulberry32((kst.getFullYear() * 1000) + day);
+
     function shuffleWithRng(arr) {
       const a = arr.slice();
       for (let i = a.length - 1; i > 0; i--) {
@@ -285,68 +356,22 @@
     let life = 3;
 
     // physics
-    let y = 24; // px
-    let v = 0.05; // px per ms-ish scale using dt
+    let y = -90;      // 화면 위에서 등장
+    let v = 0.02;     // px/ms
     let lastTs = null;
 
     // current question
-    let current = null; // [eng, kor]
-    let currentCorrect = null;
+    let current = null;         // [eng, kor]
+    let currentCorrect = null;  // kor string
     let choiceButtons = [];
 
     function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
 
-    function pickNextWord() {
-      current = dailyList[idx % dailyList.length];
-      idx++;
-
-      // build 4 choices: 1 correct + 3 wrong
-      const correct = current[1];
-      const seen = new Set([correct]);
-
-      const options = [correct];
-      // pull wrong meanings
-      while (options.length < 4 && seen.size < WORDS.length) {
-        const r = WORDS[Math.floor(rng() * WORDS.length)][1];
-        if (!seen.has(r)) {
-          seen.add(r);
-          options.push(r);
-        }
-      }
-      // shuffle options
-      for (let i = options.length - 1; i > 0; i--) {
-        const j = Math.floor(rng() * (i + 1));
-        [options[i], options[j]] = [options[j], options[i]];
-      }
-
-      currentCorrect = correct;
-
-      // render
-      wordTextEl.textContent = String(current[0]).toLowerCase();
-      y = 24;
-      v = speedForScore(score);
-      wordCardEl.classList.remove("good","bad");
-      renderChoices(options);
-    }
-
     function speedForScore(s) {
-      // gentle ramp
-      const base = 0.05;
-      const add = Math.min(0.05, Math.floor(s / 80) * 0.08);
+      // 느리게 시작 + 점수에 따라 아주 서서히 가속
+      const base = 0.02;
+      const add  = Math.min(0.03, Math.floor(s / 120) * 0.004);
       return base + add;
-    }
-
-    function renderChoices(options) {
-      choicesEl.innerHTML = "";
-      choiceButtons = options.map((text, i) => {
-        const b = document.createElement("button");
-        b.className = "choice";
-        b.type = "button";
-        b.textContent = text;
-        b.addEventListener("click", () => choose(text, b));
-        choicesEl.appendChild(b);
-        return b;
-      });
     }
 
     function setHUD() {
@@ -359,26 +384,93 @@
       choiceButtons.forEach(b => b.disabled = lock);
     }
 
-    function choose(text, btn) {
+    function renderChoices(options) {
+      const palette = [
+        "#A7F3D0", "#FDE68A", "#FCA5A5", "#93C5FD",
+        "#FBCFE8", "#C7D2FE", "#86EFAC", "#FFD54A"
+      ];
+      const icons = ["✨", "⭐️", "🐾", "🔥", "💎", "🍀"];
+
+      choicesEl.innerHTML = "";
+      choiceButtons = options.map((meaning) => {
+        const b = document.createElement("button");
+        b.className = "choice";
+        b.type = "button";
+
+        // store real answer (important because we add icon to text)
+        b.dataset.answer = meaning;
+
+        const color = palette[Math.floor(rng() * palette.length)];
+        const tilt = (rng() * 10 - 5).toFixed(2);      // -5 ~ +5deg
+        const scale = (0.98 + rng() * 0.08).toFixed(3); // 0.98~1.06
+        b.style.background = color;
+        b.style.transform = `rotate(${tilt}deg) scale(${scale})`;
+
+        const icon = icons[Math.floor(rng() * icons.length)];
+        b.textContent = `${icon}  ${meaning}`;
+
+        b.addEventListener("click", () => choose(meaning, b));
+        choicesEl.appendChild(b);
+        return b;
+      });
+    }
+
+    function pickNextWord() {
+      current = dailyList[idx % dailyList.length];
+      idx++;
+
+      const correct = current[1];
+      const seen = new Set([correct]);
+      const options = [correct];
+
+      while (options.length < 4 && seen.size < WORDS.length) {
+        const r = WORDS[Math.floor(rng() * WORDS.length)][1];
+        if (!seen.has(r)) { seen.add(r); options.push(r); }
+      }
+
+      // shuffle options
+      for (let i = options.length - 1; i > 0; i--) {
+        const j = Math.floor(rng() * (i + 1));
+        [options[i], options[j]] = [options[j], options[i]];
+      }
+
+      currentCorrect = correct;
+
+      // render word
+      wordTextEl.textContent = String(current[0]).toLowerCase();
+
+      // card tilt (sticker vibe)
+      const tilt = (rng() * 6 - 3).toFixed(2);
+      wordCardEl.style.transform = `translateX(-50%) rotate(${tilt}deg)`;
+
+      // reset physics & styles
+      y = -90;
+      v = speedForScore(score);
+      wordCardEl.classList.remove("good","bad");
+
+      renderChoices(options);
+      lockChoices(false);
+    }
+
+    function choose(meaning, btn) {
       if (!running) return;
       lockChoices(true);
 
-      const ok = (text === currentCorrect);
+      const ok = (meaning === currentCorrect);
       if (ok) {
         combo += 1;
         const bonus = clamp(combo - 1, 0, 20);
         score += 10 + bonus;
         wordCardEl.classList.add("good");
         btn.classList.add("correct");
-        // speed up slightly as feedback
       } else {
         combo = 0;
         life -= 1;
         wordCardEl.classList.add("bad");
         btn.classList.add("wrong");
-        // show which one was correct
+        // show correct
         choiceButtons.forEach(b => {
-          if (b.textContent === currentCorrect) b.classList.add("correct");
+          if (b.dataset.answer === currentCorrect) b.classList.add("correct");
         });
       }
 
@@ -389,12 +481,10 @@
         return;
       }
 
-      // next word after short delay
       setTimeout(() => {
         if (!running) return;
         pickNextWord();
         setHUD();
-        lockChoices(false);
       }, 520);
     }
 
@@ -419,26 +509,22 @@
     // Top5 local scores
     const SCORE_KEY = "vareM_wordfall_top5_v1";
     function loadScores() {
-      try {
-        return JSON.parse(localStorage.getItem(SCORE_KEY) || "[]");
-      } catch {
-        return [];
-      }
+      try { return JSON.parse(localStorage.getItem(SCORE_KEY) || "[]"); }
+      catch { return []; }
     }
     function saveScore(s) {
       const arr = loadScores();
       arr.push({ score: s, at: new Date().toISOString() });
       arr.sort((a,b)=>b.score-a.score);
-      const top5 = arr.slice(0,5);
-      localStorage.setItem(SCORE_KEY, JSON.stringify(top5));
+      localStorage.setItem(SCORE_KEY, JSON.stringify(arr.slice(0,5)));
     }
     function renderTopScores() {
       const arr = loadScores();
       if (!arr.length) {
-        scoreBox.innerHTML = "<b>Top 5</b><div style='margin-top:6px;color:rgba(233,238,252,.7)'>No records yet.</div>";
+        scoreBox.innerHTML = "<b>Top 5</b><div style='margin-top:6px;opacity:.75'>No records yet.</div>";
         return;
       }
-      const items = arr.map(x => `<li><b>${x.score}</b> <span style="color:rgba(233,238,252,.65)">(${x.at.slice(0,10)})</span></li>`).join("");
+      const items = arr.map(x => `<li><b>${x.score}</b> <span style="opacity:.7">(${x.at.slice(0,10)})</span></li>`).join("");
       scoreBox.innerHTML = `<b>Top 5</b><ol>${items}</ol>`;
     }
 
@@ -450,12 +536,12 @@
       lastTs = ts;
 
       y += v * dt;
-      // update position
       wordCardEl.style.top = y + "px";
 
       const stageH = stageEl.clientHeight;
       const cardH = wordCardEl.offsetHeight;
       const floorY = stageH - 14; // floor height
+
       if (y + cardH >= floorY) {
         // missed
         combo = 0;
@@ -471,7 +557,6 @@
           setTimeout(() => {
             if (!running) return;
             pickNextWord();
-            lockChoices(false);
             setHUD();
           }, 520);
         }
@@ -486,7 +571,6 @@
       running = true;
       setHUD();
       pickNextWord();
-      lockChoices(false);
     }
 
     function restartGame() {
@@ -494,7 +578,7 @@
       startGame();
     }
 
-    // keyboard shortcuts 1~4 for desktop
+    // keyboard shortcuts 1~4
     window.addEventListener("keydown", (e) => {
       if (!running) return;
       const k = e.key;
@@ -505,16 +589,11 @@
       }
     });
 
-    startBtn.addEventListener("click", () => {
-      hideModal();
-      startGame();
-    });
+    startBtn.addEventListener("click", () => { hideModal(); startGame(); });
     restartBtn.addEventListener("click", restartGame);
     playAgainBtn.addEventListener("click", restartGame);
     closeBtn.addEventListener("click", hideModal);
-    overlay.addEventListener("click", (e) => {
-      if (e.target === overlay) hideModal();
-    });
+    overlay.addEventListener("click", (e) => { if (e.target === overlay) hideModal(); });
 
     // init
     setHUD();
