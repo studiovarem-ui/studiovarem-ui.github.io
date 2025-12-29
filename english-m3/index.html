@@ -21,6 +21,7 @@ body{
   border-radius:18px; padding:22px; background:rgba(255,255,255,.02);
 }
 .top{ display:flex; justify-content:flex-end; align-items:flex-start; gap:10px; }
+
 .day{
   font-size:12px; border:1px solid rgba(255,255,255,.18); border-radius:999px;
   padding:6px 10px; opacity:.75; cursor:pointer; user-select:none;
@@ -72,7 +73,7 @@ body{
   <div class="hint">내일 다시 키링을 터치하세요.</div>
 </div>
 
-<!-- ✅ data/data.js 로드 (LIST + add() + 로더 포함) -->
+<!-- ✅ data/data.js 로드 -->
 <script src="data/data.js"></script>
 
 <script>
@@ -85,6 +86,8 @@ function dayOfYear(d){
 }
 
 let mode="EN";
+let _lastItem=null, _lastDayIndex=0;
+
 function render(item, dayIndex){
   dayNum.innerText = dayIndex + 1;
   word.innerText = item.w.toLowerCase();
@@ -97,20 +100,20 @@ function render(item, dayIndex){
     meaning.innerText="뜻: " + (item.m_ko ?? item.m_en ?? "");
     example.innerText="예문: " + (item.e_ko ?? item.e_en ?? "");
   }
+
   btnEN.classList.toggle("active", mode==="EN");
   btnKO.classList.toggle("active", mode==="KO");
 }
 
-btnEN.onclick=()=>{mode="EN"; window.__VAREM_LAST_ITEM && render(window.__VAREM_LAST_ITEM, window.__VAREM_LAST_DAY);};
-btnKO.onclick=()=>{mode="KO"; window.__VAREM_LAST_ITEM && render(window.__VAREM_LAST_ITEM, window.__VAREM_LAST_DAY);};
+btnEN.onclick=()=>{ mode="EN"; if(_lastItem) render(_lastItem,_lastDayIndex); };
+btnKO.onclick=()=>{ mode="KO"; if(_lastItem) render(_lastItem,_lastDayIndex); };
 
 window.VAREM_onReady(function(){
   const dayIndex = dayOfYear(kst()); // 0-based
   const item = window.VAREM_LIST[dayIndex % window.VAREM_LIST.length];
 
-  // toggle용 캐시
-  window.__VAREM_LAST_ITEM = item;
-  window.__VAREM_LAST_DAY  = dayIndex;
+  _lastItem = item;
+  _lastDayIndex = dayIndex;
 
   render(item, dayIndex);
 
