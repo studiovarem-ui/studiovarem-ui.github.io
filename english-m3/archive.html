@@ -34,12 +34,14 @@ body{
   background:rgba(255,255,255,.02);
 }
 
+/* ✅ 목록은 "5개 높이"만 보이게 + 스크롤은 전체 */
 .list{
   max-height: 270px;
   overflow:auto;
   -webkit-overflow-scrolling: touch;
 }
 
+/* 목록 줄 */
 .row{
   display:flex; justify-content:space-between; align-items:center;
   padding:14px 16px;
@@ -52,6 +54,7 @@ body{
 .day{ font-size:12px; opacity:.6; }
 .word{ font-size:16px; font-weight:700; }
 
+/* 상세(투데이 카드 스타일) */
 .detail{
   border-top:1px solid rgba(255,255,255,.10);
   padding:18px 16px 18px;
@@ -81,6 +84,7 @@ body{
 
 .meaning{ margin-top:16px; font-size:18px; line-height:1.6; }
 .example{ margin-top:10px; font-size:16px; opacity:.88; line-height:1.6; }
+
 .hint{ margin-top:10px; font-size:12px; opacity:.35; }
 </style>
 </head>
@@ -99,7 +103,7 @@ body{
 
     <div class="detail" id="detail">
       <div class="detailTop">
-        <div class="detailTitle">중3 영어 · 아카이브</div>
+        <div class="detailTitle">Archive</div>
         <div class="detailDay" id="dDay">Day -</div>
       </div>
 
@@ -107,7 +111,6 @@ body{
 
       <div class="meta">
         <div class="pill" id="dPos">POS</div>
-        <div class="pill">M3</div>
         <button class="lang active" id="btnEN" type="button">English</button>
         <button class="lang" id="btnKO" type="button">Korean</button>
       </div>
@@ -119,47 +122,28 @@ body{
   </div>
 </div>
 
+<!-- ✅ data/data.js 로드 (LIST + add() + 로더 포함) -->
 <script src="data/data.js"></script>
 
 <script>
-function kstTodayMidnight(){
-  const now = new Date();
-  const kst = new Date(now.getTime() + now.getTimezoneOffset()*60000 + 9*3600000);
-  return new Date(kst.getFullYear(), kst.getMonth(), kst.getDate());
+function kst(){
+  const n=new Date();
+  return new Date(n.getTime()+n.getTimezoneOffset()*60000+9*3600000);
 }
-function kstDayOfYearIndex(){
-  const t = kstTodayMidnight();
-  const y0 = new Date(t.getFullYear(), 0, 1);
-  return Math.floor((t - y0) / 86400000); // 0-based
+function dayOfYear(d){
+  return Math.floor((d-new Date(d.getFullYear(),0,1))/86400000);
 }
 
-const listEl = document.getElementById("list");
-const detailEl = document.getElementById("detail");
-
-let currentIndex = null; // 0-based
+let currentIndex = null;
 let mode = "EN";
 
 function itemForDayIndex(i){
-  const LIST = window.VAREM_LIST || [];
-  if(!LIST.length) return null;
-  const idx = ((i % LIST.length) + LIST.length) % LIST.length;
-  return LIST[idx];
+  return window.VAREM_LIST[i % window.VAREM_LIST.length];
 }
 
-function renderList(){
-  const LIST = window.VAREM_LIST || [];
+function renderList(todayIndex){
+  const listEl = document.getElementById("list");
   listEl.innerHTML = "";
-
-  if(!LIST.length){
-    const row = document.createElement("div");
-    row.className = "row";
-    row.style.cursor = "default";
-    row.innerHTML = `<div class="day">Loading...</div><div class="word"></div>`;
-    listEl.appendChild(row);
-    return;
-  }
-
-  const todayIndex = kstDayOfYearIndex();
 
   if(todayIndex <= 0){
     const row = document.createElement("div");
@@ -171,12 +155,12 @@ function renderList(){
   }
 
   for(let i = todayIndex - 1; i >= 0; i--){
-    const it = itemForDayIndex(i);
     const dayNum = i + 1;
+    const it = itemForDayIndex(i);
 
     const row = document.createElement("div");
     row.className = "row";
-    row.innerHTML = `<div class="day">Day ${dayNum}</div><div class="word">${(it?.w||"").toLowerCase()}</div>`;
+    row.innerHTML = `<div class="day">Day ${dayNum}</div><div class="word">${it.w.toLowerCase()}</div>`;
     row.onclick = () => showDetail(i);
     listEl.appendChild(row);
   }
@@ -185,11 +169,10 @@ function renderList(){
 function renderDetail(){
   if(currentIndex === null) return;
   const it = itemForDayIndex(currentIndex);
-  if(!it) return;
 
   dDay.innerText = "Day " + (currentIndex + 1);
-  dWord.innerText = (it.w || "").toLowerCase();
-  dPos.innerText = it.p || "";
+  dWord.innerText = it.w.toLowerCase();
+  dPos.innerText = it.p;
 
   if(mode === "EN"){
     dMeaning.innerText = "Meaning: " + (it.m_en ?? it.m_ko ?? "");
@@ -206,18 +189,18 @@ function renderDetail(){
 function showDetail(dayIndex){
   currentIndex = dayIndex;
   mode = "EN";
-  detailEl.style.display = "block";
+  detail.style.display = "block";
   renderDetail();
-  detailEl.scrollIntoView({behavior:"smooth", block:"start"});
+  detail.scrollIntoView({behavior:"smooth", block:"start"});
 }
 
 btnEN.onclick = () => { mode="EN"; renderDetail(); };
 btnKO.onclick = () => { mode="KO"; renderDetail(); };
 
-window.VAREM_onReady(() => {
-  renderList();
+window.VAREM_onReady(function(){
+  const todayIndex = dayOfYear(kst()); // 0-based
+  renderList(todayIndex);
 });
-renderList();
 </script>
 </body>
 </html>
