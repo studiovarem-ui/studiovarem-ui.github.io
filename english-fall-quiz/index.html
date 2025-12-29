@@ -7,49 +7,59 @@
 
   <style>
     :root{
-      --blue:#557CF3; --teal:#4BACC6; --gray:#A6A6A6;
-      --bg:#000; --text:#fff; --muted:#c9c9c9;
-      --danger:#ff4d4f; --ok:#22c55e;
-      --radius:18px;
+      --bg:#000;
+      --text:#fff;
+      --card:#111;
+      --shadow: rgba(0,0,0,.85);
+      --ok:#22c55e;
+      --bad:#ff4d4f;
     }
     *{box-sizing:border-box}
-    body{
+
+    /* ✅ 스크롤 완전 차단 */
+    html, body{
+      height:100%;
       margin:0;
-      font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Apple SD Gothic Neo,Malgun Gothic,sans-serif;
-      background: var(--bg);
+      overflow:hidden;
+      overscroll-behavior:none;
+      background:var(--bg);
       color:var(--text);
+      font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Apple SD Gothic Neo,Malgun Gothic,sans-serif;
       -webkit-font-smoothing:antialiased;
-      padding: 18px 14px 20px;
+      touch-action: manipulation;
     }
-    .wrap{max-width:520px;margin:0 auto}
+    body{
+      padding: 18px 14px 18px;
+    }
+
+    .wrap{
+      height:100%;
+      max-width: 980px;
+      margin:0 auto;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
     .brand{
       text-align:center;
       letter-spacing:.22em;
       font-weight:900;
       font-size:14px;
-      margin-top:8px;
-      margin-bottom:12px;
       opacity:.9;
+      flex:0 0 auto;
     }
 
-    /* board: minimal for sticker vibe */
-    .board{
-      background: transparent;
-      border: none;
-      border-radius: var(--radius);
-    }
-
+    /* 상단 HUD (DAY 삭제) */
     .topbar{
       display:flex;
       align-items:center;
-      justify-content:space-between;
+      justify-content:center;
       gap:10px;
-      margin-bottom:12px;
       flex-wrap:wrap;
+      flex:0 0 auto;
     }
-
-    /* HUD sticker pills */
-    .pill, .stat{
+    .stat{
       display:inline-flex;
       align-items:center;
       gap:8px;
@@ -58,30 +68,42 @@
       background:#fff;
       color:#111;
       border:4px solid #000;
-      box-shadow: 0 10px 0 rgba(0,0,0,.85);
+      box-shadow: 0 10px 0 var(--shadow);
       font-weight: 900;
       font-size:12px;
       white-space:nowrap;
     }
-    .stats{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
 
-    /* stage bigger */
+    /* ✅ 2분할 레이아웃 */
+    .main{
+      flex:1 1 auto;
+      min-height:0; /* 중요: 내부 스크롤/넘침 방지 */
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:14px;
+      align-items:stretch;
+    }
+
+    /* 왼쪽: stage */
+    .leftPanel{
+      position:relative;
+      border-radius:22px;
+      overflow:hidden;
+      min-height:0;
+    }
     .stage{
       position:relative;
-      height: 520px;  /* 더 크게 */
-      border-radius: 22px;
+      height:100%;
+      border-radius:22px;
       overflow:hidden;
       background: transparent;
     }
-
     .floor{
       position:absolute; left:0; right:0; bottom:0;
       height:14px;
       background: #111;
       border-top:4px solid #000;
     }
-
-    /* word card sticker */
     .wordCard{
       position:absolute;
       left: 50%;
@@ -90,9 +112,9 @@
       min-width: 240px;
       padding: 16px 18px;
       border-radius: 22px;
-      background: #111;
+      background: var(--card);
       border: 4px solid #000;
-      box-shadow: 0 16px 0 rgba(0,0,0,.85), 0 26px 60px rgba(0,0,0,.45);
+      box-shadow: 0 16px 0 var(--shadow), 0 26px 60px rgba(0,0,0,.45);
       text-align:center;
       user-select:none;
       will-change: top, transform;
@@ -106,7 +128,7 @@
     }
     .wordCard .word{
       margin-top:8px;
-      font-size:42px;
+      font-size:44px;
       font-weight:900;
       letter-spacing:.01em;
       color:#fff;
@@ -120,43 +142,45 @@
       outline-offset: 2px;
     }
 
-    .controls{
-      margin-top:14px;
+    /* 오른쪽: choices + controls */
+    .rightPanel{
       display:flex;
       flex-direction:column;
       gap:12px;
+      min-height:0;
     }
-
-    /* choices: 1-column sticker labels */
     .choices{
       display:grid;
-      grid-template-columns: 1fr;
+      grid-template-rows: repeat(4, 1fr);
       gap: 12px;
+      flex:1 1 auto;
+      min-height:0;
     }
-
     button.choice{
+      width:100%;
       appearance:none;
       border: 4px solid #000;
-      border-radius: 999px;
-      padding: 14px 18px;
-      font-size: 18px;
+      border-radius: 18px;
+      padding: 14px 16px;
+      font-size: 20px;
       font-weight: 900;
       color:#111;
       cursor:pointer;
-      box-shadow: 0 12px 0 rgba(0,0,0,.85), 0 18px 40px rgba(0,0,0,.35);
-      transform-origin: center;
-      min-height: 54px;
+      box-shadow: 0 12px 0 var(--shadow), 0 18px 40px rgba(0,0,0,.35);
+      background:#E5E7EB;
       text-align:left;
-      letter-spacing: .01em;
+      letter-spacing:.01em;
+      display:flex;
+      align-items:center;
+      justify-content:flex-start;
+      user-select:none;
+      transform:none; /* ✅ 삐뚤빼뚤 제거 */
     }
     button.choice:active{
-      transform: translateY(6px) scale(.99) !important;
-      box-shadow: 0 6px 0 rgba(0,0,0,.85), 0 12px 26px rgba(0,0,0,.35);
+      transform: translateY(6px);
+      box-shadow: 0 6px 0 var(--shadow), 0 12px 26px rgba(0,0,0,.35);
     }
-    button.choice[disabled]{
-      cursor: default;
-      opacity:.95;
-    }
+    button.choice[disabled]{cursor:default; opacity:.95;}
     button.choice.correct{
       outline: 3px solid rgba(255,255,255,.9);
       outline-offset: 3px;
@@ -166,13 +190,14 @@
       filter: grayscale(.25);
     }
 
-    .row{
+    .controls{
       display:flex;
       gap:10px;
-      align-items:center;
       justify-content:space-between;
+      flex:0 0 auto;
     }
     .btn{
+      flex:1;
       border-radius: 999px;
       padding: 10px 14px;
       background:#fff;
@@ -180,14 +205,15 @@
       color:#111;
       font-weight: 900;
       cursor:pointer;
-      box-shadow: 0 10px 0 rgba(0,0,0,.85);
+      box-shadow: 0 10px 0 var(--shadow);
     }
     .btn:active{
       transform: translateY(6px);
-      box-shadow: 0 4px 0 rgba(0,0,0,.85);
+      box-shadow: 0 4px 0 var(--shadow);
     }
 
     .hint{
+      flex:0 0 auto;
       color: rgba(255,255,255,.72);
       font-size: 12px;
       line-height: 1.35;
@@ -204,13 +230,14 @@
       color:#fff;
     }
 
-    /* overlay */
+    /* Game over modal */
     .overlay{
       position:fixed; inset:0;
       display:none;
       align-items:center; justify-content:center;
       background: rgba(0,0,0,.72);
       padding: 18px 14px;
+      z-index: 50;
     }
     .modal{
       width:min(520px, 100%);
@@ -219,7 +246,7 @@
       border:4px solid #000;
       border-radius: 18px;
       padding: 16px;
-      box-shadow: 0 18px 0 rgba(0,0,0,.85), 0 34px 80px rgba(0,0,0,.45);
+      box-shadow: 0 18px 0 var(--shadow), 0 34px 80px rgba(0,0,0,.45);
     }
     .modal h2{margin:0 0 8px; font-size:20px; font-weight: 900;}
     .modal .sub{color:rgba(0,0,0,.72); font-size:13px; margin-bottom:12px; font-weight:800;}
@@ -231,6 +258,22 @@
       font-weight:800;
     }
     .scores ol{margin:8px 0 0; padding-left:18px; font-weight:800;}
+
+    /* 모바일 세로: 2분할 -> 위/아래 */
+    @media (max-width: 720px){
+      body{padding: 14px 12px;}
+      .main{
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr auto;
+      }
+      .choices{
+        grid-template-rows: repeat(4, auto);
+      }
+      button.choice{
+        border-radius: 999px; /* 모바일은 라벨 느낌 */
+        font-size: 18px;
+      }
+    }
   </style>
 </head>
 
@@ -238,34 +281,35 @@
   <div class="wrap">
     <div class="brand">VAREM</div>
 
-    <div class="board">
-      <div class="topbar">
-        <div class="pill" id="dayPill">DAY <span id="dayNum">—</span></div>
-        <div class="stats">
-          <div class="stat">Score <span id="score">0</span></div>
-          <div class="stat">Combo <span id="combo">0</span></div>
-          <div class="stat">♥ <span id="life">3</span></div>
+    <!-- ✅ DAY 삭제 -->
+    <div class="topbar">
+      <div class="stat">Score <span id="score">0</span></div>
+      <div class="stat">Combo <span id="combo">0</span></div>
+      <div class="stat">♥ <span id="life">3</span></div>
+    </div>
+
+    <!-- ✅ 2분할 -->
+    <div class="main">
+      <div class="leftPanel">
+        <div class="stage" id="stage" aria-label="Game stage">
+          <div class="wordCard" id="wordCard" role="group" aria-label="Falling word">
+            <div class="label">WORD</div>
+            <div class="word" id="wordText">ready</div>
+          </div>
+          <div class="floor"></div>
         </div>
       </div>
 
-      <div class="stage" id="stage" aria-label="Game stage">
-        <div class="wordCard" id="wordCard" role="group" aria-label="Falling word">
-          <div class="label">WORD</div>
-          <div class="word" id="wordText">ready</div>
-        </div>
-        <div class="floor"></div>
-      </div>
-
-      <div class="controls">
+      <div class="rightPanel">
         <div class="choices" id="choices"></div>
 
-        <div class="row">
+        <div class="controls">
           <button class="btn" id="startBtn">Start</button>
           <button class="btn" id="restartBtn">Restart</button>
         </div>
 
         <div class="hint">
-          규칙: 떨어지는 영단어의 <b>올바른 뜻</b> 스티커를 터치하세요. 바닥에 닿으면 ♥ 감소.<br/>
+          규칙: 떨어지는 영단어의 <b>올바른 뜻</b>을 터치하세요. 바닥에 닿으면 ♥ 감소.<br/>
           데스크탑: <span class="kbd">1</span>~<span class="kbd">4</span> 키 선택 가능.
         </div>
       </div>
@@ -276,7 +320,7 @@
     <div class="modal">
       <h2 id="modalTitle">Game Over</h2>
       <div class="sub" id="modalSub">Your score: 0</div>
-      <div class="row">
+      <div style="display:flex; gap:10px; justify-content:space-between;">
         <button class="btn" id="playAgainBtn">Play again</button>
         <button class="btn" id="closeBtn">Close</button>
       </div>
@@ -286,7 +330,12 @@
 
   <script src="./data.js"></script>
   <script>
-    // ---------- KST day-of-year seed ----------
+    // 스크롤/튕김 방지(특히 iOS)
+    document.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+    }, { passive:false });
+
+    // ---------- KST day-of-year seed (로직은 남겨둠: daily shuffle용) ----------
     function getKSTDate() {
       const now = new Date();
       const utc = now.getTime() + now.getTimezoneOffset() * 60000;
@@ -311,7 +360,6 @@
     }
 
     // ---------- DOM ----------
-    const dayNumEl = document.getElementById("dayNum");
     const scoreEl = document.getElementById("score");
     const comboEl = document.getElementById("combo");
     const lifeEl = document.getElementById("life");
@@ -335,8 +383,6 @@
 
     const kst = getKSTDate();
     const day = dayOfYearKST(kst);
-    dayNumEl.textContent = String(day);
-
     const rng = mulberry32((kst.getFullYear() * 1000) + day);
 
     function shuffleWithRng(arr) {
@@ -356,19 +402,18 @@
     let life = 3;
 
     // physics
-    let y = -90;      // 화면 위에서 등장
+    let y = -90;
     let v = 0.02;     // px/ms
     let lastTs = null;
 
     // current question
-    let current = null;         // [eng, kor]
-    let currentCorrect = null;  // kor string
+    let current = null;
+    let currentCorrect = null;
     let choiceButtons = [];
 
     function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
 
     function speedForScore(s) {
-      // 느리게 시작 + 점수에 따라 아주 서서히 가속
       const base = 0.02;
       const add  = Math.min(0.03, Math.floor(s / 120) * 0.004);
       return base + add;
@@ -385,29 +430,18 @@
     }
 
     function renderChoices(options) {
-      const palette = [
-        "#A7F3D0", "#FDE68A", "#FCA5A5", "#93C5FD",
-        "#FBCFE8", "#C7D2FE", "#86EFAC", "#FFD54A"
-      ];
-      const icons = ["✨", "⭐️", "🐾", "🔥", "💎", "🍀"];
+      const palette = ["#A7F3D0", "#FDE68A", "#FCA5A5", "#93C5FD"];
 
       choicesEl.innerHTML = "";
-      choiceButtons = options.map((meaning) => {
+      choiceButtons = options.map((meaning, i) => {
         const b = document.createElement("button");
         b.className = "choice";
         b.type = "button";
-
-        // store real answer (important because we add icon to text)
         b.dataset.answer = meaning;
 
-        const color = palette[Math.floor(rng() * palette.length)];
-        const tilt = (rng() * 10 - 5).toFixed(2);      // -5 ~ +5deg
-        const scale = (0.98 + rng() * 0.08).toFixed(3); // 0.98~1.06
-        b.style.background = color;
-        b.style.transform = `rotate(${tilt}deg) scale(${scale})`;
-
-        const icon = icons[Math.floor(rng() * icons.length)];
-        b.textContent = `${icon}  ${meaning}`;
+        // ✅ 이모지/삐뚤 제거: 고정 색만
+        b.style.background = palette[i % palette.length];
+        b.textContent = meaning;
 
         b.addEventListener("click", () => choose(meaning, b));
         choicesEl.appendChild(b);
@@ -428,7 +462,6 @@
         if (!seen.has(r)) { seen.add(r); options.push(r); }
       }
 
-      // shuffle options
       for (let i = options.length - 1; i > 0; i--) {
         const j = Math.floor(rng() * (i + 1));
         [options[i], options[j]] = [options[j], options[i]];
@@ -436,14 +469,11 @@
 
       currentCorrect = correct;
 
-      // render word
       wordTextEl.textContent = String(current[0]).toLowerCase();
 
-      // card tilt (sticker vibe)
-      const tilt = (rng() * 6 - 3).toFixed(2);
-      wordCardEl.style.transform = `translateX(-50%) rotate(${tilt}deg)`;
+      // ✅ 삐뚤 제거 (회전 없음)
+      wordCardEl.style.transform = `translateX(-50%)`;
 
-      // reset physics & styles
       y = -90;
       v = speedForScore(score);
       wordCardEl.classList.remove("good","bad");
@@ -468,7 +498,6 @@
         life -= 1;
         wordCardEl.classList.add("bad");
         btn.classList.add("wrong");
-        // show correct
         choiceButtons.forEach(b => {
           if (b.dataset.answer === currentCorrect) b.classList.add("correct");
         });
@@ -540,10 +569,9 @@
 
       const stageH = stageEl.clientHeight;
       const cardH = wordCardEl.offsetHeight;
-      const floorY = stageH - 14; // floor height
+      const floorY = stageH - 14;
 
       if (y + cardH >= floorY) {
-        // missed
         combo = 0;
         life -= 1;
         setHUD();
