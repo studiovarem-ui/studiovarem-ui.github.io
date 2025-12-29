@@ -20,8 +20,7 @@ body{
   border:1px solid rgba(255,255,255,.12);
   border-radius:18px; padding:22px; background:rgba(255,255,255,.02);
 }
-.top{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
-.subtitle{ font-size:16px; opacity:.8; }
+.top{ display:flex; justify-content:flex-end; align-items:flex-start; gap:10px; }
 .day{
   font-size:12px; border:1px solid rgba(255,255,255,.18); border-radius:999px;
   padding:6px 10px; opacity:.75; cursor:pointer; user-select:none;
@@ -55,7 +54,6 @@ body{
 
   <div class="card">
     <div class="top">
-      <div class="subtitle">중3 영어 · 매일 한 단어</div>
       <div class="day" onclick="location.href='archive.html'">Day <span id="dayNum"></span></div>
     </div>
 
@@ -63,7 +61,6 @@ body{
 
     <div class="meta">
       <div class="pill" id="pos"></div>
-      <div class="pill">M3</div>
       <button class="lang active" id="btnEN" type="button">English</button>
       <button class="lang" id="btnKO" type="button">Korean</button>
     </div>
@@ -75,78 +72,51 @@ body{
   <div class="hint">내일 다시 키링을 터치하세요.</div>
 </div>
 
-<!-- ✅ 공통 데이터 로더 -->
+<!-- ✅ data/data.js 로드 (LIST + add() + 로더 포함) -->
 <script src="data/data.js"></script>
 
 <script>
-function kstTodayMidnight(){
-  const now = new Date();
-  const kst = new Date(now.getTime() + now.getTimezoneOffset()*60000 + 9*3600000);
-  return new Date(kst.getFullYear(), kst.getMonth(), kst.getDate());
+function kst(){
+  const n=new Date();
+  return new Date(n.getTime()+n.getTimezoneOffset()*60000+9*3600000);
 }
-function kstDayOfYearIndex(){
-  const t = kstTodayMidnight();
-  const y0 = new Date(t.getFullYear(), 0, 1);
-  return Math.floor((t - y0) / 86400000); // 0-based
-}
-function getQueryDay(){
-  const q = new URLSearchParams(location.search);
-  const v = q.get("day");
-  if(!v) return null;
-  const n = parseInt(v, 10);
-  return Number.isFinite(n) ? n : null; // 1-based expected
+function dayOfYear(d){
+  return Math.floor((d-new Date(d.getFullYear(),0,1))/86400000);
 }
 
 let mode="EN";
-function render(it, dayIndex){
-  dayNum.innerText = (dayIndex + 1);
-  word.innerText = (it.w || "").toLowerCase();
-  pos.innerText = it.p || "";
+function render(item, dayIndex){
+  dayNum.innerText = dayIndex + 1;
+  word.innerText = item.w.toLowerCase();
+  pos.innerText = item.p;
 
   if(mode==="EN"){
-    meaning.innerText="Meaning: " + (it.m_en ?? it.m_ko ?? "");
-    example.innerText="Example: " + (it.e_en ?? it.e_ko ?? "");
+    meaning.innerText="Meaning: " + (item.m_en ?? item.m_ko ?? "");
+    example.innerText="Example: " + (item.e_en ?? item.e_ko ?? "");
   }else{
-    meaning.innerText="뜻: " + (it.m_ko ?? it.m_en ?? "");
-    example.innerText="예문: " + (it.e_ko ?? it.e_en ?? "");
+    meaning.innerText="뜻: " + (item.m_ko ?? item.m_en ?? "");
+    example.innerText="예문: " + (item.e_ko ?? item.e_en ?? "");
   }
   btnEN.classList.toggle("active", mode==="EN");
   btnKO.classList.toggle("active", mode==="KO");
 }
 
-btnEN.onclick=()=>{mode="EN"; start();};
-btnKO.onclick=()=>{mode="KO"; start();};
+btnEN.onclick=()=>{mode="EN"; window.__VAREM_LAST_ITEM && render(window.__VAREM_LAST_ITEM, window.__VAREM_LAST_DAY);};
+btnKO.onclick=()=>{mode="KO"; window.__VAREM_LAST_ITEM && render(window.__VAREM_LAST_ITEM, window.__VAREM_LAST_DAY);};
 
-function start(){
-  const LIST = window.VAREM_LIST || [];
-  if(!LIST.length){
-    // 데이터 아직 로딩 중
-    dayNum.innerText = "-";
-    word.innerText = "loading...";
-    pos.innerText = "";
-    meaning.innerText = "";
-    example.innerText = "";
-    return;
-  }
+window.VAREM_onReady(function(){
+  const dayIndex = dayOfYear(kst()); // 0-based
+  const item = window.VAREM_LIST[dayIndex % window.VAREM_LIST.length];
 
-  const qDay = getQueryDay(); // 1-based
-  const dayIndex = (qDay ? (qDay-1) : kstDayOfYearIndex()); // 0-based
+  // toggle용 캐시
+  window.__VAREM_LAST_ITEM = item;
+  window.__VAREM_LAST_DAY  = dayIndex;
 
-  const safeIndex = ((dayIndex % LIST.length) + LIST.length) % LIST.length;
-  const it = LIST[safeIndex];
+  render(item, dayIndex);
 
-  render(it, dayIndex);
-}
-
-// 데이터 로드 완료 콜백
-window.VAREM_onReady(() => {
-  start();
   // 토글 힌트(2회)
   btnKO.classList.add("hintPulse");
 });
-
-// 초기(로딩 전)
-start();
 </script>
 </body>
 </html>
