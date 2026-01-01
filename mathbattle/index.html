@@ -4,31 +4,23 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <title>Math Battle · iOS UI</title>
+  <title>Math Battle</title>
   <style>
-    /* =========================
-       SCROLL 완전 차단 (핵심)
-    ========================= */
+    /* ===== 스크롤/바운스 완전 차단 ===== */
     html, body{
       height:100%;
       margin:0;
-      overflow:hidden;              /* 스크롤 제거 */
-      overscroll-behavior:none;     /* 바운스 방지(지원 브라우저) */
-      touch-action:none;            /* 터치 스크롤 제스처 차단 */
+      overflow:hidden;
+      overscroll-behavior:none;
+      touch-action:none;
       -webkit-text-size-adjust:100%;
+      background:#0b1020;
     }
-    body{
-      position:fixed;               /* iOS에서 특히 강력 */
-      width:100%;
-      height:100%;
-    }
+    body{ position:fixed; width:100%; height:100%; }
 
-    /* =========================
-       iOS-style UI
-    ========================= */
     :root{
-      --bg1:#0b0f1a;
-      --bg2:#0f1630;
+      --bg1:#0b1020;
+      --bg2:#0f1a38;
       --card:rgba(255,255,255,.06);
       --card2:rgba(255,255,255,.04);
       --line:rgba(255,255,255,.10);
@@ -37,17 +29,16 @@
       --muted2:rgba(243,245,255,.45);
       --blue:#6aa9ff;
       --blue2:#557CF3;
+      --teal:#4BACC6;
       --good:#43e28b;
       --bad:#ff5b6a;
+      --shadow: 0 20px 50px rgba(0,0,0,.38);
     }
 
     *{ box-sizing:border-box; font-family: system-ui, -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
     .app{
-      height:100vh;
-      width:100vw;
-      display:flex;
-      align-items:center;
-      justify-content:center;
+      height:100vh; width:100vw;
+      display:flex; align-items:center; justify-content:center;
       padding:16px;
       background:
         radial-gradient(1200px 700px at 20% 10%, rgba(85,124,243,.35), transparent 60%),
@@ -55,10 +46,9 @@
         linear-gradient(180deg, var(--bg2), var(--bg1));
       color:var(--text);
     }
-
     .phone{
       width:min(520px, 96vw);
-      height:min(920px, 96vh);
+      height:min(940px, 96vh);
       display:flex;
       flex-direction:column;
       gap:14px;
@@ -67,99 +57,196 @@
     .card{
       background:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.04));
       border:1px solid var(--line);
-      border-radius:20px;
+      border-radius:22px;
       padding:16px;
-      box-shadow: 0 20px 50px rgba(0,0,0,.35);
+      box-shadow: var(--shadow);
+      position:relative;
+      overflow:hidden;
+    }
+    .card.soft{
+      background:rgba(255,255,255,.05);
+      box-shadow:none;
     }
 
-    .topRow{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:12px;
-    }
+    /* ===== 화면(페이지) 전환 ===== */
+    .screen{ display:none; height:100%; }
+    .screen.active{ display:flex; flex-direction:column; gap:14px; }
 
-    .sideTitle{
-      font-weight:800;
-      font-size:18px;
-      letter-spacing:-.02em;
+    /* ===== 공통 버튼 ===== */
+    .btn{
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      padding:12px 14px;
+      border-radius:16px;
+      font-weight:1000;
+      cursor:pointer;
     }
-    .subMsg{
-      margin-top:4px;
-      color:var(--muted);
-      font-weight:700;
-      font-size:13px;
-      min-height:18px;
+    .btn:active{ transform: translateY(1px); filter:brightness(.98); }
+    .btn.primary{
+      border:none;
+      background: linear-gradient(180deg, rgba(106,169,255,.95), rgba(85,124,243,.95));
+      box-shadow: 0 10px 24px rgba(85,124,243,.25);
     }
+    .btn.wide{ width:100%; height:56px; font-size:16px; }
+    .btn.small{ padding:10px 12px; border-radius:14px; font-size:13px; }
 
-    .nameCol{
+    /* ===== 시작화면 ===== */
+    .titleCard{
+      flex:1;
       display:flex;
       flex-direction:column;
-      gap:6px;
+      justify-content:center;
+      gap:14px;
+      text-align:center;
+    }
+    .logo{
+      font-weight:1100;
+      letter-spacing:.02em;
+      font-size:34px;
+    }
+    .subtitle{
+      color:var(--muted);
+      font-weight:900;
+      line-height:1.45;
+      font-size:14px;
+    }
+    .badgeRow{
+      margin-top:6px;
+      display:flex;
+      justify-content:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.05);
+      color:rgba(243,245,255,.85);
+      font-weight:900;
+      font-size:12px;
+    }
+
+    /* ===== 캐릭터 선택 ===== */
+    .topRow{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+    }
+    .h1{
+      font-size:18px;
+      font-weight:1100;
+    }
+    .hint{
+      color:var(--muted);
+      font-size:13px;
+      font-weight:800;
+      line-height:1.45;
+      margin-top:4px;
+    }
+    .charGrid{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:12px;
+    }
+    .charCard{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:14px;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(0,0,0,.16);
+      cursor:pointer;
+    }
+    .charCard.selected{
+      outline:2px solid rgba(106,169,255,.85);
+      border-color: rgba(106,169,255,.0);
+      background:rgba(85,124,243,.12);
+    }
+    .charLeft{
+      display:flex; align-items:center; gap:12px;
+    }
+    .charEmoji{
+      width:52px; height:52px;
+      border-radius:16px;
+      display:flex; align-items:center; justify-content:center;
+      background:rgba(255,255,255,.07);
+      border:1px solid rgba(255,255,255,.10);
+      font-size:28px;
+      flex:0 0 auto;
+    }
+    .charInfo{ display:flex; flex-direction:column; gap:4px; }
+    .charName{ font-weight:1100; font-size:16px; }
+    .charDesc{ color:var(--muted); font-weight:800; font-size:12px; }
+    .statPills{
+      display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;
+    }
+    .pill{
+      font-size:12px;
+      font-weight:1000;
+      color:rgba(243,245,255,.88);
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:999px;
+      padding:6px 10px;
+    }
+
+    /* ===== 전투 화면 ===== */
+    .battleHeader{
+      display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
+    }
+    .nameCol{
+      display:flex; flex-direction:column; gap:6px; min-width:46%;
     }
     .nameLine{
-      display:flex;
-      align-items:center;
-      gap:8px;
-      font-weight:900;
-      font-size:18px;
+      display:flex; align-items:center; gap:8px;
+      font-weight:1100; font-size:18px;
     }
-    .dot{
-      width:8px; height:8px; border-radius:50%;
-      background:rgba(255,255,255,.35);
-    }
+    .dot{ width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,.35); }
+    .subMsg{ min-height:18px; font-weight:900; font-size:13px; color:var(--muted); }
     .hpLine{
-      display:flex;
-      align-items:center;
-      gap:8px;
+      display:flex; align-items:center; gap:8px;
       font-variant-numeric: tabular-nums;
       color:var(--muted);
       font-size:12px;
-      font-weight:800;
+      font-weight:1000;
     }
-
     .hpPill{
-      width:140px;
-      height:10px;
-      border-radius:999px;
+      width:150px; height:10px; border-radius:999px;
       background:rgba(0,0,0,.25);
       border:1px solid rgba(255,255,255,.10);
       overflow:hidden;
     }
     .hpFill{
-      height:100%;
-      width:70%;
+      height:100%; width:70%;
       border-radius:999px;
       background:linear-gradient(90deg, var(--good), rgba(67,226,139,.55));
     }
     .hpFill.bad{
       background:linear-gradient(90deg, var(--bad), rgba(255,91,106,.55));
     }
-
-    .battleCard{
-      position:relative;
-      overflow:hidden;
-    }
-    .battleGlow{
-      position:absolute; inset:-60px;
-      background: radial-gradient(400px 220px at 20% 10%, rgba(106,169,255,.18), transparent 60%),
-                  radial-gradient(420px 260px at 90% 40%, rgba(85,124,243,.16), transparent 60%);
-      pointer-events:none;
-      filter: blur(0px);
-    }
-
-    .questionCard{
-      padding:18px;
-    }
-    .qRow{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
+    .midRow{
+      margin-top:10px;
+      display:flex; align-items:center; justify-content:space-between;
       gap:10px;
     }
+
+    .flash{
+      position:absolute; inset:0;
+      opacity:0; pointer-events:none;
+      transition: opacity .16s ease;
+    }
+    .flash.good{ background:rgba(67,226,139,.16); }
+    .flash.bad{ background:rgba(255,91,106,.16); }
+
     .question{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      font-weight:1200;
       font-size:40px;
-      font-weight:1000;
       letter-spacing:-.03em;
     }
     .timerPill{
@@ -170,59 +257,48 @@
       border-radius:999px;
       background:rgba(255,255,255,.07);
       border:1px solid rgba(255,255,255,.10);
-      font-weight:900;
+      font-weight:1100;
       font-variant-numeric: tabular-nums;
       min-width:96px;
       justify-content:center;
+      font-size:14px;
     }
-    .hint{
+    .helper{
       margin-top:10px;
       color:var(--muted);
-      font-size:14px;
-      font-weight:700;
+      font-size:13px;
+      font-weight:900;
+      line-height:1.45;
     }
 
-    .inputRow{
-      margin-top:14px;
-      display:flex;
-      gap:12px;
-      align-items:stretch;
+    .answerDisplayRow{
+      margin-top:12px;
+      display:flex; align-items:stretch; gap:12px;
     }
-    .answer{
+    /* input 대신 표시창(키보드 안 뜸) */
+    .answerDisplay{
       flex:1;
       height:56px;
-      border-radius:14px;
+      border-radius:16px;
       border:1px solid rgba(255,255,255,.10);
       background:rgba(0,0,0,.20);
-      color:var(--text);
-      font-size:18px;
+      display:flex;
+      align-items:center;
       padding:0 14px;
-      outline:none;
-      font-weight:900;
+      font-weight:1100;
+      font-size:20px;
+      color:var(--text);
     }
-    .answer::placeholder{ color:rgba(243,245,255,.35); font-weight:900; }
-
-    .attackBtn{
-      width:72px;
-      height:56px;
-      border-radius:16px;
-      border:1px solid rgba(255,255,255,.12);
-      background: linear-gradient(180deg, rgba(106,169,255,.95), rgba(85,124,243,.95));
-      color:white;
-      font-weight:1000;
-      font-size:14px;
-      cursor:pointer;
-      box-shadow: 0 10px 20px rgba(85,124,243,.25);
+    .placeholder{
+      color:rgba(243,245,255,.35);
+      font-weight:1100;
     }
-    .attackBtn:active{ transform: translateY(1px); filter:brightness(.98); }
-    .attackBtn[disabled]{ opacity:.45; cursor:not-allowed; }
 
     .grid2{
       display:grid;
       grid-template-columns:1fr 1fr;
       gap:12px;
     }
-
     .miniCard{
       background:rgba(255,255,255,.045);
       border:1px solid rgba(255,255,255,.10);
@@ -234,93 +310,61 @@
       justify-content:center;
       gap:6px;
     }
-    .miniLabel{
-      color:var(--muted);
-      font-weight:900;
-      font-size:12px;
-      letter-spacing:-.01em;
-    }
-    .miniValue{
-      font-weight:1000;
-      font-size:32px;
-      letter-spacing:-.02em;
-      font-variant-numeric: tabular-nums;
-    }
+    .miniLabel{ color:var(--muted); font-weight:1100; font-size:12px; }
+    .miniValue{ font-weight:1200; font-size:32px; font-variant-numeric: tabular-nums; }
 
-    .footerRow{
-      display:flex;
-      gap:12px;
-      align-items:center;
-      justify-content:space-between;
-    }
-    .pillRow{
-      flex:1;
-      display:flex;
+    /* ===== 게임 내 숫자 키패드 ===== */
+    .keypad{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
       gap:10px;
-      align-items:center;
+      margin-top:12px;
+    }
+    .key{
+      height:56px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      font-weight:1200;
+      font-size:18px;
+      cursor:pointer;
+    }
+    .key:active{ transform:translateY(1px); filter:brightness(.98); }
+    .key.func{
+      font-size:14px;
+      font-weight:1200;
+      color:rgba(243,245,255,.88);
+      background:rgba(0,0,0,.18);
+    }
+    .key.attack{
+      border:none;
+      background: linear-gradient(180deg, rgba(106,169,255,.95), rgba(85,124,243,.95));
+      box-shadow: 0 10px 24px rgba(85,124,243,.22);
+    }
+    .key[disabled]{ opacity:.45; cursor:not-allowed; }
+
+    .bottomPill{
+      margin-top:12px;
+      width:100%;
+      display:flex;
       justify-content:center;
       padding:12px 14px;
       border-radius:999px;
       border:1px solid rgba(255,255,255,.10);
       background:rgba(255,255,255,.05);
+      font-weight:1100;
       color:rgba(243,245,255,.85);
-      font-weight:900;
-      font-size:13px;
-      overflow:hidden;
       white-space:nowrap;
+      overflow:hidden;
       text-overflow:ellipsis;
-    }
-    .smallBtn{
-      padding:10px 12px;
-      border-radius:14px;
-      background:rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.10);
-      color:var(--text);
-      font-weight:900;
-      cursor:pointer;
-    }
-    .smallBtn:active{ transform: translateY(1px); }
-
-    .flash{
-      position:absolute; inset:0;
-      opacity:0;
-      pointer-events:none;
-      transition: opacity .18s ease;
-    }
-    .flash.good{ background:rgba(67,226,139,.16); }
-    .flash.bad{ background:rgba(255,91,106,.16); }
-
-    .shake{ animation:shake .22s linear 1; }
-    @keyframes shake{
-      0%{transform:translateX(0)}
-      25%{transform:translateX(-6px)}
-      50%{transform:translateX(6px)}
-      75%{transform:translateX(-4px)}
-      100%{transform:translateX(0)}
-    }
-
-    .controls{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:10px;
-      margin-top:12px;
-    }
-    select{
-      height:46px;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.10);
-      background:rgba(0,0,0,.20);
-      color:var(--text);
-      font-weight:900;
-      padding:0 12px;
-      outline:none;
-      appearance:none;
     }
 
     @media (max-width:420px){
       .question{ font-size:34px; }
       .miniValue{ font-size:28px; }
       .timerPill{ min-width:86px; padding:9px 12px; }
+      .hpPill{ width:140px; }
     }
   </style>
 </head>
@@ -329,394 +373,555 @@
   <div class="app">
     <div class="phone">
 
-      <!-- BATTLE STATUS -->
-      <div class="card battleCard">
-        <div class="battleGlow"></div>
-        <div class="flash good" id="flashGood"></div>
-        <div class="flash bad" id="flashBad"></div>
+      <!-- =========================
+           SCREEN 1: START
+      ========================== -->
+      <div class="screen active" id="screenStart">
+        <div class="card titleCard">
+          <div class="logo">MATH BATTLE</div>
+          <div class="subtitle">
+            사칙연산을 풀면 공격!<br/>
+            틀리면 에너지가 깎여요.<br/>
+            몬스터를 쓰러뜨리고 다음 스테이지로!
+          </div>
+          <div class="badgeRow">
+            <div class="badge">🧠 초등 저학년</div>
+            <div class="badge">⚔️ 캐릭터 선택</div>
+            <div class="badge">👾 스테이지 진행</div>
+          </div>
+          <div style="margin-top:18px;">
+            <button class="btn primary wide" id="btnGoSelect">START</button>
+          </div>
+        </div>
 
-        <div class="topRow">
-          <div class="nameCol" style="min-width:46%">
-            <div class="nameLine"><span class="dot"></span><span id="heroName">주인공</span></div>
-            <div class="subMsg" id="heroMsg">준비!</div>
-            <div class="hpLine">
-              <div class="hpPill"><div class="hpFill" id="heroHpBar"></div></div>
-              <span id="heroHpTxt">100</span>
+        <div class="card soft">
+          <div class="hint" style="margin:0; text-align:center;">
+            NFC 키링에는 GitHub Pages 주소만 넣으면 “태그 → 바로 실행”
+          </div>
+        </div>
+      </div>
+
+      <!-- =========================
+           SCREEN 2: CHARACTER SELECT
+      ========================== -->
+      <div class="screen" id="screenSelect">
+        <div class="card">
+          <div class="topRow">
+            <div>
+              <div class="h1">캐릭터 선택</div>
+              <div class="hint">전사 / 마법사 / 궁수 중 하나를 고르고 전투로 들어가요.</div>
+            </div>
+            <button class="btn small" id="btnBackToStart">뒤로</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="charGrid" id="charGrid">
+            <!-- JS로 렌더 -->
+          </div>
+
+          <div style="margin-top:12px; display:flex; gap:10px;">
+            <button class="btn primary wide" id="btnStartBattle" disabled>전투 시작</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- =========================
+           SCREEN 3: BATTLE
+      ========================== -->
+      <div class="screen" id="screenBattle">
+
+        <!-- STATUS -->
+        <div class="card" id="battleStatusCard">
+          <div class="flash good" id="flashGood"></div>
+          <div class="flash bad" id="flashBad"></div>
+
+          <div class="battleHeader">
+            <div class="nameCol">
+              <div class="nameLine"><span class="dot"></span><span id="heroName">주인공</span></div>
+              <div class="subMsg" id="heroMsg">준비!</div>
+              <div class="hpLine">
+                <div class="hpPill"><div class="hpFill" id="heroHpBar"></div></div>
+                <span id="heroHpTxt">100</span>
+              </div>
+            </div>
+
+            <div class="nameCol" style="text-align:right;">
+              <div class="nameLine" style="justify-content:flex-end;"><span id="mobName">슬라임</span><span class="dot"></span></div>
+              <div class="subMsg" id="mobMsg" style="text-align:right;">덤벼!</div>
+              <div class="hpLine" style="justify-content:flex-end;">
+                <span id="mobHpTxt">60</span>
+                <div class="hpPill"><div class="hpFill bad" id="mobHpBar"></div></div>
+              </div>
             </div>
           </div>
 
-          <div class="nameCol" style="text-align:right; min-width:46%">
-            <div class="nameLine" style="justify-content:flex-end;"><span id="mobName">슬라임</span><span class="dot"></span></div>
-            <div class="subMsg" id="mobMsg" style="text-align:right;">덤벼!</div>
-            <div class="hpLine" style="justify-content:flex-end;">
-              <span id="mobHpTxt">60</span>
-              <div class="hpPill"><div class="hpFill bad" id="mobHpBar"></div></div>
+          <div class="midRow">
+            <div class="pill" id="stageTxt">스테이지 1</div>
+            <button class="btn small" id="btnReset">처음부터</button>
+          </div>
+        </div>
+
+        <!-- QUESTION + ANSWER -->
+        <div class="card">
+          <div class="question">
+            <div id="questionText">10 - 0 = ?</div>
+            <div class="timerPill"><span>⏱</span><span id="timerText">3.5</span></div>
+          </div>
+          <div class="helper">아래 키패드로 정답을 입력하고 <b>공격</b>하세요.</div>
+
+          <div class="answerDisplayRow">
+            <div class="answerDisplay" id="answerDisplay"><span class="placeholder">정답</span></div>
+          </div>
+
+          <!-- In-game Keypad (아이폰 키보드 안 뜸) -->
+          <div class="keypad" id="keypad">
+            <!-- 1~9 -->
+            <button class="key" data-key="1">1</button>
+            <button class="key" data-key="2">2</button>
+            <button class="key" data-key="3">3</button>
+            <button class="key" data-key="4">4</button>
+            <button class="key" data-key="5">5</button>
+            <button class="key" data-key="6">6</button>
+            <button class="key" data-key="7">7</button>
+            <button class="key" data-key="8">8</button>
+            <button class="key" data-key="9">9</button>
+            <!-- 기능키 -->
+            <button class="key func" data-key="clear">전체삭제</button>
+            <button class="key" data-key="0">0</button>
+            <button class="key func" data-key="back">←</button>
+            <!-- 공격(전체 폭) -->
+            <button class="key attack" id="btnAttack" style="grid-column: 1 / span 3; height:58px;">공격!</button>
+          </div>
+        </div>
+
+        <!-- STATS -->
+        <div class="grid2">
+          <div class="miniCard">
+            <div class="miniLabel">점수</div>
+            <div class="miniValue" id="scoreTxt">0</div>
+          </div>
+          <div class="miniCard" style="align-items:flex-end; text-align:right;">
+            <div class="miniLabel">연속 정답</div>
+            <div class="miniValue" id="streakTxt">0</div>
+          </div>
+        </div>
+
+        <div class="card soft">
+          <div class="grid2">
+            <div class="miniCard" style="min-height:auto;">
+              <div class="miniLabel">난이도</div>
+              <div class="miniValue" style="font-size:26px;" id="diffTxt">쉬움</div>
+            </div>
+            <div class="miniCard" style="min-height:auto; align-items:flex-end; text-align:right;">
+              <div class="miniLabel">캐릭터</div>
+              <div class="miniValue" style="font-size:26px;" id="classTxt">전사</div>
             </div>
           </div>
+          <div class="bottomPill" id="domainPill">studiovarem-ui.github.io</div>
         </div>
 
-        <div style="margin-top:12px; display:flex; align-items:center; justify-content:space-between; gap:10px;">
-          <div style="color:var(--muted2); font-weight:900; font-size:12px;" id="stageTxt">스테이지 1</div>
-          <button class="smallBtn" id="resetBtn">처음부터</button>
-        </div>
       </div>
-
-      <!-- QUESTION -->
-      <div class="card questionCard">
-        <div class="qRow">
-          <div class="question" id="question">10 - 0 = ?</div>
-          <div class="timerPill"><span>⏱</span><span id="timer">3.5</span></div>
-        </div>
-        <div class="hint">정답을 입력하고 <b>공격!</b>을 누르세요. (엔터도 가능)</div>
-
-        <div class="inputRow">
-          <input id="answer" class="answer" type="number" inputmode="numeric" placeholder="정답" />
-          <button id="attackBtn" class="attackBtn">공격!</button>
-        </div>
-
-        <div class="controls">
-          <select id="difficulty">
-            <option value="easy" selected>난이도 · 쉬움</option>
-            <option value="normal">난이도 · 보통</option>
-            <option value="hard">난이도 · 어려움</option>
-          </select>
-          <select id="ops">
-            <option value="mix" selected>사칙 · 혼합</option>
-            <option value="add">덧셈</option>
-            <option value="sub">뺄셈</option>
-            <option value="mul">곱셈</option>
-            <option value="div">나눗셈(딱 떨어짐)</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- STATS -->
-      <div class="grid2">
-        <div class="miniCard">
-          <div class="miniLabel">점수</div>
-          <div class="miniValue" id="score">0</div>
-        </div>
-        <div class="miniCard" style="align-items:flex-end; text-align:right;">
-          <div class="miniLabel">연속 정답</div>
-          <div class="miniValue" id="streak">0</div>
-        </div>
-      </div>
-
-      <!-- FOOTER -->
-      <div class="card">
-        <div class="footerRow">
-          <div class="miniCard" style="flex:1; margin:0; min-height:auto; padding:12px 14px;">
-            <div class="miniLabel">난이도</div>
-            <div class="miniValue" style="font-size:28px;" id="diffTxt">쉬움</div>
-          </div>
-          <div class="miniCard" style="flex:1; margin:0; min-height:auto; padding:12px 14px; align-items:flex-end; text-align:right;">
-            <div class="miniLabel">남은 문제</div>
-            <div class="miniValue" style="font-size:28px;" id="remainTxt">5</div>
-          </div>
-        </div>
-
-        <div style="margin-top:12px;" class="pillRow" id="domainPill">studiovarem-ui.github.io</div>
-      </div>
-
     </div>
   </div>
 
-  <script>
-    /* =========================
-       iOS에서 '잡아당김 스크롤'까지 차단
-    ========================= */
-    document.addEventListener('touchmove', (e) => e.preventDefault(), { passive:false });
+<script>
+  // iOS에서 잡아당김/스크롤까지 차단
+  document.addEventListener('touchmove', (e) => e.preventDefault(), { passive:false });
 
-    (() => {
-      // ----- 상태 -----
-      const state = {
-        stage: 1,
-        heroMax: 100,
-        heroHp: 100,
-        mobMax: 60,
-        mobHp: 60,
-        score: 0,
-        streak: 0,
-        remain: 5,
-        difficulty: 'easy',
-        ops: 'mix',
-        timer: 3.5,
-        ticking: null,
-        current: null
-      };
+  (() => {
+    const $ = (id) => document.getElementById(id);
 
-      const mobs = [
-        { name:'슬라임', hp:60 },
-        { name:'고블린', hp:72 },
-        { name:'드래곤', hp:85 },
-        { name:'보스',   hp:100 }
-      ];
+    // Screens
+    const screenStart  = $('screenStart');
+    const screenSelect = $('screenSelect');
+    const screenBattle = $('screenBattle');
 
-      // ----- 엘리먼트 -----
-      const $ = (id) => document.getElementById(id);
-      const heroHpBar = $('heroHpBar');
-      const mobHpBar  = $('mobHpBar');
-      const heroHpTxt = $('heroHpTxt');
-      const mobHpTxt  = $('mobHpTxt');
-      const heroMsg   = $('heroMsg');
-      const mobMsg    = $('mobMsg');
-      const heroName  = $('heroName');
-      const mobName   = $('mobName');
-      const stageTxt  = $('stageTxt');
+    function show(screen){
+      [screenStart, screenSelect, screenBattle].forEach(s => s.classList.remove('active'));
+      screen.classList.add('active');
+    }
 
-      const question  = $('question');
-      const timerEl   = $('timer');
-      const answer    = $('answer');
-      const attackBtn = $('attackBtn');
-      const resetBtn  = $('resetBtn');
+    // Buttons
+    $('btnGoSelect').addEventListener('click', () => show(screenSelect));
+    $('btnBackToStart').addEventListener('click', () => show(screenStart));
 
-      const scoreEl   = $('score');
-      const streakEl  = $('streak');
-      const remainEl  = $('remainTxt');
-      const diffTxt   = $('diffTxt');
+    // Character data
+    const characters = [
+      { id:'warrior', name:'전사', emoji:'⚔️', desc:'기본 공격이 강해요', dmgMul:1.15, timeBonus:0.0, wrongDmgMul:1.0 },
+      { id:'mage',    name:'마법사', emoji:'🪄', desc:'시간이 조금 더 여유로워요', dmgMul:1.0,  timeBonus:0.6, wrongDmgMul:1.0 },
+      { id:'archer',  name:'궁수', emoji:'🏹', desc:'연속 정답 보너스가 커요', dmgMul:1.05, timeBonus:0.0, wrongDmgMul:0.95 }
+    ];
+    let selectedChar = null;
 
-      const difficultySel = $('difficulty');
-      const opsSel        = $('ops');
+    const charGrid = $('charGrid');
+    const btnStartBattle = $('btnStartBattle');
 
-      const flashGood = $('flashGood');
-      const flashBad  = $('flashBad');
+    function renderCharCards(){
+      charGrid.innerHTML = '';
+      characters.forEach(c => {
+        const el = document.createElement('div');
+        el.className = 'charCard' + (selectedChar?.id === c.id ? ' selected' : '');
+        el.innerHTML = `
+          <div class="charLeft">
+            <div class="charEmoji">${c.emoji}</div>
+            <div class="charInfo">
+              <div class="charName">${c.name}</div>
+              <div class="charDesc">${c.desc}</div>
+            </div>
+          </div>
+          <div class="statPills">
+            <span class="pill">공격 × ${c.dmgMul.toFixed(2)}</span>
+            <span class="pill">시간 + ${c.timeBonus.toFixed(1)}s</span>
+          </div>
+        `;
+        el.addEventListener('click', () => {
+          selectedChar = c;
+          btnStartBattle.disabled = false;
+          renderCharCards();
+        });
+        charGrid.appendChild(el);
+      });
+    }
+    renderCharCards();
 
-      // ----- 유틸 -----
-      const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
-      const rint = (a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+    // Battle UI els
+    const heroName = $('heroName');
+    const heroMsg  = $('heroMsg');
+    const heroHpBar= $('heroHpBar');
+    const heroHpTxt= $('heroHpTxt');
 
-      function diffConfig(){
-        if(state.difficulty==='easy')   return {max:10, mulMax:5, time:3.5};
-        if(state.difficulty==='normal') return {max:20, mulMax:9, time:3.2};
-        return {max:50, mulMax:12, time:3.0};
+    const mobName  = $('mobName');
+    const mobMsg   = $('mobMsg');
+    const mobHpBar = $('mobHpBar');
+    const mobHpTxt = $('mobHpTxt');
+
+    const stageTxt = $('stageTxt');
+    const questionText = $('questionText');
+    const timerText = $('timerText');
+
+    const answerDisplay = $('answerDisplay');
+    const btnAttack = $('btnAttack');
+    const keypad = $('keypad');
+
+    const scoreTxt = $('scoreTxt');
+    const streakTxt = $('streakTxt');
+    const diffTxt = $('diffTxt');
+    const classTxt = $('classTxt');
+
+    const flashGood = $('flashGood');
+    const flashBad  = $('flashBad');
+
+    // Game State
+    const state = {
+      stage: 1,
+      heroMax: 100,
+      heroHp: 100,
+      mobMax: 60,
+      mobHp: 60,
+      score: 0,
+      streak: 0,
+      difficulty: 'easy', // 고정 쉬움(원하면 선택 추가 가능)
+      ops: 'mix',
+      baseTime: 4.0,
+      timer: 4.0,
+      ticking: null,
+      current: null,
+      answer: '', // 키패드 입력 문자열
+      gameOver: false
+    };
+
+    // Monsters per stage (HP 달라짐)
+    const monsters = [
+      { name:'슬라임',   hp:60 },
+      { name:'고블린',   hp:78 },
+      { name:'늑대',     hp:92 },
+      { name:'오우거',   hp:112 },
+      { name:'드래곤',   hp:140 },
+      { name:'보스',     hp:170 }
+    ];
+
+    // Difficulty config (저학년 기준)
+    function diffConfig(){
+      // 쉬움 기준(0~10, 곱/나눗셈은 작게)
+      return {max:10, mulMax:5, time:4.0};
+    }
+
+    const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
+    const rint = (a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+
+    function flash(kind){
+      const el = (kind==='good') ? flashGood : flashBad;
+      el.style.opacity = '1';
+      setTimeout(()=> el.style.opacity='0', 150);
+    }
+
+    function setBars(){
+      heroHpTxt.textContent = state.heroHp;
+      mobHpTxt.textContent  = state.mobHp;
+      heroHpBar.style.width = (state.heroHp/state.heroMax*100)+'%';
+      mobHpBar.style.width  = (state.mobHp/state.mobMax*100)+'%';
+    }
+
+    function setAnswerDisplay(){
+      if(state.answer.length === 0){
+        answerDisplay.innerHTML = `<span class="placeholder">정답</span>`;
+      }else{
+        answerDisplay.textContent = state.answer;
       }
+    }
 
-      function setBars(){
-        heroHpTxt.textContent = state.heroHp;
-        mobHpTxt.textContent  = state.mobHp;
-        heroHpBar.style.width = (state.heroHp/state.heroMax*100)+'%';
-        mobHpBar.style.width  = (state.mobHp/state.mobMax*100)+'%';
-      }
+    function stopTimer(){
+      if(state.ticking) clearInterval(state.ticking);
+      state.ticking = null;
+    }
 
-      function flash(kind){
-        const el = (kind==='good') ? flashGood : flashBad;
-        el.style.opacity = '1';
-        setTimeout(()=> el.style.opacity='0', 160);
-      }
+    function startTimer(){
+      stopTimer();
+      const cfg = diffConfig();
+      const bonus = selectedChar?.timeBonus ?? 0;
+      state.timer = cfg.time + bonus;
+      timerText.textContent = state.timer.toFixed(1);
 
-      function stopTimer(){
-        if(state.ticking) clearInterval(state.ticking);
-        state.ticking = null;
-      }
-      function startTimer(){
-        stopTimer();
-        state.timer = diffConfig().time;
-        timerEl.textContent = state.timer.toFixed(1);
-
-        state.ticking = setInterval(()=>{
-          state.timer = Math.max(0, state.timer - 0.1);
-          timerEl.textContent = state.timer.toFixed(1);
-          if(state.timer <= 0){
-            stopTimer();
-            onWrong('시간 초과!');
-          }
-        }, 100);
-      }
-
-      function generateQuestion(){
-        const cfg = diffConfig();
-        let mode = state.ops;
-        if(mode==='mix'){
-          const ops = ['add','sub','mul','div'];
-          mode = ops[rint(0,ops.length-1)];
-        }
-
-        let a,b,q,ans;
-        if(mode==='add'){
-          a=rint(0,cfg.max); b=rint(0,cfg.max);
-          q=`${a} + ${b} = ?`; ans=a+b;
-        }else if(mode==='sub'){
-          a=rint(0,cfg.max); b=rint(0,cfg.max);
-          if(b>a) [a,b]=[b,a];
-          q=`${a} - ${b} = ?`; ans=a-b;
-        }else if(mode==='mul'){
-          a=rint(0,cfg.mulMax); b=rint(0,cfg.mulMax);
-          q=`${a} × ${b} = ?`; ans=a*b;
-        }else{ // div (딱 떨어짐)
-          b=rint(1,cfg.mulMax);
-          ans=rint(0,cfg.mulMax);
-          a=b*ans;
-          q=`${a} ÷ ${b} = ?`;
-        }
-        return {q, a: ans};
-      }
-
-      function updateStats(){
-        scoreEl.textContent = state.score;
-        streakEl.textContent = state.streak;
-        remainEl.textContent = state.remain;
-        stageTxt.textContent = `스테이지 ${state.stage}`;
-        diffTxt.textContent =
-          state.difficulty==='easy' ? '쉬움' :
-          state.difficulty==='normal' ? '보통' : '어려움';
-      }
-
-      function nextQuestion(){
-        state.current = generateQuestion();
-        question.textContent = state.current.q;
-        answer.value = '';
-        answer.focus();
-        startTimer();
-      }
-
-      function nextStage(){
-        stopTimer();
-        state.stage += 1;
-
-        const m = mobs[Math.min(mobs.length-1, state.stage-1)];
-        const extra = (state.stage-1)*8;
-        state.mobMax = m.hp + extra;
-        state.mobHp  = state.mobMax;
-        mobName.textContent = m.name;
-
-        // 초등 저학년용: 다음 스테이지로 갈 때 약간 회복
-        state.heroHp = clamp(state.heroHp + 15, 0, state.heroMax);
-
-        state.remain = 5;
-        state.streak = 0;
-
-        heroMsg.textContent = '다음!';
-        mobMsg.textContent = '덤벼!';
-        setBars();
-        updateStats();
-
-        // 6스테이지에서 엔딩(원하면 바꿔도 됨)
-        if(state.stage >= 6){
-          attackBtn.disabled = true;
-          answer.disabled = true;
-          question.textContent = '🎉 축하해요! 모두 물리쳤어요!';
-          timerEl.textContent = '--.-';
-          return;
-        }
-
-        nextQuestion();
-      }
-
-      function onCorrect(){
-        flash('good');
-        heroMsg.textContent = '공격 성공!';
-        mobMsg.textContent  = '아야!';
-
-        const baseDmg = 12;
-        const bonus = Math.min(10, state.streak*2);
-        const dmg = baseDmg + bonus;
-
-        state.mobHp = clamp(state.mobHp - dmg, 0, state.mobMax);
-        state.score += 10 + bonus;
-        state.streak += 1;
-        state.remain -= 1;
-
-        setBars();
-        updateStats();
-
-        if(state.mobHp <= 0){
-          nextStage();
-          return;
-        }
-        if(state.remain <= 0){
-          // 남은 문제가 끝나면 스테이지 통과(친화적)
-          nextStage();
-          return;
-        }
-        nextQuestion();
-      }
-
-      function onWrong(reason='오답!'){
-        flash('bad');
-        heroMsg.textContent = '피격…';
-        mobMsg.textContent  = '헤헷!';
-
-        const dmg = 10;
-        state.heroHp = clamp(state.heroHp - dmg, 0, state.heroMax);
-        state.streak = 0;
-        state.remain -= 1;
-
-        setBars();
-        updateStats();
-
-        if(state.heroHp <= 0){
+      state.ticking = setInterval(() => {
+        state.timer = Math.max(0, state.timer - 0.1);
+        timerText.textContent = state.timer.toFixed(1);
+        if(state.timer <= 0){
           stopTimer();
-          attackBtn.disabled = true;
-          answer.disabled = true;
-          question.textContent = '💥 게임 오버! 다시 해볼까요?';
-          timerEl.textContent = '--.-';
-          return;
+          onWrong('시간 초과!');
         }
-        if(state.remain <= 0){
-          nextStage();
-          return;
-        }
-        nextQuestion();
+      }, 100);
+    }
+
+    function generateQuestion(){
+      const cfg = diffConfig();
+      let op = state.ops;
+      if(op==='mix'){
+        const ops = ['add','sub','mul','div'];
+        op = ops[rint(0, ops.length-1)];
       }
 
-      function submit(){
-        if(!state.current) return;
-        const v = answer.value.trim();
-        if(v === ''){
-          stopTimer();
-          onWrong('입력 안 함!');
-          return;
-        }
+      let a,b,q,ans;
+      if(op==='add'){
+        a=rint(0,cfg.max); b=rint(0,cfg.max);
+        q=`${a} + ${b} = ?`; ans=a+b;
+      }else if(op==='sub'){
+        a=rint(0,cfg.max); b=rint(0,cfg.max);
+        if(b>a) [a,b]=[b,a];
+        q=`${a} - ${b} = ?`; ans=a-b;
+      }else if(op==='mul'){
+        a=rint(0,cfg.mulMax); b=rint(0,cfg.mulMax);
+        q=`${a} × ${b} = ?`; ans=a*b;
+      }else{
+        b=rint(1,cfg.mulMax);
+        ans=rint(0,cfg.mulMax);
+        a=b*ans;
+        q=`${a} ÷ ${b} = ?`;
+      }
+      return {q, a: ans};
+    }
+
+    function updateUI(){
+      stageTxt.textContent = `스테이지 ${state.stage}`;
+      scoreTxt.textContent = state.score;
+      streakTxt.textContent = state.streak;
+
+      diffTxt.textContent = '쉬움';
+      classTxt.textContent = selectedChar ? selectedChar.name : '-';
+
+      setBars();
+      setAnswerDisplay();
+
+      heroName.textContent = selectedChar ? selectedChar.name : '주인공';
+    }
+
+    function newMonsterForStage(){
+      const m = monsters[Math.min(monsters.length-1, state.stage-1)];
+      state.mobMax = m.hp;
+      state.mobHp  = state.mobMax;
+      mobName.textContent = m.name;
+    }
+
+    function nextQuestion(){
+      state.current = generateQuestion();
+      questionText.textContent = state.current.q;
+      state.answer = '';
+      setAnswerDisplay();
+      startTimer();
+      btnAttack.disabled = false;
+      state.gameOver = false;
+    }
+
+    function onCorrect(){
+      flash('good');
+      heroMsg.textContent = '공격 성공!';
+      mobMsg.textContent  = '아야!';
+
+      const base = 14;
+      const streakBonus = selectedChar?.id === 'archer' ? Math.min(14, state.streak*3) : Math.min(10, state.streak*2);
+      const dmgMul = selectedChar?.dmgMul ?? 1.0;
+      const dmg = Math.round((base + streakBonus) * dmgMul);
+
+      state.mobHp = clamp(state.mobHp - dmg, 0, state.mobMax);
+      state.score += 10 + streakBonus;
+      state.streak += 1;
+
+      updateUI();
+
+      if(state.mobHp <= 0){
+        // 몬스터 처치 -> 다음 스테이지
+        nextStage();
+        return;
+      }
+      nextQuestion();
+    }
+
+    function onWrong(reason='오답!'){
+      flash('bad');
+      heroMsg.textContent = '피격…';
+      mobMsg.textContent  = '헤헷!';
+
+      const baseDmg = 12;
+      const wrongMul = selectedChar?.wrongDmgMul ?? 1.0;
+      const dmg = Math.round(baseDmg * wrongMul);
+
+      state.heroHp = clamp(state.heroHp - dmg, 0, state.heroMax);
+      state.streak = 0;
+
+      updateUI();
+
+      if(state.heroHp <= 0){
+        gameOver();
+        return;
+      }
+      nextQuestion();
+    }
+
+    function gameOver(){
+      stopTimer();
+      state.gameOver = true;
+      btnAttack.disabled = true;
+      heroMsg.textContent = '기절…';
+      mobMsg.textContent  = '내가 이겼다!';
+      questionText.textContent = '💥 GAME OVER';
+      timerText.textContent = '--.-';
+    }
+
+    function nextStage(){
+      stopTimer();
+      state.stage += 1;
+
+      // 다음 몬스터 세팅
+      newMonsterForStage();
+
+      // 다음 스테이지 시작 시 약간 회복(저학년용)
+      state.heroHp = clamp(state.heroHp + 15, 0, state.heroMax);
+
+      heroMsg.textContent = '다음!';
+      mobMsg.textContent  = '덤벼!';
+
+      updateUI();
+
+      // 엔딩(원하면 더 늘려도 됨)
+      if(state.stage > monsters.length){
         stopTimer();
-        const num = Number(v);
-        if(Number.isNaN(num)){
-          onWrong('숫자가 아님!');
-          return;
-        }
-        if(num === state.current.a) onCorrect();
-        else onWrong('오답!');
+        btnAttack.disabled = true;
+        questionText.textContent = '🎉 ALL CLEAR!';
+        timerText.textContent = '--.-';
+        heroMsg.textContent = '승리!';
+        mobMsg.textContent  = '...';
+        return;
       }
 
-      function resetAll(){
+      nextQuestion();
+    }
+
+    function submitAnswer(){
+      if(state.gameOver) return;
+      if(!state.current) return;
+
+      const v = state.answer.trim();
+      if(v === ''){
         stopTimer();
-        state.stage = 1;
-        state.heroHp = 100;
-        state.heroMax = 100;
-        state.score = 0;
-        state.streak = 0;
-        state.remain = 5;
-
-        state.difficulty = difficultySel.value;
-        state.ops = opsSel.value;
-
-        const m = mobs[0];
-        state.mobMax = m.hp;
-        state.mobHp  = state.mobMax;
-        mobName.textContent = m.name;
-
-        heroName.textContent = '주인공';
-        heroMsg.textContent = '준비!';
-        mobMsg.textContent = '덤벼!';
-
-        attackBtn.disabled = false;
-        answer.disabled = false;
-
-        setBars();
-        updateStats();
-        nextQuestion();
+        onWrong('입력 안 함!');
+        return;
       }
 
-      // ----- 이벤트 -----
-      attackBtn.addEventListener('click', submit);
-      answer.addEventListener('keydown', (e)=>{ if(e.key==='Enter') submit(); });
+      stopTimer();
+      const num = Number(v);
+      if(Number.isNaN(num)){
+        onWrong('숫자가 아님!');
+        return;
+      }
 
-      resetBtn.addEventListener('click', resetAll);
-      difficultySel.addEventListener('change', resetAll);
-      opsSel.addEventListener('change', resetAll);
+      if(num === state.current.a) onCorrect();
+      else onWrong('오답!');
+    }
 
-      // 시작
-      resetAll();
-    })();
-  </script>
+    // Keypad handling
+    keypad.addEventListener('click', (e) => {
+      const btn = e.target.closest('button');
+      if(!btn) return;
+      const key = btn.dataset.key;
+
+      // 공격 버튼은 별도
+      if(btn.id === 'btnAttack') return;
+
+      if(state.gameOver) return;
+
+      if(key === 'clear'){
+        state.answer = '';
+      } else if(key === 'back'){
+        state.answer = state.answer.slice(0, -1);
+      } else if(/^\d$/.test(key)){
+        // 너무 길어지지 않게 제한
+        if(state.answer.length < 4) state.answer += key;
+      }
+      setAnswerDisplay();
+    });
+
+    btnAttack.addEventListener('click', submitAnswer);
+
+    // Reset
+    $('btnReset').addEventListener('click', () => resetAll(true));
+
+    // Start battle from selection
+    btnStartBattle.addEventListener('click', () => {
+      if(!selectedChar) return;
+      resetAll(false);
+      show(screenBattle);
+    });
+
+    function resetAll(goToStart){
+      stopTimer();
+      state.stage = 1;
+      state.heroHp = 100;
+      state.heroMax = 100;
+      state.score = 0;
+      state.streak = 0;
+      state.ops = 'mix';
+      state.answer = '';
+      state.gameOver = false;
+
+      newMonsterForStage();
+
+      heroMsg.textContent = '준비!';
+      mobMsg.textContent  = '덤벼!';
+
+      updateUI();
+      nextQuestion();
+
+      if(goToStart){
+        selectedChar = null;
+        btnStartBattle.disabled = true;
+        renderCharCards();
+        show(screenStart);
+      }
+    }
+
+    // 초기
+    // 시작화면에선 전투 시작하지 않음
+  })();
+</script>
 </body>
 </html>
