@@ -32,14 +32,14 @@
       --teal:#4BACC6;
       --good:#43e28b;
       --bad:#ff5b6a;
-      --shadow: 0 20px 50px rgba(0,0,0,.38);
+      --shadow: 0 18px 44px rgba(0,0,0,.36);
     }
 
     *{ box-sizing:border-box; font-family: system-ui, -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
     .app{
       height:100vh; width:100vw;
       display:flex; align-items:center; justify-content:center;
-      padding:16px;
+      padding:14px;
       background:
         radial-gradient(1200px 700px at 20% 10%, rgba(85,124,243,.35), transparent 60%),
         radial-gradient(900px 600px at 80% 40%, rgba(75,172,198,.22), transparent 55%),
@@ -51,14 +51,14 @@
       height:min(940px, 96vh);
       display:flex;
       flex-direction:column;
-      gap:14px;
+      gap:12px;
     }
 
     .card{
       background:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.04));
       border:1px solid var(--line);
       border-radius:22px;
-      padding:16px;
+      padding:14px;
       box-shadow: var(--shadow);
       position:relative;
       overflow:hidden;
@@ -68,18 +68,18 @@
       box-shadow:none;
     }
 
-    /* ===== 화면(페이지) 전환 ===== */
+    /* ===== 화면 전환 ===== */
     .screen{ display:none; height:100%; }
-    .screen.active{ display:flex; flex-direction:column; gap:14px; }
+    .screen.active{ display:flex; flex-direction:column; gap:12px; }
 
-    /* ===== 공통 버튼 ===== */
+    /* ===== 버튼 ===== */
     .btn{
       border:1px solid rgba(255,255,255,.12);
       background:rgba(255,255,255,.06);
       color:var(--text);
       padding:12px 14px;
       border-radius:16px;
-      font-weight:1000;
+      font-weight:1100;
       cursor:pointer;
     }
     .btn:active{ transform: translateY(1px); filter:brightness(.98); }
@@ -88,7 +88,7 @@
       background: linear-gradient(180deg, rgba(106,169,255,.95), rgba(85,124,243,.95));
       box-shadow: 0 10px 24px rgba(85,124,243,.25);
     }
-    .btn.wide{ width:100%; height:56px; font-size:16px; }
+    .btn.wide{ width:100%; height:54px; font-size:16px; }
     .btn.small{ padding:10px 12px; border-radius:14px; font-size:13px; }
 
     /* ===== 시작화면 ===== */
@@ -97,17 +97,18 @@
       display:flex;
       flex-direction:column;
       justify-content:center;
-      gap:14px;
+      gap:12px;
       text-align:center;
+      padding:18px 16px;
     }
     .logo{
-      font-weight:1100;
+      font-weight:1200;
       letter-spacing:.02em;
       font-size:34px;
     }
     .subtitle{
       color:var(--muted);
-      font-weight:900;
+      font-weight:950;
       line-height:1.45;
       font-size:14px;
     }
@@ -127,36 +128,61 @@
       border:1px solid rgba(255,255,255,.12);
       background:rgba(255,255,255,.05);
       color:rgba(243,245,255,.85);
-      font-weight:900;
+      font-weight:950;
       font-size:12px;
     }
 
-    /* ===== 캐릭터 선택 ===== */
+    /* ===== 선택 화면 ===== */
     .topRow{
       display:flex; align-items:center; justify-content:space-between; gap:10px;
     }
     .h1{
       font-size:18px;
-      font-weight:1100;
+      font-weight:1200;
     }
     .hint{
       color:var(--muted);
       font-size:13px;
-      font-weight:800;
+      font-weight:900;
       line-height:1.45;
       margin-top:4px;
     }
+
+    /* 난이도 선택 */
+    .diffRow{
+      display:grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap:10px;
+      margin-top:10px;
+    }
+    .diffBtn{
+      height:48px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(0,0,0,.16);
+      color:rgba(243,245,255,.88);
+      font-weight:1100;
+      cursor:pointer;
+    }
+    .diffBtn.selected{
+      border:none;
+      outline:2px solid rgba(106,169,255,.85);
+      background:rgba(85,124,243,.14);
+      color:var(--text);
+    }
+
     .charGrid{
       display:grid;
       grid-template-columns:1fr;
-      gap:12px;
+      gap:10px;
+      margin-top:10px;
     }
     .charCard{
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:12px;
-      padding:14px;
+      padding:12px;
       border-radius:18px;
       border:1px solid rgba(255,255,255,.12);
       background:rgba(0,0,0,.16);
@@ -180,40 +206,43 @@
       flex:0 0 auto;
     }
     .charInfo{ display:flex; flex-direction:column; gap:4px; }
-    .charName{ font-weight:1100; font-size:16px; }
-    .charDesc{ color:var(--muted); font-weight:800; font-size:12px; }
+    .charName{ font-weight:1200; font-size:16px; }
+    .charDesc{ color:var(--muted); font-weight:900; font-size:12px; }
     .statPills{
       display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;
     }
     .pill{
       font-size:12px;
-      font-weight:1000;
+      font-weight:1100;
       color:rgba(243,245,255,.88);
       background:rgba(255,255,255,.06);
       border:1px solid rgba(255,255,255,.10);
       border-radius:999px;
       padding:6px 10px;
+      white-space:nowrap;
     }
 
     /* ===== 전투 화면 ===== */
     .battleHeader{
       display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
     }
+
     .nameCol{
       display:flex; flex-direction:column; gap:6px; min-width:46%;
     }
     .nameLine{
       display:flex; align-items:center; gap:8px;
-      font-weight:1100; font-size:18px;
+      font-weight:1200; font-size:18px;
     }
     .dot{ width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,.35); }
-    .subMsg{ min-height:18px; font-weight:900; font-size:13px; color:var(--muted); }
+    .subMsg{ min-height:18px; font-weight:950; font-size:13px; color:var(--muted); }
+
     .hpLine{
       display:flex; align-items:center; gap:8px;
       font-variant-numeric: tabular-nums;
       color:var(--muted);
       font-size:12px;
-      font-weight:1000;
+      font-weight:1100;
     }
     .hpPill{
       width:150px; height:10px; border-radius:999px;
@@ -229,6 +258,34 @@
     .hpFill.bad{
       background:linear-gradient(90deg, var(--bad), rgba(255,91,106,.55));
     }
+
+    /* 캐릭터/몬스터 그림 표시 */
+    .artRow{
+      margin-top:10px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .art{
+      width:92px; height:92px;
+      border-radius:22px;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:54px;
+      user-select:none;
+      filter: drop-shadow(0 14px 18px rgba(0,0,0,.22));
+    }
+    .art.smallRight{ margin-left:auto; }
+    .vs{
+      font-weight:1200;
+      color:rgba(243,245,255,.55);
+      letter-spacing:.06em;
+    }
+
     .midRow{
       margin-top:10px;
       display:flex; align-items:center; justify-content:space-between;
@@ -253,107 +310,122 @@
       display:inline-flex;
       align-items:center;
       gap:8px;
-      padding:10px 14px;
+      padding:9px 12px;
       border-radius:999px;
       background:rgba(255,255,255,.07);
       border:1px solid rgba(255,255,255,.10);
-      font-weight:1100;
+      font-weight:1200;
       font-variant-numeric: tabular-nums;
-      min-width:96px;
+      min-width:92px;
       justify-content:center;
       font-size:14px;
     }
     .helper{
-      margin-top:10px;
+      margin-top:8px;
       color:var(--muted);
       font-size:13px;
-      font-weight:900;
+      font-weight:950;
       line-height:1.45;
     }
 
     .answerDisplayRow{
-      margin-top:12px;
-      display:flex; align-items:stretch; gap:12px;
+      margin-top:10px;
+      display:flex; align-items:stretch; gap:10px;
     }
-    /* input 대신 표시창(키보드 안 뜸) */
     .answerDisplay{
       flex:1;
-      height:56px;
+      height:50px;
       border-radius:16px;
       border:1px solid rgba(255,255,255,.10);
       background:rgba(0,0,0,.20);
       display:flex;
       align-items:center;
       padding:0 14px;
-      font-weight:1100;
-      font-size:20px;
+      font-weight:1200;
+      font-size:18px;
       color:var(--text);
     }
     .placeholder{
       color:rgba(243,245,255,.35);
-      font-weight:1100;
+      font-weight:1200;
     }
 
-    .grid2{
+    /* ===== 숫자 키패드 (작게/효율적으로) ===== */
+    .battleGrid{
       display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:12px;
+      grid-template-columns: 1.08fr .92fr;  /* 왼쪽: 키패드 / 오른쪽: 버튼+정보 */
+      gap:10px;
+      margin-top:10px;
+      align-items:start;
     }
+
+    .keypad{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:8px;                 /* 간격 줄임 */
+    }
+    .key{
+      height:44px;             /* 버튼 높이 줄임 */
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      font-weight:1200;
+      font-size:16px;          /* 글자 작게 */
+      cursor:pointer;
+    }
+    .key:active{ transform:translateY(1px); filter:brightness(.98); }
+    .key.func{
+      font-size:13px;
+      font-weight:1200;
+      color:rgba(243,245,255,.88);
+      background:rgba(0,0,0,.18);
+    }
+    .key[disabled]{ opacity:.45; cursor:not-allowed; }
+
+    .sideStack{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .attackBtn{
+      height:44px;
+      border-radius:14px;
+      border:none;
+      background: linear-gradient(180deg, rgba(106,169,255,.95), rgba(85,124,243,.95));
+      box-shadow: 0 10px 24px rgba(85,124,243,.22);
+      color:white;
+      font-weight:1200;
+      font-size:14px;
+      cursor:pointer;
+    }
+    .attackBtn:active{ transform:translateY(1px); filter:brightness(.98); }
+    .attackBtn[disabled]{ opacity:.45; cursor:not-allowed; }
+
     .miniCard{
       background:rgba(255,255,255,.045);
       border:1px solid rgba(255,255,255,.10);
       border-radius:18px;
-      padding:14px;
-      min-height:84px;
+      padding:12px;
+      min-height:70px;
       display:flex;
       flex-direction:column;
       justify-content:center;
       gap:6px;
     }
-    .miniLabel{ color:var(--muted); font-weight:1100; font-size:12px; }
-    .miniValue{ font-weight:1200; font-size:32px; font-variant-numeric: tabular-nums; }
-
-    /* ===== 게임 내 숫자 키패드 ===== */
-    .keypad{
-      display:grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap:10px;
-      margin-top:12px;
-    }
-    .key{
-      height:56px;
-      border-radius:16px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(255,255,255,.06);
-      color:var(--text);
-      font-weight:1200;
-      font-size:18px;
-      cursor:pointer;
-    }
-    .key:active{ transform:translateY(1px); filter:brightness(.98); }
-    .key.func{
-      font-size:14px;
-      font-weight:1200;
-      color:rgba(243,245,255,.88);
-      background:rgba(0,0,0,.18);
-    }
-    .key.attack{
-      border:none;
-      background: linear-gradient(180deg, rgba(106,169,255,.95), rgba(85,124,243,.95));
-      box-shadow: 0 10px 24px rgba(85,124,243,.22);
-    }
-    .key[disabled]{ opacity:.45; cursor:not-allowed; }
+    .miniLabel{ color:var(--muted); font-weight:1200; font-size:12px; }
+    .miniValue{ font-weight:1300; font-size:26px; font-variant-numeric: tabular-nums; }
 
     .bottomPill{
-      margin-top:12px;
+      margin-top:10px;
       width:100%;
       display:flex;
       justify-content:center;
-      padding:12px 14px;
+      padding:10px 12px;
       border-radius:999px;
       border:1px solid rgba(255,255,255,.10);
       background:rgba(255,255,255,.05);
-      font-weight:1100;
+      font-weight:1200;
       color:rgba(243,245,255,.85);
       white-space:nowrap;
       overflow:hidden;
@@ -362,9 +434,10 @@
 
     @media (max-width:420px){
       .question{ font-size:34px; }
-      .miniValue{ font-size:28px; }
-      .timerPill{ min-width:86px; padding:9px 12px; }
       .hpPill{ width:140px; }
+      .art{ width:86px; height:86px; font-size:50px; }
+      .battleGrid{ grid-template-columns: 1.05fr .95fr; }
+      .key{ height:42px; }
     }
   </style>
 </head>
@@ -380,16 +453,15 @@
         <div class="card titleCard">
           <div class="logo">MATH BATTLE</div>
           <div class="subtitle">
-            사칙연산을 풀면 공격!<br/>
-            틀리면 에너지가 깎여요.<br/>
+            문제를 풀면 공격! 틀리면 에너지 감소!<br/>
             몬스터를 쓰러뜨리고 다음 스테이지로!
           </div>
           <div class="badgeRow">
             <div class="badge">🧠 초등 저학년</div>
-            <div class="badge">⚔️ 캐릭터 선택</div>
+            <div class="badge">🧙 직업 선택</div>
             <div class="badge">👾 스테이지 진행</div>
           </div>
-          <div style="margin-top:18px;">
+          <div style="margin-top:16px;">
             <button class="btn primary wide" id="btnGoSelect">START</button>
           </div>
         </div>
@@ -402,25 +474,32 @@
       </div>
 
       <!-- =========================
-           SCREEN 2: CHARACTER SELECT
+           SCREEN 2: CHARACTER + DIFFICULTY
       ========================== -->
       <div class="screen" id="screenSelect">
         <div class="card">
           <div class="topRow">
             <div>
-              <div class="h1">캐릭터 선택</div>
-              <div class="hint">전사 / 마법사 / 궁수 중 하나를 고르고 전투로 들어가요.</div>
+              <div class="h1">직업 선택 + 난이도</div>
+              <div class="hint">난이도 먼저 고르고, 전사/마법사/궁수를 선택하세요.</div>
             </div>
             <button class="btn small" id="btnBackToStart">뒤로</button>
+          </div>
+
+          <div style="margin-top:10px;">
+            <div class="miniLabel" style="margin-bottom:6px; font-weight:1200;">난이도</div>
+            <div class="diffRow" id="diffRow">
+              <button class="diffBtn selected" data-diff="easy">쉬움</button>
+              <button class="diffBtn" data-diff="normal">보통</button>
+              <button class="diffBtn" data-diff="hard">어려움</button>
+            </div>
           </div>
         </div>
 
         <div class="card">
-          <div class="charGrid" id="charGrid">
-            <!-- JS로 렌더 -->
-          </div>
-
-          <div style="margin-top:12px; display:flex; gap:10px;">
+          <div class="miniLabel" style="font-weight:1200;">직업</div>
+          <div class="charGrid" id="charGrid"></div>
+          <div style="margin-top:10px; display:flex; gap:10px;">
             <button class="btn primary wide" id="btnStartBattle" disabled>전투 시작</button>
           </div>
         </div>
@@ -431,7 +510,7 @@
       ========================== -->
       <div class="screen" id="screenBattle">
 
-        <!-- STATUS -->
+        <!-- STATUS + ART -->
         <div class="card" id="battleStatusCard">
           <div class="flash good" id="flashGood"></div>
           <div class="flash bad" id="flashBad"></div>
@@ -456,66 +535,77 @@
             </div>
           </div>
 
+          <!-- 캐릭터/몬스터 그림 -->
+          <div class="artRow">
+            <div class="art" id="heroArt">⚔️</div>
+            <div class="vs">VS</div>
+            <div class="art smallRight" id="mobArt">👾</div>
+          </div>
+
           <div class="midRow">
             <div class="pill" id="stageTxt">스테이지 1</div>
             <button class="btn small" id="btnReset">처음부터</button>
           </div>
         </div>
 
-        <!-- QUESTION + ANSWER -->
+        <!-- QUESTION + INPUT + KEYPAD -->
         <div class="card">
           <div class="question">
             <div id="questionText">10 - 0 = ?</div>
-            <div class="timerPill"><span>⏱</span><span id="timerText">3.5</span></div>
+            <div class="timerPill"><span>⏱</span><span id="timerText">4.0</span></div>
           </div>
-          <div class="helper">아래 키패드로 정답을 입력하고 <b>공격</b>하세요.</div>
+          <div class="helper">키패드로 정답을 입력하고 <b>공격</b>하세요.</div>
 
           <div class="answerDisplayRow">
             <div class="answerDisplay" id="answerDisplay"><span class="placeholder">정답</span></div>
           </div>
 
-          <!-- In-game Keypad (아이폰 키보드 안 뜸) -->
-          <div class="keypad" id="keypad">
-            <!-- 1~9 -->
-            <button class="key" data-key="1">1</button>
-            <button class="key" data-key="2">2</button>
-            <button class="key" data-key="3">3</button>
-            <button class="key" data-key="4">4</button>
-            <button class="key" data-key="5">5</button>
-            <button class="key" data-key="6">6</button>
-            <button class="key" data-key="7">7</button>
-            <button class="key" data-key="8">8</button>
-            <button class="key" data-key="9">9</button>
-            <!-- 기능키 -->
-            <button class="key func" data-key="clear">전체삭제</button>
-            <button class="key" data-key="0">0</button>
-            <button class="key func" data-key="back">←</button>
-            <!-- 공격(전체 폭) -->
-            <button class="key attack" id="btnAttack" style="grid-column: 1 / span 3; height:58px;">공격!</button>
+          <div class="battleGrid">
+            <!-- 작은 숫자패드 -->
+            <div class="keypad" id="keypad">
+              <button class="key" data-key="1">1</button>
+              <button class="key" data-key="2">2</button>
+              <button class="key" data-key="3">3</button>
+
+              <button class="key" data-key="4">4</button>
+              <button class="key" data-key="5">5</button>
+              <button class="key" data-key="6">6</button>
+
+              <button class="key" data-key="7">7</button>
+              <button class="key" data-key="8">8</button>
+              <button class="key" data-key="9">9</button>
+
+              <button class="key func" data-key="clear">전체</button>
+              <button class="key" data-key="0">0</button>
+              <button class="key func" data-key="back">←</button>
+            </div>
+
+            <!-- 오른쪽: 공격 + 스탯 -->
+            <div class="sideStack">
+              <button class="attackBtn" id="btnAttack">공격!</button>
+
+              <div class="miniCard">
+                <div class="miniLabel">점수</div>
+                <div class="miniValue" id="scoreTxt">0</div>
+              </div>
+              <div class="miniCard">
+                <div class="miniLabel">연속 정답</div>
+                <div class="miniValue" id="streakTxt">0</div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- STATS -->
-        <div class="grid2">
-          <div class="miniCard">
-            <div class="miniLabel">점수</div>
-            <div class="miniValue" id="scoreTxt">0</div>
-          </div>
-          <div class="miniCard" style="align-items:flex-end; text-align:right;">
-            <div class="miniLabel">연속 정답</div>
-            <div class="miniValue" id="streakTxt">0</div>
-          </div>
-        </div>
-
+        <!-- FOOTER INFO -->
         <div class="card soft">
-          <div class="grid2">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
             <div class="miniCard" style="min-height:auto;">
               <div class="miniLabel">난이도</div>
-              <div class="miniValue" style="font-size:26px;" id="diffTxt">쉬움</div>
+              <div class="miniValue" style="font-size:22px;" id="diffTxt">쉬움</div>
             </div>
-            <div class="miniCard" style="min-height:auto; align-items:flex-end; text-align:right;">
-              <div class="miniLabel">캐릭터</div>
-              <div class="miniValue" style="font-size:26px;" id="classTxt">전사</div>
+            <div class="miniCard" style="min-height:auto; text-align:right; align-items:flex-end;">
+              <div class="miniLabel">직업</div>
+              <div class="miniValue" style="font-size:22px;" id="classTxt">전사</div>
             </div>
           </div>
           <div class="bottomPill" id="domainPill">studiovarem-ui.github.io</div>
@@ -536,24 +626,34 @@
     const screenStart  = $('screenStart');
     const screenSelect = $('screenSelect');
     const screenBattle = $('screenBattle');
-
     function show(screen){
       [screenStart, screenSelect, screenBattle].forEach(s => s.classList.remove('active'));
       screen.classList.add('active');
     }
 
-    // Buttons
     $('btnGoSelect').addEventListener('click', () => show(screenSelect));
     $('btnBackToStart').addEventListener('click', () => show(screenStart));
 
-    // Character data
+    // Character data (그림=emoji로 우선 표시. 나중에 png로 쉽게 교체 가능)
     const characters = [
-      { id:'warrior', name:'전사', emoji:'⚔️', desc:'기본 공격이 강해요', dmgMul:1.15, timeBonus:0.0, wrongDmgMul:1.0 },
-      { id:'mage',    name:'마법사', emoji:'🪄', desc:'시간이 조금 더 여유로워요', dmgMul:1.0,  timeBonus:0.6, wrongDmgMul:1.0 },
-      { id:'archer',  name:'궁수', emoji:'🏹', desc:'연속 정답 보너스가 커요', dmgMul:1.05, timeBonus:0.0, wrongDmgMul:0.95 }
+      { id:'warrior', name:'전사', emoji:'⚔️', art:'🛡️', desc:'기본 공격이 강해요', dmgMul:1.15, timeBonus:0.0, wrongDmgMul:1.0 },
+      { id:'mage',    name:'마법사', emoji:'🪄', art:'🧙', desc:'시간이 조금 더 여유로워요', dmgMul:1.0,  timeBonus:0.6, wrongDmgMul:1.0 },
+      { id:'archer',  name:'궁수', emoji:'🏹', art:'🧝', desc:'연속 정답 보너스가 커요', dmgMul:1.05, timeBonus:0.0, wrongDmgMul:0.95 }
     ];
     let selectedChar = null;
 
+    // Difficulty
+    let selectedDiff = 'easy'; // easy/normal/hard
+    const diffRow = $('diffRow');
+    diffRow.addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-diff]');
+      if(!btn) return;
+      selectedDiff = btn.dataset.diff;
+      [...diffRow.querySelectorAll('.diffBtn')].forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+    });
+
+    // Render chars
     const charGrid = $('charGrid');
     const btnStartBattle = $('btnStartBattle');
 
@@ -571,8 +671,8 @@
             </div>
           </div>
           <div class="statPills">
-            <span class="pill">공격 × ${c.dmgMul.toFixed(2)}</span>
-            <span class="pill">시간 + ${c.timeBonus.toFixed(1)}s</span>
+            <span class="pill">공격×${c.dmgMul.toFixed(2)}</span>
+            <span class="pill">시간+${c.timeBonus.toFixed(1)}s</span>
           </div>
         `;
         el.addEventListener('click', () => {
@@ -585,16 +685,18 @@
     }
     renderCharCards();
 
-    // Battle UI els
+    // Battle UI
     const heroName = $('heroName');
     const heroMsg  = $('heroMsg');
     const heroHpBar= $('heroHpBar');
     const heroHpTxt= $('heroHpTxt');
+    const heroArt  = $('heroArt');
 
     const mobName  = $('mobName');
     const mobMsg   = $('mobMsg');
     const mobHpBar = $('mobHpBar');
     const mobHpTxt = $('mobHpTxt');
+    const mobArt   = $('mobArt');
 
     const stageTxt = $('stageTxt');
     const questionText = $('questionText');
@@ -612,7 +714,7 @@
     const flashGood = $('flashGood');
     const flashBad  = $('flashBad');
 
-    // Game State
+    // Game state
     const state = {
       stage: 1,
       heroMax: 100,
@@ -621,30 +723,29 @@
       mobHp: 60,
       score: 0,
       streak: 0,
-      difficulty: 'easy', // 고정 쉬움(원하면 선택 추가 가능)
       ops: 'mix',
-      baseTime: 4.0,
       timer: 4.0,
       ticking: null,
       current: null,
-      answer: '', // 키패드 입력 문자열
+      answer: '',
       gameOver: false
     };
 
-    // Monsters per stage (HP 달라짐)
+    // Monsters per stage (HP 다름)
     const monsters = [
-      { name:'슬라임',   hp:60 },
-      { name:'고블린',   hp:78 },
-      { name:'늑대',     hp:92 },
-      { name:'오우거',   hp:112 },
-      { name:'드래곤',   hp:140 },
-      { name:'보스',     hp:170 }
+      { name:'슬라임',   hp:60,  art:'👾' },
+      { name:'고블린',   hp:80,  art:'👹' },
+      { name:'늑대',     hp:95,  art:'🐺' },
+      { name:'오우거',   hp:115, art:'🧟' },
+      { name:'드래곤',   hp:145, art:'🐲' },
+      { name:'보스',     hp:175, art:'💀' }
     ];
 
-    // Difficulty config (저학년 기준)
+    // Difficulty config
     function diffConfig(){
-      // 쉬움 기준(0~10, 곱/나눗셈은 작게)
-      return {max:10, mulMax:5, time:4.0};
+      if(selectedDiff === 'easy')   return {max:10, mulMax:5,  time:4.0, label:'쉬움'};
+      if(selectedDiff === 'normal') return {max:20, mulMax:9,  time:3.6, label:'보통'};
+      return {max:50, mulMax:12, time:3.2, label:'어려움'};
     }
 
     const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
@@ -654,6 +755,14 @@
       const el = (kind==='good') ? flashGood : flashBad;
       el.style.opacity = '1';
       setTimeout(()=> el.style.opacity='0', 150);
+    }
+
+    // 간단한 “맞으면 몬스터 흔들/틀리면 캐릭터 흔들” 느낌
+    function bump(el){
+      el.animate(
+        [{transform:'translateY(0)'},{transform:'translateY(-3px)'},{transform:'translateY(0)'}],
+        {duration:180, easing:'ease-out'}
+      );
     }
 
     function setBars(){
@@ -726,13 +835,15 @@
       scoreTxt.textContent = state.score;
       streakTxt.textContent = state.streak;
 
-      diffTxt.textContent = '쉬움';
+      const cfg = diffConfig();
+      diffTxt.textContent = cfg.label;
       classTxt.textContent = selectedChar ? selectedChar.name : '-';
+
+      heroName.textContent = selectedChar ? selectedChar.name : '주인공';
+      heroArt.textContent  = selectedChar ? selectedChar.art : '⚔️';
 
       setBars();
       setAnswerDisplay();
-
-      heroName.textContent = selectedChar ? selectedChar.name : '주인공';
     }
 
     function newMonsterForStage(){
@@ -740,6 +851,7 @@
       state.mobMax = m.hp;
       state.mobHp  = state.mobMax;
       mobName.textContent = m.name;
+      mobArt.textContent  = m.art;
     }
 
     function nextQuestion(){
@@ -756,9 +868,10 @@
       flash('good');
       heroMsg.textContent = '공격 성공!';
       mobMsg.textContent  = '아야!';
+      bump(mobArt);
 
       const base = 14;
-      const streakBonus = selectedChar?.id === 'archer' ? Math.min(14, state.streak*3) : Math.min(10, state.streak*2);
+      const streakBonus = (selectedChar?.id === 'archer') ? Math.min(14, state.streak*3) : Math.min(10, state.streak*2);
       const dmgMul = selectedChar?.dmgMul ?? 1.0;
       const dmg = Math.round((base + streakBonus) * dmgMul);
 
@@ -769,7 +882,6 @@
       updateUI();
 
       if(state.mobHp <= 0){
-        // 몬스터 처치 -> 다음 스테이지
         nextStage();
         return;
       }
@@ -780,6 +892,7 @@
       flash('bad');
       heroMsg.textContent = '피격…';
       mobMsg.textContent  = '헤헷!';
+      bump(heroArt);
 
       const baseDmg = 12;
       const wrongMul = selectedChar?.wrongDmgMul ?? 1.0;
@@ -811,10 +924,9 @@
       stopTimer();
       state.stage += 1;
 
-      // 다음 몬스터 세팅
       newMonsterForStage();
 
-      // 다음 스테이지 시작 시 약간 회복(저학년용)
+      // 다음 스테이지 시작 시 약간 회복
       state.heroHp = clamp(state.heroHp + 15, 0, state.heroMax);
 
       heroMsg.textContent = '다음!';
@@ -822,9 +934,7 @@
 
       updateUI();
 
-      // 엔딩(원하면 더 늘려도 됨)
       if(state.stage > monsters.length){
-        stopTimer();
         btnAttack.disabled = true;
         questionText.textContent = '🎉 ALL CLEAR!';
         timerText.textContent = '--.-';
@@ -837,8 +947,7 @@
     }
 
     function submitAnswer(){
-      if(state.gameOver) return;
-      if(!state.current) return;
+      if(state.gameOver || !state.current) return;
 
       const v = state.answer.trim();
       if(v === ''){
@@ -858,15 +967,11 @@
       else onWrong('오답!');
     }
 
-    // Keypad handling
+    // Keypad
     keypad.addEventListener('click', (e) => {
       const btn = e.target.closest('button');
       if(!btn) return;
       const key = btn.dataset.key;
-
-      // 공격 버튼은 별도
-      if(btn.id === 'btnAttack') return;
-
       if(state.gameOver) return;
 
       if(key === 'clear'){
@@ -874,7 +979,6 @@
       } else if(key === 'back'){
         state.answer = state.answer.slice(0, -1);
       } else if(/^\d$/.test(key)){
-        // 너무 길어지지 않게 제한
         if(state.answer.length < 4) state.answer += key;
       }
       setAnswerDisplay();
@@ -885,7 +989,7 @@
     // Reset
     $('btnReset').addEventListener('click', () => resetAll(true));
 
-    // Start battle from selection
+    // Start battle
     btnStartBattle.addEventListener('click', () => {
       if(!selectedChar) return;
       resetAll(false);
@@ -915,12 +1019,12 @@
         selectedChar = null;
         btnStartBattle.disabled = true;
         renderCharCards();
+        selectedDiff = 'easy';
+        [...diffRow.querySelectorAll('.diffBtn')].forEach(b => b.classList.remove('selected'));
+        diffRow.querySelector('[data-diff="easy"]').classList.add('selected');
         show(screenStart);
       }
     }
-
-    // 초기
-    // 시작화면에선 전투 시작하지 않음
   })();
 </script>
 </body>
