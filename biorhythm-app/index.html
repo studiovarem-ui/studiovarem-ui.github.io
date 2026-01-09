@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>바이오리듬 & 별자리 운세</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      min-height: 100vh;
+      background: #0a0a0f;
+      font-family: 'Pretendard', 'Noto Sans KR', -apple-system, sans-serif;
+      color: #fff;
+      position: relative;
+      overflow-x: hidden;
+    }
+    
+    /* Animated Background */
+    .bg-gradient {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: 
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(120, 119, 198, 0.15), transparent),
+        radial-gradient(ellipse 60% 40% at 100% 100%, rgba(255, 107, 107, 0.1), transparent),
+        radial-gradient(ellipse 60% 40% at 0% 100%, rgba(78, 205, 196, 0.1), transparent);
+      pointer-events: none;
+    }
+    
+    .stars {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-image: 
+        radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,0.3), transparent),
+        radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.2), transparent),
+        radial-gradient(1px 1px at 90px 40px, rgba(255,255,255,0.4), transparent),
+        radial-gradient(2px 2px at 130px 80px, rgba(255,255,255,0.2), transparent),
+        radial-gradient(1px 1px at 160px 120px, rgba(255,255,255,0.3), transparent),
+        radial-gradient(2px 2px at 200px 50px, rgba(255,255,255,0.25), transparent),
+        radial-gradient(1px 1px at 250px 160px, rgba(255,255,255,0.35), transparent),
+        radial-gradient(2px 2px at 300px 90px, rgba(255,255,255,0.2), transparent);
+      background-size: 300px 200px;
+      pointer-events: none;
+      opacity: 0.6;
+    }
+    
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      position: relative;
+      z-index: 1;
+    }
+    
+    /* Header */
+    header { text-align: center; margin-bottom: 40px; }
+    
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 20px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 100px;
+      border: 1px solid rgba(255,255,255,0.1);
+      margin-bottom: 20px;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.7);
+    }
+    
+    .badge span { font-size: 24px; }
+    
+    h1 {
+      font-size: 48px;
+      font-weight: 800;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.7) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -2px;
+    }
+    
+    .subtitle {
+      color: rgba(255,255,255,0.5);
+      font-size: 16px;
+      font-weight: 300;
+    }
+    
+    /* Card */
+    .card {
+      background: rgba(255,255,255,0.03);
+      backdrop-filter: blur(20px);
+      border-radius: 24px;
+      padding: 28px;
+      margin-bottom: 24px;
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 4px 30px rgba(0,0,0,0.3);
+    }
+    
+    /* Input Section */
+    .input-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+    
+    .input-group label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    input[type="date"] {
+      width: 100%;
+      padding: 16px 20px;
+      font-size: 15px;
+      border: 2px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      background: rgba(0,0,0,0.4);
+      color: #fff;
+      outline: none;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    input[type="date"]:focus {
+      border-color: rgba(255,255,255,0.2);
+    }
+    
+    /* Zodiac Info */
+    .zodiac-info {
+      margin-top: 20px;
+      padding: 20px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    
+    .zodiac-main {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .zodiac-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+    }
+    
+    .zodiac-name {
+      font-size: 24px;
+      font-weight: 700;
+    }
+    
+    .zodiac-meta {
+      font-size: 13px;
+      color: rgba(255,255,255,0.5);
+      margin-top: 4px;
+    }
+    
+    .days-lived {
+      text-align: center;
+    }
+    
+    .days-number {
+      font-size: 28px;
+      font-weight: 700;
+    }
+    
+    .days-label {
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+    }
+    
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      padding: 6px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.06);
+      overflow-x: auto;
+    }
+    
+    .tab {
+      flex: 1;
+      padding: 14px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      white-space: nowrap;
+      background: transparent;
+      color: rgba(255,255,255,0.5);
+    }
+    
+    .tab.active {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+    }
+    
+    /* Tab Content */
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    
+    /* Overall Score */
+    .overall-score {
+      border-radius: 24px;
+      padding: 32px;
+      margin-bottom: 24px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .overall-score .bg-symbol {
+      position: absolute;
+      top: -50px;
+      right: -50px;
+      font-size: 150px;
+      opacity: 0.1;
+    }
+    
+    .score-label {
+      font-size: 14px;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    
+    .score-value {
+      font-size: 72px;
+      font-weight: 800;
+      line-height: 1;
+      margin-bottom: 16px;
+    }
+    
+    .score-message {
+      font-size: 16px;
+      color: rgba(255,255,255,0.8);
+      line-height: 1.6;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    
+    /* Lucky Items */
+    .lucky-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    
+    .lucky-item {
+      background: rgba(255,255,255,0.03);
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    
+    .lucky-item .icon {
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+    
+    .lucky-item .label {
+      font-size: 11px;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 4px;
+    }
+    
+    .lucky-item .value {
+      font-size: 14px;
+      font-weight: 600;
+    }
+    
+    .lucky-color {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      margin: 0 auto 8px;
+    }
+    
+    /* Fortune Categories */
+    .fortune-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    
+    .fortune-card {
+      background: rgba(255,255,255,0.03);
+      border-radius: 20px;
+      padding: 24px;
+      border: 1px solid rgba(255,255,255,0.08);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .fortune-card .glow {
+      position: absolute;
+      top: -20px;
+      right: -20px;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      opacity: 0.2;
+      filter: blur(20px);
+    }
+    
+    .fortune-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    
+    .fortune-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    
+    .fortune-title {
+      font-size: 16px;
+      font-weight: 700;
+    }
+    
+    .fortune-score {
+      font-size: 24px;
+      font-weight: 800;
+    }
+    
+    .fortune-bar {
+      height: 6px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 3px;
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+    
+    .fortune-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+    }
+    
+    .fortune-message {
+      font-size: 14px;
+      color: rgba(255,255,255,0.7);
+      line-height: 1.6;
+    }
+    
+    /* Biorhythm Cards */
+    .bio-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    
+    .bio-card {
+      background: rgba(255,255,255,0.03);
+      border-radius: 20px;
+      padding: 24px;
+      border: 1px solid rgba(255,255,255,0.08);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .bio-card.critical {
+      border-color: #ef4444;
+    }
+    
+    .critical-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      padding: 4px 10px;
+      background: rgba(239,68,68,0.2);
+      border: 1px solid rgba(239,68,68,0.3);
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #ef4444;
+    }
+    
+    .bio-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    
+    .bio-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+    
+    .bio-title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+    
+    .bio-period {
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+      margin-top: 2px;
+    }
+    
+    .bio-value {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    
+    .bio-number {
+      font-size: 42px;
+      font-weight: 800;
+    }
+    
+    .bio-percent {
+      font-size: 20px;
+      color: rgba(255,255,255,0.4);
+    }
+    
+    .bio-trend {
+      font-size: 16px;
+      margin-left: 4px;
+    }
+    
+    .bio-trend.up { color: #22c55e; }
+    .bio-trend.down { color: #ef4444; }
+    
+    .phase-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+    
+    .bio-bar {
+      height: 8px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+    
+    .bio-bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.5s ease;
+    }
+    
+    .bio-advice {
+      font-size: 13px;
+      color: rgba(255,255,255,0.6);
+      line-height: 1.6;
+    }
+    
+    /* Chart */
+    .chart-container {
+      margin-bottom: 24px;
+    }
+    
+    .chart-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .chart-svg {
+      width: 100%;
+      height: auto;
+    }
+    
+    .chart-legend {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 16px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 100px;
+    }
+    
+    .legend-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+    }
+    
+    .legend-label {
+      font-size: 13px;
+      color: rgba(255,255,255,0.7);
+    }
+    
+    /* Zodiac Traits */
+    .traits-section {
+      margin-top: 24px;
+    }
+    
+    .traits-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+    
+    .traits-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    
+    .trait-tag {
+      padding: 8px 16px;
+      border-radius: 100px;
+      font-size: 13px;
+    }
+    
+    .compatibility-box {
+      padding: 16px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 12px;
+    }
+    
+    .compatibility-label {
+      font-size: 13px;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 8px;
+    }
+    
+    .compatibility-value {
+      font-size: 15px;
+      font-weight: 600;
+    }
+    
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 80px 20px;
+      color: rgba(255,255,255,0.4);
+    }
+    
+    .empty-state .icon {
+      font-size: 64px;
+      margin-bottom: 24px;
+    }
+    
+    .empty-state p {
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+    
+    .empty-state .hint {
+      font-size: 14px;
+    }
+    
+    /* Footer */
+    footer {
+      text-align: center;
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.3);
+      font-size: 12px;
+    }
+    
+    /* About Section */
+    .about-section {
+      font-size: 15px;
+      line-height: 1.8;
+      color: rgba(255,255,255,0.8);
+    }
+    
+    .about-section h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #fff;
+    }
+    
+    .about-section section {
+      margin-bottom: 32px;
+    }
+    
+    .about-section p {
+      color: rgba(255,255,255,0.7);
+      margin: 0;
+    }
+    
+    .formula-box {
+      padding: 20px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 12px;
+      font-family: monospace;
+      font-size: 14px;
+      margin: 16px 0;
+      text-align: center;
+      color: #4ECDC4;
+    }
+    
+    .cycle-info {
+      padding: 20px;
+      border-left: 4px solid;
+      border-radius: 0 12px 12px 0;
+      margin-bottom: 12px;
+    }
+    
+    .cycle-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    
+    .cycle-header span:first-child {
+      font-size: 24px;
+    }
+    
+    .cycle-header span:last-child {
+      font-weight: 700;
+    }
+    
+    .cycle-desc {
+      font-size: 14px;
+      color: rgba(255,255,255,0.7);
+    }
+    
+    .warning-box {
+      padding: 20px;
+      background: rgba(251,191,36,0.1);
+      border-radius: 12px;
+      border: 1px solid rgba(251,191,36,0.2);
+    }
+    
+    .warning-box h3 {
+      color: #fbbf24;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .warning-box p {
+      font-size: 14px;
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      h1 { font-size: 32px; }
+      .score-value { font-size: 56px; }
+      .bio-number { font-size: 32px; }
+      .zodiac-info { flex-direction: column; text-align: center; }
+      .zodiac-main { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-gradient"></div>
+  <div class="stars"></div>
+  
+  <div class="container">
+    <header>
+      <div class="badge">
+        <span>🌙</span>
+        <span>Biorhythm & Horoscope</span>
+        <span>⭐</span>
+      </div>
+      <h1>바이오리듬 & 별자리</h1>
+      <p class="subtitle">당신의 리듬과 오늘의 운세를 확인하세요</p>
+    </header>
+    
+    <div class="card">
+      <div class="input-grid">
+        <div class="input-group">
+          <label><span>🎂</span> 생년월일</label>
+          <input type="date" id="birthDate">
+        </div>
+        <div class="input-group">
+          <label><span>📅</span> 기준일</label>
+          <input type="date" id="viewDate">
+        </div>
+      </div>
+      <div id="zodiacInfo"></div>
+    </div>
+    
+    <div id="tabsContainer" style="display: none;">
+      <div class="tabs">
+        <button class="tab active" data-tab="dashboard">📊 대시보드</button>
+        <button class="tab" data-tab="horoscope">⭐ 별자리 운세</button>
+        <button class="tab" data-tab="about">💡 정보</button>
+      </div>
+    </div>
+    
+    <div id="content">
+      <div class="empty-state">
+        <div class="icon">🌙⭐</div>
+        <p>생년월일을 입력해주세요</p>
+        <p class="hint">바이오리듬과 별자리 운세를 확인할 수 있습니다</p>
+      </div>
+    </div>
+    
+    <footer>
+      <p>바이오리듬과 별자리 운세는 참고용이며 과학적으로 검증되지 않았습니다.</p>
+    </footer>
+  </div>
+  
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
