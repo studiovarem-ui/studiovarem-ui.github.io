@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>바이오리듬 & 별자리 운세</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -16,7 +16,6 @@
       overflow-x: hidden;
     }
     
-    /* Animated Background */
     .bg-gradient {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -35,10 +34,7 @@
         radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.2), transparent),
         radial-gradient(1px 1px at 90px 40px, rgba(255,255,255,0.4), transparent),
         radial-gradient(2px 2px at 130px 80px, rgba(255,255,255,0.2), transparent),
-        radial-gradient(1px 1px at 160px 120px, rgba(255,255,255,0.3), transparent),
-        radial-gradient(2px 2px at 200px 50px, rgba(255,255,255,0.25), transparent),
-        radial-gradient(1px 1px at 250px 160px, rgba(255,255,255,0.35), transparent),
-        radial-gradient(2px 2px at 300px 90px, rgba(255,255,255,0.2), transparent);
+        radial-gradient(1px 1px at 160px 120px, rgba(255,255,255,0.3), transparent);
       background-size: 300px 200px;
       pointer-events: none;
       opacity: 0.6;
@@ -52,7 +48,6 @@
       z-index: 1;
     }
     
-    /* Header */
     header { text-align: center; margin-bottom: 40px; }
     
     .badge {
@@ -90,7 +85,6 @@
       font-weight: 300;
     }
     
-    /* Card */
     .card {
       background: rgba(255,255,255,0.03);
       backdrop-filter: blur(20px);
@@ -101,7 +95,6 @@
       box-shadow: 0 4px 30px rgba(0,0,0,0.3);
     }
     
-    /* Input Section */
     .input-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -120,7 +113,8 @@
       letter-spacing: 1px;
     }
     
-    input[type="date"] {
+    /* PC용 달력 */
+    .pc-date-input {
       width: 100%;
       padding: 16px 20px;
       font-size: 15px;
@@ -129,15 +123,105 @@
       background: rgba(0,0,0,0.4);
       color: #fff;
       outline: none;
-      transition: all 0.3s ease;
       cursor: pointer;
     }
     
-    input[type="date"]:focus {
+    .pc-date-input:focus {
       border-color: rgba(255,255,255,0.2);
     }
     
-    /* Zodiac Info */
+    /* 모바일용 숫자 입력 */
+    .mobile-date-input {
+      display: none;
+      gap: 8px;
+      align-items: center;
+    }
+    
+    .mobile-date-input input {
+      padding: 16px 8px;
+      font-size: 18px;
+      border: 2px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      background: rgba(0,0,0,0.4);
+      color: #fff;
+      outline: none;
+      text-align: center;
+    }
+    
+    .mobile-date-input input:focus {
+      border-color: rgba(255,255,255,0.3);
+    }
+    
+    .mobile-date-input .year { width: 75px; }
+    .mobile-date-input .month { width: 55px; }
+    .mobile-date-input .day { width: 55px; }
+    .mobile-date-input .separator { color: rgba(255,255,255,0.4); font-size: 20px; }
+    
+    @media (max-width: 768px) and (pointer: coarse) {
+      .mobile-date-input { display: flex; }
+      .pc-date-input { display: none; }
+    }
+    
+    /* 메뉴 버튼 */
+    .menu-section { display: none; margin-top: 30px; }
+    .menu-section.show { display: block; }
+    
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    
+    .menu-btn {
+      padding: 40px 20px;
+      border-radius: 24px;
+      border: 1px solid rgba(255,255,255,0.1);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .menu-btn:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    }
+    
+    .menu-btn:active { transform: translateY(0); }
+    
+    .menu-btn.dashboard {
+      background: linear-gradient(135deg, rgba(255,107,107,0.2), rgba(255,107,107,0.05));
+      border-color: rgba(255,107,107,0.3);
+    }
+    
+    .menu-btn.horoscope {
+      background: linear-gradient(135deg, rgba(78,205,196,0.2), rgba(78,205,196,0.05));
+      border-color: rgba(78,205,196,0.3);
+    }
+    
+    .menu-btn .icon { font-size: 48px; margin-bottom: 16px; }
+    .menu-btn .title { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+    .menu-btn .desc { font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.5; }
+    
+    /* 뒤로가기 버튼 */
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 100px;
+      color: rgba(255,255,255,0.7);
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-bottom: 24px;
+    }
+    
+    .back-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+    
     .zodiac-info {
       margin-top: 20px;
       padding: 20px;
@@ -149,11 +233,7 @@
       gap: 20px;
     }
     
-    .zodiac-main {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
+    .zodiac-main { display: flex; align-items: center; gap: 16px; }
     
     .zodiac-icon {
       width: 64px;
@@ -165,71 +245,15 @@
       font-size: 32px;
     }
     
-    .zodiac-name {
-      font-size: 24px;
-      font-weight: 700;
-    }
+    .zodiac-name { font-size: 24px; font-weight: 700; }
+    .zodiac-meta { font-size: 13px; color: rgba(255,255,255,0.5); margin-top: 4px; }
+    .days-lived { text-align: center; }
+    .days-number { font-size: 28px; font-weight: 700; }
+    .days-label { font-size: 12px; color: rgba(255,255,255,0.5); }
     
-    .zodiac-meta {
-      font-size: 13px;
-      color: rgba(255,255,255,0.5);
-      margin-top: 4px;
-    }
+    .content-section { display: none; }
+    .content-section.show { display: block; }
     
-    .days-lived {
-      text-align: center;
-    }
-    
-    .days-number {
-      font-size: 28px;
-      font-weight: 700;
-    }
-    
-    .days-label {
-      font-size: 12px;
-      color: rgba(255,255,255,0.5);
-    }
-    
-    /* Tabs */
-    .tabs {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 24px;
-      padding: 6px;
-      background: rgba(255,255,255,0.03);
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,0.06);
-      overflow-x: auto;
-    }
-    
-    .tab {
-      flex: 1;
-      padding: 14px 16px;
-      font-size: 14px;
-      font-weight: 600;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      white-space: nowrap;
-      background: transparent;
-      color: rgba(255,255,255,0.5);
-    }
-    
-    .tab.active {
-      background: rgba(255,255,255,0.1);
-      color: #fff;
-    }
-    
-    /* Tab Content */
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-    
-    /* Overall Score */
     .overall-score {
       border-radius: 24px;
       padding: 32px;
@@ -270,7 +294,6 @@
       margin: 0 auto;
     }
     
-    /* Lucky Items */
     .lucky-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -286,30 +309,11 @@
       border: 1px solid rgba(255,255,255,0.08);
     }
     
-    .lucky-item .icon {
-      font-size: 28px;
-      margin-bottom: 8px;
-    }
+    .lucky-item .icon { font-size: 28px; margin-bottom: 8px; }
+    .lucky-item .label { font-size: 11px; color: rgba(255,255,255,0.5); margin-bottom: 4px; }
+    .lucky-item .value { font-size: 14px; font-weight: 600; }
+    .lucky-color { width: 32px; height: 32px; border-radius: 50%; margin: 0 auto 8px; }
     
-    .lucky-item .label {
-      font-size: 11px;
-      color: rgba(255,255,255,0.5);
-      margin-bottom: 4px;
-    }
-    
-    .lucky-item .value {
-      font-size: 14px;
-      font-weight: 600;
-    }
-    
-    .lucky-color {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      margin: 0 auto 8px;
-    }
-    
-    /* Fortune Categories */
     .fortune-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -337,12 +341,7 @@
       filter: blur(20px);
     }
     
-    .fortune-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
+    .fortune-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
     
     .fortune-icon {
       width: 44px;
@@ -354,15 +353,8 @@
       font-size: 20px;
     }
     
-    .fortune-title {
-      font-size: 16px;
-      font-weight: 700;
-    }
-    
-    .fortune-score {
-      font-size: 24px;
-      font-weight: 800;
-    }
+    .fortune-title { font-size: 16px; font-weight: 700; }
+    .fortune-score { font-size: 24px; font-weight: 800; }
     
     .fortune-bar {
       height: 6px;
@@ -372,18 +364,9 @@
       overflow: hidden;
     }
     
-    .fortune-bar-fill {
-      height: 100%;
-      border-radius: 3px;
-    }
+    .fortune-bar-fill { height: 100%; border-radius: 3px; }
+    .fortune-message { font-size: 14px; color: rgba(255,255,255,0.7); line-height: 1.6; }
     
-    .fortune-message {
-      font-size: 14px;
-      color: rgba(255,255,255,0.7);
-      line-height: 1.6;
-    }
-    
-    /* Biorhythm Cards */
     .bio-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -400,9 +383,7 @@
       overflow: hidden;
     }
     
-    .bio-card.critical {
-      border-color: #ef4444;
-    }
+    .bio-card.critical { border-color: #ef4444; }
     
     .critical-badge {
       position: absolute;
@@ -417,12 +398,7 @@
       color: #ef4444;
     }
     
-    .bio-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
+    .bio-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
     
     .bio-icon {
       width: 48px;
@@ -434,39 +410,12 @@
       font-size: 24px;
     }
     
-    .bio-title {
-      font-size: 18px;
-      font-weight: 700;
-    }
-    
-    .bio-period {
-      font-size: 12px;
-      color: rgba(255,255,255,0.5);
-      margin-top: 2px;
-    }
-    
-    .bio-value {
-      display: flex;
-      align-items: baseline;
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-    
-    .bio-number {
-      font-size: 42px;
-      font-weight: 800;
-    }
-    
-    .bio-percent {
-      font-size: 20px;
-      color: rgba(255,255,255,0.4);
-    }
-    
-    .bio-trend {
-      font-size: 16px;
-      margin-left: 4px;
-    }
-    
+    .bio-title { font-size: 18px; font-weight: 700; }
+    .bio-period { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+    .bio-value { display: flex; align-items: baseline; gap: 8px; margin-bottom: 12px; }
+    .bio-number { font-size: 42px; font-weight: 800; }
+    .bio-percent { font-size: 20px; color: rgba(255,255,255,0.4); }
+    .bio-trend { font-size: 16px; margin-left: 4px; }
     .bio-trend.up { color: #22c55e; }
     .bio-trend.down { color: #ef4444; }
     
@@ -487,128 +436,30 @@
       margin-bottom: 16px;
     }
     
-    .bio-bar-fill {
-      height: 100%;
-      border-radius: 4px;
-      transition: width 0.5s ease;
-    }
+    .bio-bar-fill { height: 100%; border-radius: 4px; }
+    .bio-advice { font-size: 13px; color: rgba(255,255,255,0.6); line-height: 1.6; }
     
-    .bio-advice {
-      font-size: 13px;
-      color: rgba(255,255,255,0.6);
-      line-height: 1.6;
-    }
+    .chart-container { margin-bottom: 24px; }
+    .chart-title { font-size: 18px; font-weight: 700; margin-bottom: 24px; display: flex; align-items: center; gap: 10px; }
+    .chart-svg { width: 100%; height: auto; }
+    .chart-legend { display: flex; justify-content: center; gap: 32px; margin-top: 20px; flex-wrap: wrap; }
+    .legend-item { display: flex; align-items: center; gap: 10px; padding: 8px 16px; background: rgba(255,255,255,0.03); border-radius: 100px; }
+    .legend-dot { width: 14px; height: 14px; border-radius: 50%; }
+    .legend-label { font-size: 13px; color: rgba(255,255,255,0.7); }
     
-    /* Chart */
-    .chart-container {
-      margin-bottom: 24px;
-    }
+    .traits-section { margin-top: 24px; }
+    .traits-title { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
+    .traits-list { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+    .trait-tag { padding: 8px 16px; border-radius: 100px; font-size: 13px; }
+    .compatibility-box { padding: 16px; background: rgba(255,255,255,0.03); border-radius: 12px; }
+    .compatibility-label { font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 8px; }
+    .compatibility-value { font-size: 15px; font-weight: 600; }
     
-    .chart-title {
-      font-size: 18px;
-      font-weight: 700;
-      margin-bottom: 24px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+    .empty-state { text-align: center; padding: 60px 20px; color: rgba(255,255,255,0.4); }
+    .empty-state .icon { font-size: 64px; margin-bottom: 24px; }
+    .empty-state p { font-size: 18px; margin-bottom: 8px; }
+    .empty-state .hint { font-size: 14px; }
     
-    .chart-svg {
-      width: 100%;
-      height: auto;
-    }
-    
-    .chart-legend {
-      display: flex;
-      justify-content: center;
-      gap: 32px;
-      margin-top: 20px;
-      flex-wrap: wrap;
-    }
-    
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 16px;
-      background: rgba(255,255,255,0.03);
-      border-radius: 100px;
-    }
-    
-    .legend-dot {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-    }
-    
-    .legend-label {
-      font-size: 13px;
-      color: rgba(255,255,255,0.7);
-    }
-    
-    /* Zodiac Traits */
-    .traits-section {
-      margin-top: 24px;
-    }
-    
-    .traits-title {
-      font-size: 18px;
-      font-weight: 700;
-      margin-bottom: 20px;
-    }
-    
-    .traits-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-    
-    .trait-tag {
-      padding: 8px 16px;
-      border-radius: 100px;
-      font-size: 13px;
-    }
-    
-    .compatibility-box {
-      padding: 16px;
-      background: rgba(255,255,255,0.03);
-      border-radius: 12px;
-    }
-    
-    .compatibility-label {
-      font-size: 13px;
-      color: rgba(255,255,255,0.5);
-      margin-bottom: 8px;
-    }
-    
-    .compatibility-value {
-      font-size: 15px;
-      font-weight: 600;
-    }
-    
-    /* Empty State */
-    .empty-state {
-      text-align: center;
-      padding: 80px 20px;
-      color: rgba(255,255,255,0.4);
-    }
-    
-    .empty-state .icon {
-      font-size: 64px;
-      margin-bottom: 24px;
-    }
-    
-    .empty-state p {
-      font-size: 18px;
-      margin-bottom: 8px;
-    }
-    
-    .empty-state .hint {
-      font-size: 14px;
-    }
-    
-    /* Footer */
     footer {
       text-align: center;
       margin-top: 48px;
@@ -617,93 +468,16 @@
       color: rgba(255,255,255,0.3);
       font-size: 12px;
     }
-    
-    /* About Section */
-    .about-section {
-      font-size: 15px;
-      line-height: 1.8;
-      color: rgba(255,255,255,0.8);
-    }
-    
-    .about-section h3 {
-      font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 12px;
-      color: #fff;
-    }
-    
-    .about-section section {
-      margin-bottom: 32px;
-    }
-    
-    .about-section p {
-      color: rgba(255,255,255,0.7);
-      margin: 0;
-    }
-    
-    .formula-box {
-      padding: 20px;
-      background: rgba(0,0,0,0.3);
-      border-radius: 12px;
-      font-family: monospace;
-      font-size: 14px;
-      margin: 16px 0;
-      text-align: center;
-      color: #4ECDC4;
-    }
-    
-    .cycle-info {
-      padding: 20px;
-      border-left: 4px solid;
-      border-radius: 0 12px 12px 0;
-      margin-bottom: 12px;
-    }
-    
-    .cycle-header {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 8px;
-    }
-    
-    .cycle-header span:first-child {
-      font-size: 24px;
-    }
-    
-    .cycle-header span:last-child {
-      font-weight: 700;
-    }
-    
-    .cycle-desc {
-      font-size: 14px;
-      color: rgba(255,255,255,0.7);
-    }
-    
-    .warning-box {
-      padding: 20px;
-      background: rgba(251,191,36,0.1);
-      border-radius: 12px;
-      border: 1px solid rgba(251,191,36,0.2);
-    }
-    
-    .warning-box h3 {
-      color: #fbbf24;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    
-    .warning-box p {
-      font-size: 14px;
-    }
 
-    /* Responsive */
     @media (max-width: 600px) {
       h1 { font-size: 32px; }
       .score-value { font-size: 56px; }
       .bio-number { font-size: 32px; }
       .zodiac-info { flex-direction: column; text-align: center; }
       .zodiac-main { flex-direction: column; }
+      .menu-grid { grid-template-columns: 1fr; }
+      .menu-btn { padding: 30px 20px; }
+      .menu-btn .icon { font-size: 40px; }
     }
   </style>
 </head>
@@ -726,25 +500,56 @@
       <div class="input-grid">
         <div class="input-group">
           <label><span>🎂</span> 생년월일</label>
-          <input type="date" id="birthDate">
+          <input type="date" id="birthDatePC" class="pc-date-input">
+          <div class="mobile-date-input" id="birthDateMobile">
+            <input type="tel" class="year" id="birthYear" placeholder="YYYY" maxlength="4" inputmode="numeric">
+            <span class="separator">/</span>
+            <input type="tel" class="month" id="birthMonth" placeholder="MM" maxlength="2" inputmode="numeric">
+            <span class="separator">/</span>
+            <input type="tel" class="day" id="birthDay" placeholder="DD" maxlength="2" inputmode="numeric">
+          </div>
         </div>
         <div class="input-group">
           <label><span>📅</span> 기준일</label>
-          <input type="date" id="viewDate">
+          <input type="date" id="viewDatePC" class="pc-date-input">
+          <div class="mobile-date-input" id="viewDateMobile">
+            <input type="tel" class="year" id="viewYear" placeholder="YYYY" maxlength="4" inputmode="numeric">
+            <span class="separator">/</span>
+            <input type="tel" class="month" id="viewMonth" placeholder="MM" maxlength="2" inputmode="numeric">
+            <span class="separator">/</span>
+            <input type="tel" class="day" id="viewDay" placeholder="DD" maxlength="2" inputmode="numeric">
+          </div>
         </div>
       </div>
       <div id="zodiacInfo"></div>
-    </div>
-    
-    <div id="tabsContainer" style="display: none;">
-      <div class="tabs">
-        <button class="tab active" data-tab="dashboard">📊 대시보드</button>
-        <button class="tab" data-tab="horoscope">⭐ 별자리 운세</button>
-        <button class="tab" data-tab="about">💡 정보</button>
+      
+      <div class="menu-section" id="menuSection">
+        <div class="menu-grid">
+          <div class="menu-btn dashboard" id="menuDashboard">
+            <div class="icon">📊</div>
+            <div class="title">대시보드</div>
+            <div class="desc">바이오리듬 그래프와<br>오늘의 컨디션 확인</div>
+          </div>
+          <div class="menu-btn horoscope" id="menuHoroscope">
+            <div class="icon">⭐</div>
+            <div class="title">별자리 운세</div>
+            <div class="desc">오늘의 운세와<br>행운 아이템 확인</div>
+          </div>
+        </div>
       </div>
     </div>
     
-    <div id="content">
+    <div class="content-section" id="dashboardContent">
+      <button class="back-btn" id="backFromDashboard">← 메뉴로 돌아가기</button>
+      <div id="dashboardInner"></div>
+    </div>
+    
+    <div class="content-section" id="horoscopeContent">
+      <button class="back-btn" id="backFromHoroscope">← 메뉴로 돌아가기</button>
+      <div id="horoscopeInner"></div>
+    </div>
+    
+    <div id="emptyState">
       <div class="empty-state">
         <div class="icon">🌙⭐</div>
         <p>생년월일을 입력해주세요</p>

@@ -1,24 +1,93 @@
 // DOM Elements
-const birthDateInput = document.getElementById('birthDate');
-const viewDateInput = document.getElementById('viewDate');
+const birthDatePC = document.getElementById('birthDatePC');
+const viewDatePC = document.getElementById('viewDatePC');
+const birthYear = document.getElementById('birthYear');
+const birthMonth = document.getElementById('birthMonth');
+const birthDay = document.getElementById('birthDay');
+const viewYear = document.getElementById('viewYear');
+const viewMonth = document.getElementById('viewMonth');
+const viewDay = document.getElementById('viewDay');
 const zodiacInfoDiv = document.getElementById('zodiacInfo');
-const tabsContainer = document.getElementById('tabsContainer');
-const contentDiv = document.getElementById('content');
+const menuSection = document.getElementById('menuSection');
+const emptyState = document.getElementById('emptyState');
+const dashboardContent = document.getElementById('dashboardContent');
+const horoscopeContent = document.getElementById('horoscopeContent');
+const dashboardInner = document.getElementById('dashboardInner');
+const horoscopeInner = document.getElementById('horoscopeInner');
 
-// Initialize
-viewDateInput.value = new Date().toISOString().split('T')[0];
+// Initialize with today's date
+const today = new Date();
+const todayStr = today.toISOString().split('T')[0];
+viewDatePC.value = todayStr;
+viewYear.value = today.getFullYear();
+viewMonth.value = String(today.getMonth() + 1).padStart(2, '0');
+viewDay.value = String(today.getDate()).padStart(2, '0');
 
-// Event Listeners
-birthDateInput.addEventListener('change', updateApp);
-viewDateInput.addEventListener('change', updateApp);
+// Get birth date from inputs
+function getBirthDate() {
+  if (window.innerWidth <= 768 && 'ontouchstart' in window) {
+    if (birthYear.value && birthMonth.value && birthDay.value) {
+      const y = birthYear.value.padStart(4, '0');
+      const m = birthMonth.value.padStart(2, '0');
+      const d = birthDay.value.padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+    return '';
+  }
+  return birthDatePC.value;
+}
 
-document.querySelectorAll('.tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    renderContent(tab.dataset.tab);
+// Get view date from inputs
+function getViewDate() {
+  if (window.innerWidth <= 768 && 'ontouchstart' in window) {
+    if (viewYear.value && viewMonth.value && viewDay.value) {
+      const y = viewYear.value.padStart(4, '0');
+      const m = viewMonth.value.padStart(2, '0');
+      const d = viewDay.value.padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+    return todayStr;
+  }
+  return viewDatePC.value || todayStr;
+}
+
+// Event Listeners - PC
+birthDatePC.addEventListener('change', updateApp);
+viewDatePC.addEventListener('change', updateApp);
+
+// Event Listeners - Mobile
+[birthYear, birthMonth, birthDay, viewYear, viewMonth, viewDay].forEach(input => {
+  input.addEventListener('input', function() {
+    // Auto-move to next field
+    if (this.value.length === parseInt(this.maxLength)) {
+      const next = this.nextElementSibling?.nextElementSibling;
+      if (next && next.tagName === 'INPUT') next.focus();
+    }
+    updateApp();
   });
 });
+
+// Menu buttons
+document.getElementById('menuDashboard').addEventListener('click', () => showContent('dashboard'));
+document.getElementById('menuHoroscope').addEventListener('click', () => showContent('horoscope'));
+document.getElementById('backFromDashboard').addEventListener('click', () => showContent('menu'));
+document.getElementById('backFromHoroscope').addEventListener('click', () => showContent('menu'));
+
+function showContent(view) {
+  menuSection.classList.remove('show');
+  dashboardContent.classList.remove('show');
+  horoscopeContent.classList.remove('show');
+  
+  if (view === 'menu') {
+    menuSection.classList.add('show');
+  } else if (view === 'dashboard') {
+    dashboardContent.classList.add('show');
+    renderDashboard();
+  } else if (view === 'horoscope') {
+    horoscopeContent.classList.add('show');
+    renderHoroscope();
+  }
+}
 
 // Utility Functions
 function seededRandom(seed, offset = 0) {
@@ -111,27 +180,24 @@ function isCriticalDay(value, prevValue) {
 
 // Update App
 function updateApp() {
-  const birthDate = birthDateInput.value;
-  const viewDate = viewDateInput.value;
+  const birthDate = getBirthDate();
+  const viewDate = getViewDate();
   
-  if (!birthDate) {
+  if (!birthDate || birthDate.length < 10) {
     zodiacInfoDiv.innerHTML = '';
-    tabsContainer.style.display = 'none';
-    contentDiv.innerHTML = `
-      <div class="empty-state">
-        <div class="icon">🌙⭐</div>
-        <p>생년월일을 입력해주세요</p>
-        <p class="hint">바이오리듬과 별자리 운세를 확인할 수 있습니다</p>
-      </div>
-    `;
+    menuSection.classList.remove('show');
+    dashboardContent.classList.remove('show');
+    horoscopeContent.classList.remove('show');
+    emptyState.style.display = 'block';
     return;
   }
+  
+  emptyState.style.display = 'none';
   
   const zodiacKey = getZodiacSign(birthDate);
   const zodiac = zodiacSigns[zodiacKey];
   const days = getDaysSinceBirth(birthDate, viewDate);
   
-  // Zodiac Info
   zodiacInfoDiv.innerHTML = `
     <div class="zodiac-info" style="background: linear-gradient(135deg, ${zodiac.color}20, ${zodiac.color}05); border: 1px solid ${zodiac.color}30;">
       <div class="zodiac-main">
@@ -150,29 +216,20 @@ function updateApp() {
     </div>
   `;
   
-  tabsContainer.style.display = 'block';
-  const activeTab = document.querySelector('.tab.active').dataset.tab;
-  renderContent(activeTab);
+  menuSection.classList.add('show');
 }
 
-// Render Content
-function renderContent(tab) {
-  const birthDate = birthDateInput.value;
-  const viewDate = viewDateInput.value;
+function renderDashboard() {
+  const birthDate = getBirthDate();
+  const viewDate = getViewDate();
   
   if (!birthDate) return;
   
-  const zodiacKey = getZodiacSign(birthDate);
-  const zodiac = zodiacSigns[zodiacKey];
-  const fortune = generateFortune(viewDate, zodiacKey);
-  
-  // Calculate biorhythm values
   const physical = calculateBiorhythm(birthDate, viewDate, cycles.physical.period);
   const emotional = calculateBiorhythm(birthDate, viewDate, cycles.emotional.period);
   const intellectual = calculateBiorhythm(birthDate, viewDate, cycles.intellectual.period);
   const average = (physical + emotional + intellectual) / 3;
   
-  // Previous day values for trend
   const prevDate = new Date(viewDate);
   prevDate.setDate(prevDate.getDate() - 1);
   const prevDateStr = prevDate.toISOString().split('T')[0];
@@ -186,16 +243,6 @@ function renderContent(tab) {
     intellectual: { value: intellectual, trend: intellectual > prevIntellectual ? 'up' : 'down', critical: isCriticalDay(intellectual, prevIntellectual) }
   };
   
-  if (tab === 'dashboard') {
-    renderDashboard(bioValues, average);
-  } else if (tab === 'horoscope') {
-    renderHoroscope(zodiac, fortune);
-  } else if (tab === 'about') {
-    renderAbout();
-  }
-}
-
-function renderDashboard(bioValues, average) {
   const avgPhase = getPhaseInfo(average);
   const avgColor = average > 30 ? 'linear-gradient(135deg, #22c55e, #84cc16)' 
     : average > -30 ? 'linear-gradient(135deg, #fbbf24, #f59e0b)' 
@@ -233,17 +280,16 @@ function renderDashboard(bioValues, average) {
     `;
   });
   
-  // Generate chart data
   const chartData = [];
-  const centerDate = new Date(viewDateInput.value);
+  const centerDate = new Date(viewDate);
   for (let i = -15; i <= 15; i++) {
     const date = new Date(centerDate);
     date.setDate(date.getDate() + i);
     const dateStr = date.toISOString().split('T')[0];
     chartData.push({
-      physical: calculateBiorhythm(birthDateInput.value, dateStr, cycles.physical.period),
-      emotional: calculateBiorhythm(birthDateInput.value, dateStr, cycles.emotional.period),
-      intellectual: calculateBiorhythm(birthDateInput.value, dateStr, cycles.intellectual.period)
+      physical: calculateBiorhythm(birthDate, dateStr, cycles.physical.period),
+      emotional: calculateBiorhythm(birthDate, dateStr, cycles.emotional.period),
+      intellectual: calculateBiorhythm(birthDate, dateStr, cycles.intellectual.period)
     });
   }
   
@@ -255,7 +301,7 @@ function renderDashboard(bioValues, average) {
     }).join(' ');
   };
   
-  contentDiv.innerHTML = `
+  dashboardInner.innerHTML = `
     <div class="overall-score" style="background: linear-gradient(135deg, rgba(120,119,198,0.2), rgba(255,107,107,0.1)); border: 1px solid rgba(255,255,255,0.1);">
       <div class="score-label">오늘의 종합 컨디션</div>
       <div class="score-value" style="background: ${avgColor}; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
@@ -327,7 +373,16 @@ function renderDashboard(bioValues, average) {
   `;
 }
 
-function renderHoroscope(zodiac, fortune) {
+function renderHoroscope() {
+  const birthDate = getBirthDate();
+  const viewDate = getViewDate();
+  
+  if (!birthDate) return;
+  
+  const zodiacKey = getZodiacSign(birthDate);
+  const zodiac = zodiacSigns[zodiacKey];
+  const fortune = generateFortune(viewDate, zodiacKey);
+  
   const categories = [
     { key: 'love', label: '애정운', icon: '💕', gradient: 'linear-gradient(135deg, #FF6B9D, #C44569)' },
     { key: 'career', label: '직장운', icon: '💼', gradient: 'linear-gradient(135deg, #667eea, #764ba2)' },
@@ -335,7 +390,7 @@ function renderHoroscope(zodiac, fortune) {
     { key: 'health', label: '건강운', icon: '💚', gradient: 'linear-gradient(135deg, #4facfe, #00f2fe)' }
   ];
   
-  contentDiv.innerHTML = `
+  horoscopeInner.innerHTML = `
     <div class="overall-score" style="background: linear-gradient(135deg, ${zodiac.color}30, ${zodiac.color}10); border: 1px solid ${zodiac.color}30;">
       <div class="bg-symbol">${zodiac.symbol}</div>
       <div class="score-label">오늘의 종합운세</div>
@@ -400,55 +455,6 @@ function renderHoroscope(zodiac, fortune) {
       <div class="compatibility-box">
         <div class="compatibility-label">💑 궁합이 좋은 별자리</div>
         <div class="compatibility-value">${zodiac.compatibility.join(' · ')}</div>
-      </div>
-    </div>
-  `;
-}
-
-function renderAbout() {
-  contentDiv.innerHTML = `
-    <div class="card about-section">
-      <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 24px; display: flex; align-items: center; gap: 12px;">
-        💡 바이오리듬 & 별자리 운세
-      </h2>
-      
-      <section>
-        <h3>🌙 바이오리듬</h3>
-        <p>
-          바이오리듬은 19세기 후반 독일의 빌헬름 플리스와 오스트리아의 헤르만 스보보다에 의해 제안된 이론입니다. 
-          생년월일부터의 경과일수를 기반으로 신체(23일), 감성(28일), 지성(33일) 주기의 사인파를 계산합니다.
-          <strong style="color: #fff;"> 성별에 따른 차이는 없으며</strong>, 순수하게 수학적 공식으로 계산됩니다.
-        </p>
-        <div class="formula-box">값 = sin(2π × 경과일수 / 주기) × 100</div>
-      </section>
-      
-      <section>
-        <h3>🌀 세 가지 주기</h3>
-        ${Object.entries(cycles).map(([key, cycle]) => `
-          <div class="cycle-info" style="background: ${cycle.color}10; border-color: ${cycle.color};">
-            <div class="cycle-header">
-              <span>${cycle.icon}</span>
-              <span style="color: ${cycle.color};">${cycle.label} 리듬 (${cycle.period}일)</span>
-            </div>
-            <p class="cycle-desc">${cycle.description}</p>
-          </div>
-        `).join('')}
-      </section>
-      
-      <section>
-        <h3>⭐ 별자리 운세</h3>
-        <p>
-          서양 점성술에서는 태양이 황도 12궁 중 어느 별자리에 위치했는지에 따라 성격과 운세가 결정된다고 봅니다. 
-          각 별자리는 불, 흙, 공기, 물의 4원소 중 하나에 속하며, 고유한 특성과 상성을 가집니다.
-        </p>
-      </section>
-      
-      <div class="warning-box">
-        <h3>🔍 참고 사항</h3>
-        <p>
-          바이오리듬과 별자리 운세는 과학적으로 검증되지 않은 이론입니다. 
-          재미있는 참고 자료로 활용하되, 중요한 결정의 근거로 삼지 않는 것을 권장합니다.
-        </p>
       </div>
     </div>
   `;
