@@ -10,9 +10,9 @@ const viewDay = document.getElementById('viewDay');
 const zodiacInfoDiv = document.getElementById('zodiacInfo');
 const menuSection = document.getElementById('menuSection');
 const emptyState = document.getElementById('emptyState');
-const dashboardContent = document.getElementById('dashboardContent');
+const biorhythmContent = document.getElementById('biorhythmContent');
 const horoscopeContent = document.getElementById('horoscopeContent');
-const dashboardInner = document.getElementById('dashboardInner');
+const biorhythmInner = document.getElementById('biorhythmInner');
 const horoscopeInner = document.getElementById('horoscopeInner');
 
 // Initialize with today's date
@@ -68,21 +68,21 @@ viewDatePC.addEventListener('change', updateApp);
 });
 
 // Menu buttons
-document.getElementById('menuDashboard').addEventListener('click', () => showContent('dashboard'));
+document.getElementById('menuBiorhythm').addEventListener('click', () => showContent('biorhythm'));
 document.getElementById('menuHoroscope').addEventListener('click', () => showContent('horoscope'));
-document.getElementById('backFromDashboard').addEventListener('click', () => showContent('menu'));
+document.getElementById('backFromBiorhythm').addEventListener('click', () => showContent('menu'));
 document.getElementById('backFromHoroscope').addEventListener('click', () => showContent('menu'));
 
 function showContent(view) {
   menuSection.classList.remove('show');
-  dashboardContent.classList.remove('show');
+  biorhythmContent.classList.remove('show');
   horoscopeContent.classList.remove('show');
   
   if (view === 'menu') {
     menuSection.classList.add('show');
-  } else if (view === 'dashboard') {
-    dashboardContent.classList.add('show');
-    renderDashboard();
+  } else if (view === 'biorhythm') {
+    biorhythmContent.classList.add('show');
+    renderBiorhythm();
   } else if (view === 'horoscope') {
     horoscopeContent.classList.add('show');
     renderHoroscope();
@@ -186,7 +186,7 @@ function updateApp() {
   if (!birthDate || birthDate.length < 10) {
     zodiacInfoDiv.innerHTML = '';
     menuSection.classList.remove('show');
-    dashboardContent.classList.remove('show');
+    biorhythmContent.classList.remove('show');
     horoscopeContent.classList.remove('show');
     emptyState.style.display = 'block';
     return;
@@ -219,7 +219,7 @@ function updateApp() {
   menuSection.classList.add('show');
 }
 
-function renderDashboard() {
+function renderBiorhythm() {
   const birthDate = getBirthDate();
   const viewDate = getViewDate();
   
@@ -301,7 +301,7 @@ function renderDashboard() {
     }).join(' ');
   };
   
-  dashboardInner.innerHTML = `
+  biorhythmInner.innerHTML = `
     <div class="overall-score" style="background: linear-gradient(135deg, rgba(120,119,198,0.2), rgba(255,107,107,0.1)); border: 1px solid rgba(255,255,255,0.1);">
       <div class="score-label">오늘의 종합 컨디션</div>
       <div class="score-value" style="background: ${avgColor}; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
