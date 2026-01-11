@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, maximum-scale=1.0, user-scalable=no">
+    <title>🌳 수학 나무 던전 100층</title>
+    <link href="https://fonts.googleapis.com/css2?family=Jua&family=Black+Han+Sans&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Jua', sans-serif; min-height: 100vh; overflow: hidden; touch-action: manipulation; }
+        .screen { display: none; width: 100%; height: 100vh; position: relative; }
+        .screen.active { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        #start-screen { background: linear-gradient(180deg, #FFE082 0%, #81C784 50%, #4CAF50 100%); }
+        .game-title { font-family: 'Black Han Sans', sans-serif; font-size: clamp(2rem, 8vw, 4rem); color: #5D4037; text-shadow: 4px 4px 0 #FFD700; text-align: center; margin-bottom: 10px; animation: bounce 2s infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .tree-icon { font-size: clamp(4rem, 15vw, 8rem); margin-bottom: 20px; animation: sway 3s infinite ease-in-out; }
+        @keyframes sway { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
+        .input-container { background: rgba(255,255,255,0.95); border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); text-align: center; width: 90%; max-width: 350px; }
+        .name-input { width: 100%; padding: 15px; font-size: 1.3rem; font-family: 'Jua', sans-serif; border: 3px solid #81C784; border-radius: 15px; outline: none; text-align: center; margin-bottom: 15px; }
+        .btn { padding: 15px 40px; font-size: 1.2rem; font-family: 'Jua', sans-serif; border: none; border-radius: 50px; cursor: pointer; margin: 5px 0; box-shadow: 0 6px 0 rgba(0,0,0,0.2); width: 100%; }
+        .btn-primary { background: linear-gradient(180deg, #FFD700, #FFA000); color: #5D4037; }
+        .btn-secondary { background: linear-gradient(180deg, #42A5F5, #1976D2); color: white; }
+        .btn:disabled { opacity: 0.5; }
+        #character-screen { background: linear-gradient(180deg, #E1BEE7 0%, #CE93D8 50%, #AB47BC 100%); }
+        .character-title { font-family: 'Black Han Sans', sans-serif; font-size: clamp(1.5rem, 6vw, 2.5rem); color: white; text-shadow: 3px 3px 0 rgba(0,0,0,0.3); margin-bottom: 30px; }
+        .character-grid { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; }
+        .character-card { background: white; border-radius: 20px; padding: 20px; width: 100px; cursor: pointer; transition: all 0.3s; border: 4px solid transparent; box-shadow: 0 8px 20px rgba(0,0,0,0.2); text-align: center; }
+        .character-card:hover, .character-card.selected { transform: translateY(-10px) scale(1.05); border-color: #FFD700; }
+        .character-card.selected { background: linear-gradient(180deg, #FFF9C4, #FFECB3); }
+        .character-emoji { font-size: 2.5rem; display: block; margin-bottom: 10px; }
+        .character-name { font-size: 0.9rem; color: #5D4037; font-weight: bold; }
+        .character-stat { font-size: 0.7rem; color: #888; margin-top: 5px; display: block; }
+        #game-screen { background: linear-gradient(180deg, #1a472a 0%, #2d5a3d 50%, #1a472a 100%); padding: 10px; justify-content: flex-start; }
+        .game-header { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: rgba(0,0,0,0.3); border-radius: 15px; margin-bottom: 8px; }
+        .header-item { font-size: 0.9rem; color: #FFD700; }
+        .reset-btn { background: rgba(255,0,0,0.3); border: none; color: #ff6b6b; padding: 5px 10px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; }
+        .buff-area { display: flex; gap: 8px; justify-content: center; margin-bottom: 8px; flex-wrap: wrap; }
+        .buff-tag { font-size: 0.7rem; padding: 4px 10px; border-radius: 20px; color: white; }
+        .buff-attack { background: rgba(239,83,80,0.8); }
+        .buff-time { background: rgba(66,165,245,0.8); }
+        .buff-hint { background: rgba(171,71,188,0.8); }
+        .battle-area { flex: 1; width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 10px; position: relative; max-height: 28vh; }
+        .fighter { display: flex; flex-direction: column; align-items: center; width: 40%; }
+        .fighter-name { font-size: 0.8rem; color: white; margin-bottom: 5px; }
+        .health-bar-container { width: 100%; height: 16px; background: #333; border-radius: 8px; overflow: hidden; border: 2px solid #FFD700; margin-bottom: 5px; }
+        .health-bar { height: 100%; transition: width 0.5s ease; }
+        .player-health { background: linear-gradient(180deg, #66BB6A, #43A047); }
+        .monster-health { background: linear-gradient(180deg, #EF5350, #D32F2F); }
+        .health-text { font-size: 0.7rem; color: #aaa; margin-bottom: 5px; }
+        .fighter-sprite { font-size: clamp(2.5rem, 10vw, 4rem); animation: idle 1s infinite ease-in-out; }
+        @keyframes idle { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+        .vs-text { font-family: 'Black Han Sans', sans-serif; font-size: 1.5rem; color: #FF5722; text-shadow: 2px 2px 0 #000; }
+        .question-area { width: 100%; background: rgba(255,255,255,0.95); border-radius: 20px; padding: 12px; margin: 8px 0; text-align: center; }
+        .timer-bar-container { width: 100%; height: 10px; background: #ddd; border-radius: 5px; overflow: hidden; margin-bottom: 10px; }
+        .timer-bar { height: 100%; transition: width 0.1s linear; }
+        .timer-green { background: linear-gradient(90deg, #4CAF50, #8BC34A); }
+        .timer-yellow { background: linear-gradient(90deg, #FF9800, #FFC107); }
+        .timer-red { background: linear-gradient(90deg, #F44336, #E91E63); }
+        .question-text { font-family: 'Black Han Sans', sans-serif; font-size: clamp(1.5rem, 7vw, 2.5rem); color: #333; margin: 8px 0; }
+        .hint-display { background: #E1BEE7; color: #7B1FA2; padding: 10px; border-radius: 10px; margin: 8px 0; font-size: 1rem; animation: pulse 0.5s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+        .answer-display { font-size: clamp(1.3rem, 5vw, 2rem); color: #4CAF50; min-height: 40px; line-height: 40px; background: #f5f5f5; border-radius: 10px; }
+        .hint-btn { background: linear-gradient(180deg, #AB47BC, #7B1FA2); color: white; border: none; padding: 10px 20px; border-radius: 25px; font-family: 'Jua'; font-size: 0.9rem; cursor: pointer; margin-bottom: 8px; }
+        .numpad-area { width: 100%; padding: 8px; background: rgba(0,0,0,0.4); border-radius: 20px; }
+        .numpad-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; max-width: 400px; margin: 0 auto; }
+        .numpad-btn { padding: 12px; font-size: clamp(1rem, 4vw, 1.5rem); font-family: 'Black Han Sans', sans-serif; border: none; border-radius: 12px; cursor: pointer; box-shadow: 0 4px 0 rgba(0,0,0,0.3); }
+        .numpad-btn:active { transform: translateY(4px); box-shadow: none; }
+        .num-btn { background: linear-gradient(180deg, #FFFFFF, #E0E0E0); color: #333; }
+        .clear-btn { background: linear-gradient(180deg, #FF8A65, #FF5722); color: white; }
+        .negative-btn { background: linear-gradient(180deg, #9575CD, #673AB7); color: white; }
+        .attack-btn { background: linear-gradient(180deg, #FFD54F, #FF8F00); color: #5D4037; grid-column: span 2; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
+        .modal.active { display: flex; }
+        .modal-content { background: linear-gradient(180deg, #FFF8E1, #FFECB3); border-radius: 25px; padding: 25px; text-align: center; max-width: 350px; width: 90%; border: 5px solid #FFD700; max-height: 90vh; overflow-y: auto; }
+        .modal-title { font-family: 'Black Han Sans', sans-serif; font-size: 1.5rem; color: #5D4037; margin-bottom: 15px; }
+        .shop-item { background: white; border-radius: 15px; padding: 12px; margin: 8px 0; display: flex; justify-content: space-between; align-items: center; border: 3px solid #81C784; }
+        .shop-item-info { text-align: left; }
+        .shop-item-name { font-size: 0.95rem; color: #333; }
+        .shop-item-desc { font-size: 0.75rem; color: #666; }
+        .shop-btn { padding: 8px 16px; font-size: 0.85rem; background: linear-gradient(180deg, #4CAF50, #388E3C); color: white; border: none; border-radius: 10px; cursor: pointer; font-family: 'Jua'; }
+        .shop-btn:disabled { background: #ccc; }
+        .result-emoji { font-size: 4rem; margin-bottom: 15px; }
+        .result-stats { background: rgba(255,255,255,0.5); border-radius: 15px; padding: 12px; margin: 12px 0; }
+        .stat-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(0,0,0,0.1); font-size: 0.9rem; }
+        .effect-text { position: absolute; font-family: 'Black Han Sans'; font-size: 1.5rem; animation: floatUp 1s forwards; pointer-events: none; }
+        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-40px) scale(1.3); } }
+        .boss-alert { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-family: 'Black Han Sans'; font-size: 2rem; color: #FF1744; text-shadow: 0 0 20px #FF1744; animation: bossAppear 1s; z-index: 10; }
+        @keyframes bossAppear { 0% { transform: translate(-50%, -50%) scale(0); } 50% { transform: translate(-50%, -50%) scale(1.3); } 100% { transform: translate(-50%, -50%) scale(1); } }
+        .floor-clear { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-family: 'Black Han Sans'; font-size: 2rem; color: #4CAF50; text-shadow: 3px 3px 0 #000; animation: clearPop 1.5s forwards; z-index: 200; }
+        @keyframes clearPop { 0% { transform: translate(-50%, -50%) scale(0); opacity: 1; } 50% { transform: translate(-50%, -50%) scale(1.2); } 80% { opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 0; } }
+        .combo-popup { position: absolute; top: 15%; left: 50%; transform: translateX(-50%); font-family: 'Black Han Sans'; font-size: 1.2rem; color: #FF9800; text-shadow: 2px 2px 0 #000; animation: comboPop 0.5s; }
+        @keyframes comboPop { 0% { transform: translateX(-50%) scale(0.5); opacity: 0; } 50% { transform: translateX(-50%) scale(1.2); } 100% { transform: translateX(-50%) scale(1); opacity: 1; } }
+    </style>
+</head>
+<body>
+    <div id="start-screen" class="screen active">
+        <div class="tree-icon">🌳</div>
+        <h1 class="game-title">수학 나무 던전</h1>
+        <p style="color:#2E7D32; margin-bottom:20px;">🏰 100층을 정복하라! 🏰</p>
+        <div class="input-container">
+            <label style="color:#5D4037; margin-bottom:10px; display:block;">용사의 이름을 입력하세요!</label>
+            <input type="text" id="player-name" class="name-input" placeholder="이름 입력..." maxlength="10">
+            <button id="start-btn" class="btn btn-primary" onclick="goToCharacterSelect()">새 게임 시작! ⚔️</button>
+            <button id="continue-btn" class="btn btn-secondary" onclick="loadGame()" style="display:none;">이어하기 📂</button>
+        </div>
+    </div>
+    <div id="character-screen" class="screen">
+        <h2 class="character-title">⚔️ 직업을 선택하세요! ⚔️</h2>
+        <div class="character-grid">
+            <div class="character-card" data-class="warrior" onclick="selectCharacter('warrior')"><span class="character-emoji">🗡️</span><span class="character-name">전사</span><span class="character-stat">❤️ 체력 +30</span></div>
+            <div class="character-card" data-class="mage" onclick="selectCharacter('mage')"><span class="character-emoji">🧙</span><span class="character-name">마법사</span><span class="character-stat">⚔️ 공격력 +5</span></div>
+            <div class="character-card" data-class="archer" onclick="selectCharacter('archer')"><span class="character-emoji">🏹</span><span class="character-name">궁수</span><span class="character-stat">⏱️ 시간 +3초</span></div>
+        </div>
+        <button id="confirm-btn" class="btn btn-primary" onclick="startGame()" disabled style="margin-top:20px;">선택 완료! 🚀</button>
+    </div>
+    <div id="game-screen" class="screen">
+        <div class="game-header">
+            <div class="header-item">🌳 <span id="current-floor">1</span>층</div>
+            <div class="header-item" style="color:#FF9800;">🔥 <span id="combo-count">0</span></div>
+            <div class="header-item">💰 <span id="coin-count">0</span></div>
+            <button class="reset-btn" onclick="showResetConfirm()">🔄</button>
+        </div>
+        <div class="buff-area" id="buff-area"></div>
+        <div class="battle-area" id="battle-area">
+            <div class="fighter"><span class="fighter-name" id="player-display-name">용사</span><div class="health-bar-container"><div class="health-bar player-health" id="player-health-bar"></div></div><span class="health-text" id="player-health-text">100/100</span><span class="fighter-sprite" id="player-sprite">🗡️</span></div>
+            <span class="vs-text">VS</span>
+            <div class="fighter"><span class="fighter-name" id="monster-name">슬라임</span><div class="health-bar-container"><div class="health-bar monster-health" id="monster-health-bar"></div></div><span class="health-text" id="monster-health-text">20/20</span><span class="fighter-sprite" id="monster-sprite">🟢</span></div>
+        </div>
+        <div class="question-area">
+            <div class="timer-bar-container"><div class="timer-bar timer-green" id="timer-bar"></div></div>
+            <div class="question-text" id="question-text">? + ? = ?</div>
+            <div class="hint-display" id="hint-display" style="display:none;"></div>
+            <div class="answer-display" id="answer-display">_</div>
+        </div>
+        <button class="hint-btn" id="hint-btn" onclick="useHint()" style="display:none;">💡 힌트 사용 (<span id="hint-count-btn">0</span>개)</button>
+        <div class="numpad-area">
+            <div class="numpad-grid">
+                <button class="numpad-btn num-btn" onclick="inputNumber('1')">1</button>
+                <button class="numpad-btn num-btn" onclick="inputNumber('2')">2</button>
+                <button class="numpad-btn num-btn" onclick="inputNumber('3')">3</button>
+                <button class="numpad-btn clear-btn" onclick="clearAnswer()">C</button>
+                <button class="numpad-btn num-btn" onclick="inputNumber('4')">4</button>
+                <button class="numpad-btn num-btn" onclick="inputNumber('5')">5</button>
+                <button class="numpad-btn num-btn" onclick="inputNumber('6')">6</button>
+                <button class="numpad-btn negative-btn" onclick="toggleNegative()">±</button>
+                <button class="numpad-btn num-btn" onclick="inputNumber('7')">7</button>
+                <button class="numpad-btn num-btn" onclick="inputNumber('8')">8</button>
+                <button class="numpad-btn num-btn" onclick="inputNumber('9')">9</button>
+                <button class="numpad-btn num-btn" onclick="inputNumber('0')">0</button>
+                <button class="numpad-btn attack-btn" onclick="submitAnswer()">⚔️ 공격!</button>
+                <button class="numpad-btn clear-btn" onclick="backspace()">←</button>
+            </div>
+        </div>
+    </div>
+    <div id="reset-modal" class="modal"><div class="modal-content" style="border-color:#EF5350;"><div class="result-emoji">⚠️</div><h3 class="modal-title">정말 리셋하시겠어요?</h3><p style="color:#666; margin-bottom:15px;">모든 진행 상황이 삭제됩니다!</p><div style="display:flex; gap:10px;"><button class="btn" style="background:#aaa; color:white; flex:1;" onclick="hideResetConfirm()">취소</button><button class="btn" style="background:#EF5350; color:white; flex:1;" onclick="resetGame()">리셋</button></div></div></div>
+    <div id="shop-modal" class="modal"><div class="modal-content"><h3 class="modal-title">🏪 휴식의 방</h3><p style="margin-bottom:10px;">💰 보유 코인: <span id="shop-coins">0</span></p><div class="shop-item" style="border-color:#66BB6A;"><div class="shop-item-info"><div class="shop-item-name">❤️ 회복 물약</div><div class="shop-item-desc">체력 10 회복 (10코인)</div></div><button class="shop-btn" onclick="buyPotion()">구매</button></div><div class="shop-item" style="border-color:#EF5350;"><div class="shop-item-info"><div class="shop-item-name">⚔️ 공격 업 물약</div><div class="shop-item-desc">3층간 공격력 20%↑ (20코인)</div></div><button class="shop-btn" onclick="buyAttackBoost()">구매</button></div><div class="shop-item" style="border-color:#42A5F5;"><div class="shop-item-info"><div class="shop-item-name">⏱️ 타임 물약</div><div class="shop-item-desc">1층간 시간 20%↑ (20코인)</div></div><button class="shop-btn" onclick="buyTimeBoost()">구매</button></div><div class="shop-item" style="border-color:#AB47BC;"><div class="shop-item-info"><div class="shop-item-name">💡 필살기 (힌트)</div><div class="shop-item-desc">전투 중 정답 확인 (15코인)</div></div><button class="shop-btn" onclick="buyHint()">구매</button></div><div style="background:#eee; padding:10px; border-radius:10px; margin:10px 0; font-size:0.8rem;">❤️ <span id="shop-health">100/100</span> | ⚔️ <span id="shop-attack">기본</span> | 💡 <span id="shop-hints">0</span>개</div><button class="btn btn-primary" onclick="continueGame()">다음 층으로! 🚀</button></div></div>
+    <div id="gameover-modal" class="modal"><div class="modal-content"><div class="result-emoji">😢</div><h3 class="modal-title">게임 오버...</h3><div class="result-stats"><div class="stat-row"><span>도달 층</span><span id="result-floor">1층</span></div><div class="stat-row"><span>획득 코인</span><span id="result-coins">0</span></div><div class="stat-row"><span>최대 콤보</span><span id="result-combo">0</span></div></div><button class="btn btn-primary" onclick="restartGame()">다시 도전! 💪</button></div></div>
+    <div id="victory-modal" class="modal"><div class="modal-content"><div class="result-emoji">🎉</div><h3 class="modal-title">축하합니다!</h3><p style="color:#5D4037; margin-bottom:15px;">100층 던전을 정복했습니다!</p><div class="result-stats"><div class="stat-row"><span>남은 체력</span><span id="victory-health">100</span></div><div class="stat-row"><span>획득 코인</span><span id="victory-coins">0</span></div><div class="stat-row"><span>최대 콤보</span><span id="victory-combo">0</span></div></div><button class="btn btn-primary" onclick="restartGame()">새 게임 🎮</button></div></div>
+<script>
+const SAVE_KEY='mathDungeonSave';
+const characterSprites={warrior:'⚔️',mage:'🧙',archer:'🏹'};
+const monsters=[{name:'아기 슬라임',emoji:'🟢',baseHealth:20},{name:'파란 슬라임',emoji:'🔵',baseHealth:25},{name:'버섯돌이',emoji:'🍄',baseHealth:22},{name:'꼬마 유령',emoji:'👻',baseHealth:28},{name:'뚱뚱이 고블린',emoji:'👺',baseHealth:30},{name:'삐약 박쥐',emoji:'🦇',baseHealth:24},{name:'꽃요정',emoji:'🧚',baseHealth:23},{name:'도토리병사',emoji:'🐿️',baseHealth:27},{name:'달팽이기사',emoji:'🐌',baseHealth:29},{name:'무지개슬라임',emoji:'🌈',baseHealth:32},{name:'불꽃도깨비',emoji:'🔥',baseHealth:35},{name:'얼음요정',emoji:'❄️',baseHealth:33},{name:'바위거인',emoji:'🗿',baseHealth:40},{name:'독버섯',emoji:'☠️',baseHealth:38}];
+const bossMonsters=[{name:'슬라임 킹',emoji:'👑',baseHealth:60},{name:'숲의 수호자',emoji:'🌲',baseHealth:80},{name:'불꽃 드래곤',emoji:'🐉',baseHealth:100},{name:'얼음 마왕',emoji:'🧊',baseHealth:120},{name:'암흑 기사',emoji:'🦹',baseHealth:140},{name:'번개 피닉스',emoji:'⚡',baseHealth:160},{name:'독안개 뱀',emoji:'🐍',baseHealth:180},{name:'대지의 골렘',emoji:'🏔️',baseHealth:200},{name:'시간의 마법사',emoji:'⏳',baseHealth:220},{name:'별의 정령',emoji:'⭐',baseHealth:240},{name:'달빛 늑대',emoji:'🐺',baseHealth:260},{name:'태양 사자',emoji:'🦁',baseHealth:280},{name:'폭풍의 독수리',emoji:'🦅',baseHealth:300},{name:'심해의 크라켄',emoji:'🦑',baseHealth:320},{name:'우주의 악마',emoji:'👿',baseHealth:350},{name:'차원의 수호자',emoji:'🌀',baseHealth:380},{name:'혼돈의 신',emoji:'💀',baseHealth:400},{name:'영원의 불사조',emoji:'🔮',baseHealth:420},{name:'천상의 천사',emoji:'👼',baseHealth:450},{name:'수학왕',emoji:'🧮',baseHealth:500}];
+let gs={playerName:'',playerClass:'',playerMaxHealth:100,playerHealth:100,baseAttack:20,playerAttack:20,bonusTime:0,currentFloor:1,coins:0,combo:0,maxCombo:0,monsterHealth:0,monsterMaxHealth:0,currentAnswer:'',correctAnswer:0,timerInterval:null,timeLeft:0,maxTime:10,isGameActive:false,attackBoostFloors:0,timeBoostFloors:0,hintCount:0};
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+function checkSaveData(){const save=localStorage.getItem(SAVE_KEY);if(save)document.getElementById('continue-btn').style.display='block';}
+function goToCharacterSelect(){const name=document.getElementById('player-name').value.trim();if(!name){alert('이름을 입력해주세요!');return;}gs.playerName=name;showScreen('character-screen');}
+function selectCharacter(c){document.querySelectorAll('.character-card').forEach(card=>card.classList.remove('selected'));document.querySelector(`[data-class="${c}"]`).classList.add('selected');gs.playerClass=c;document.getElementById('confirm-btn').disabled=false;}
+function startGame(){switch(gs.playerClass){case'warrior':gs.playerMaxHealth=130;gs.baseAttack=20;gs.bonusTime=0;break;case'mage':gs.playerMaxHealth=100;gs.baseAttack=25;gs.bonusTime=0;break;case'archer':gs.playerMaxHealth=100;gs.baseAttack=20;gs.bonusTime=3;break;}gs.playerHealth=gs.playerMaxHealth;gs.playerAttack=gs.baseAttack;gs.currentFloor=1;gs.coins=0;gs.combo=0;gs.maxCombo=0;gs.attackBoostFloors=0;gs.timeBoostFloors=0;gs.hintCount=0;showScreen('game-screen');document.getElementById('player-display-name').textContent=gs.playerName;document.getElementById('player-sprite').textContent=characterSprites[gs.playerClass];startFloor();}
+function startFloor(){gs.isGameActive=true;gs.combo=0;updateUI();updateBuffs();const isBoss=gs.currentFloor%5===0;let monster=isBoss?bossMonsters[Math.min(Math.floor(gs.currentFloor/5)-1,bossMonsters.length-1)]:monsters[Math.floor(Math.random()*monsters.length)];if(isBoss)showBossAlert();const mult=1+(gs.currentFloor-1)*0.1;gs.monsterMaxHealth=Math.floor(monster.baseHealth*mult);gs.monsterHealth=gs.monsterMaxHealth;document.getElementById('monster-name').textContent=monster.name;document.getElementById('monster-sprite').textContent=monster.emoji;gs.playerAttack=gs.attackBoostFloors>0?Math.floor(gs.baseAttack*1.2):gs.baseAttack;let baseTime=10+gs.bonusTime+Math.floor(gs.currentFloor/20)*2;gs.maxTime=gs.timeBoostFloors>0?Math.floor(baseTime*1.2):baseTime;updateHealthBars();generateQuestion();}
+function generateQuestion(){const d=Math.ceil(gs.currentFloor/15);let n1,n2,op,ans;const ops=['+','-'];if(gs.currentFloor>=20)ops.push('×');if(gs.currentFloor>=40)ops.push('÷');op=ops[Math.floor(Math.random()*ops.length)];switch(d){case 1:n1=Math.floor(Math.random()*9)+1;n2=Math.floor(Math.random()*9)+1;break;case 2:n1=Math.floor(Math.random()*90)+10;n2=Math.floor(Math.random()*9)+1;break;case 3:n1=Math.floor(Math.random()*90)+10;n2=Math.floor(Math.random()*90)+10;break;case 4:n1=Math.floor(Math.random()*900)+100;n2=Math.floor(Math.random()*90)+10;break;default:n1=Math.floor(Math.random()*900)+100;n2=Math.floor(Math.random()*900)+100;}if(op==='×'){n1=Math.floor(Math.random()*(5+d*2))+2;n2=Math.floor(Math.random()*(5+d*2))+2;}else if(op==='÷'){n2=Math.floor(Math.random()*(3+d))+2;ans=Math.floor(Math.random()*(5+d*2))+1;n1=n2*ans;}if(op==='-'&&d<5&&n1<n2)[n1,n2]=[n2,n1];switch(op){case'+':ans=n1+n2;break;case'-':ans=n1-n2;break;case'×':ans=n1*n2;break;case'÷':ans=n1/n2;break;}gs.correctAnswer=ans;document.getElementById('question-text').textContent=`${n1} ${op} ${n2} = ?`;gs.currentAnswer='';document.getElementById('answer-display').textContent='_';document.getElementById('hint-display').style.display='none';updateHintBtn();startTimer();}
+function startTimer(){gs.timeLeft=gs.maxTime*10;clearInterval(gs.timerInterval);const bar=document.getElementById('timer-bar');bar.style.width='100%';bar.className='timer-bar timer-green';gs.timerInterval=setInterval(()=>{if(!gs.isGameActive)return;gs.timeLeft--;const pct=(gs.timeLeft/(gs.maxTime*10))*100;bar.style.width=pct+'%';bar.className='timer-bar '+(pct>50?'timer-green':pct>20?'timer-yellow':'timer-red');if(gs.timeLeft<=0){clearInterval(gs.timerInterval);playerTakesDamage();}},100);}
+function inputNumber(n){if(!gs.isGameActive||gs.currentAnswer.replace('-','').length>=4)return;gs.currentAnswer+=n;document.getElementById('answer-display').textContent=gs.currentAnswer;}
+function clearAnswer(){gs.currentAnswer='';document.getElementById('answer-display').textContent='_';}
+function backspace(){gs.currentAnswer=gs.currentAnswer.slice(0,-1);document.getElementById('answer-display').textContent=gs.currentAnswer||'_';}
+function toggleNegative(){gs.currentAnswer=gs.currentAnswer.startsWith('-')?gs.currentAnswer.slice(1):'-'+gs.currentAnswer;document.getElementById('answer-display').textContent=gs.currentAnswer||'_';}
+function submitAnswer(){if(!gs.isGameActive||!gs.currentAnswer)return;clearInterval(gs.timerInterval);parseInt(gs.currentAnswer)===gs.correctAnswer?monsterTakesDamage():playerTakesDamage();}
+function monsterTakesDamage(){gs.combo++;if(gs.combo>gs.maxCombo)gs.maxCombo=gs.combo;if(gs.combo>=3){gs.coins++;showCombo();}showDamage('monster',gs.playerAttack);gs.monsterHealth-=gs.playerAttack;updateHealthBars();document.getElementById('hint-display').style.display='none';if(gs.monsterHealth<=0){gs.isGameActive=false;showFloorClear();setTimeout(()=>floorCleared(),1500);}else setTimeout(generateQuestion,500);updateUI();}
+function playerTakesDamage(){gs.combo=0;const dmg=10+Math.floor(gs.currentFloor/10)*2;showDamage('player',dmg);gs.playerHealth-=dmg;updateHealthBars();document.getElementById('hint-display').style.display='none';if(gs.playerHealth<=0){gs.playerHealth=0;updateHealthBars();gs.isGameActive=false;setTimeout(gameOver,500);}else setTimeout(generateQuestion,500);updateUI();}
+function floorCleared(){gs.attackBoostFloors=Math.max(0,gs.attackBoostFloors-1);gs.timeBoostFloors=Math.max(0,gs.timeBoostFloors-1);if(gs.currentFloor>=100){showVictory();return;}saveGame();if(gs.currentFloor%5===0)showShop();else{gs.currentFloor++;startFloor();}}
+function useHint(){if(gs.hintCount<=0||!gs.isGameActive)return;gs.hintCount--;document.getElementById('hint-display').textContent='💡 정답은 '+gs.correctAnswer+' 입니다! 🎯';document.getElementById('hint-display').style.display='block';updateHintBtn();updateBuffs();}
+function updateHintBtn(){const btn=document.getElementById('hint-btn');btn.style.display=gs.hintCount>0&&gs.isGameActive?'block':'none';document.getElementById('hint-count-btn').textContent=gs.hintCount;}
+function showDamage(target,amount){const area=document.getElementById('battle-area');const el=document.createElement('div');el.className='effect-text';el.textContent='-'+amount;el.style.color=target==='player'?'#EF5350':'#4CAF50';el.style.top='40%';el.style.left=target==='player'?'20%':'70%';area.appendChild(el);setTimeout(()=>el.remove(),1000);}
+function showCombo(){const area=document.getElementById('battle-area');const el=document.createElement('div');el.className='combo-popup';el.textContent='🔥 '+gs.combo+' 콤보! +1💰';area.appendChild(el);setTimeout(()=>el.remove(),1500);}
+function showBossAlert(){const area=document.getElementById('battle-area');const el=document.createElement('div');el.className='boss-alert';el.textContent='⚠️ 보스 등장! ⚠️';area.appendChild(el);setTimeout(()=>el.remove(),2000);}
+function showFloorClear(){const el=document.createElement('div');el.className='floor-clear';el.textContent='🎉 '+gs.currentFloor+'층 클리어!';document.body.appendChild(el);setTimeout(()=>el.remove(),1500);}
+function showShop(){document.getElementById('shop-coins').textContent=gs.coins;document.getElementById('shop-health').textContent=gs.playerHealth+'/'+gs.playerMaxHealth;document.getElementById('shop-attack').textContent=gs.attackBoostFloors>0?'+20%('+gs.attackBoostFloors+'층)':'기본';document.getElementById('shop-hints').textContent=gs.hintCount;document.getElementById('shop-modal').classList.add('active');}
+function buyPotion(){if(gs.coins>=10&&gs.playerHealth<gs.playerMaxHealth){gs.coins-=10;gs.playerHealth=Math.min(gs.playerHealth+10,gs.playerMaxHealth);showShop();}}
+function buyAttackBoost(){if(gs.coins>=20){gs.coins-=20;gs.attackBoostFloors+=3;showShop();}}
+function buyTimeBoost(){if(gs.coins>=20){gs.coins-=20;gs.timeBoostFloors+=1;showShop();}}
+function buyHint(){if(gs.coins>=15){gs.coins-=15;gs.hintCount++;showShop();}}
+function continueGame(){document.getElementById('shop-modal').classList.remove('active');gs.currentFloor++;startFloor();}
+function gameOver(){document.getElementById('result-floor').textContent=gs.currentFloor+'층';document.getElementById('result-coins').textContent=gs.coins;document.getElementById('result-combo').textContent=gs.maxCombo;document.getElementById('gameover-modal').classList.add('active');localStorage.removeItem(SAVE_KEY);}
+function showVictory(){document.getElementById('victory-health').textContent=gs.playerHealth;document.getElementById('victory-coins').textContent=gs.coins;document.getElementById('victory-combo').textContent=gs.maxCombo;document.getElementById('victory-modal').classList.add('active');localStorage.removeItem(SAVE_KEY);}
+function restartGame(){document.querySelectorAll('.modal').forEach(m=>m.classList.remove('active'));document.querySelectorAll('.character-card').forEach(c=>c.classList.remove('selected'));document.getElementById('player-name').value='';document.getElementById('confirm-btn').disabled=true;document.getElementById('continue-btn').style.display='none';gs={playerName:'',playerClass:'',playerMaxHealth:100,playerHealth:100,baseAttack:20,playerAttack:20,bonusTime:0,currentFloor:1,coins:0,combo:0,maxCombo:0,monsterHealth:0,monsterMaxHealth:0,currentAnswer:'',correctAnswer:0,timerInterval:null,timeLeft:0,maxTime:10,isGameActive:false,attackBoostFloors:0,timeBoostFloors:0,hintCount:0};showScreen('start-screen');checkSaveData();}
+function showResetConfirm(){document.getElementById('reset-modal').classList.add('active');}
+function hideResetConfirm(){document.getElementById('reset-modal').classList.remove('active');}
+function resetGame(){localStorage.removeItem(SAVE_KEY);hideResetConfirm();restartGame();}
+function saveGame(){const data={playerName:gs.playerName,playerClass:gs.playerClass,playerMaxHealth:gs.playerMaxHealth,playerHealth:gs.playerHealth,baseAttack:gs.baseAttack,bonusTime:gs.bonusTime,currentFloor:gs.currentFloor+1,coins:gs.coins,maxCombo:gs.maxCombo,attackBoostFloors:gs.attackBoostFloors,timeBoostFloors:gs.timeBoostFloors,hintCount:gs.hintCount};localStorage.setItem(SAVE_KEY,JSON.stringify(data));}
+function loadGame(){const data=JSON.parse(localStorage.getItem(SAVE_KEY));if(!data)return;gs.playerName=data.playerName;gs.playerClass=data.playerClass;gs.playerMaxHealth=data.playerMaxHealth;gs.playerHealth=data.playerHealth;gs.baseAttack=data.baseAttack;gs.bonusTime=data.bonusTime;gs.currentFloor=data.currentFloor;gs.coins=data.coins;gs.maxCombo=data.maxCombo;gs.attackBoostFloors=data.attackBoostFloors||0;gs.timeBoostFloors=data.timeBoostFloors||0;gs.hintCount=data.hintCount||0;showScreen('game-screen');document.getElementById('player-display-name').textContent=gs.playerName;document.getElementById('player-sprite').textContent=characterSprites[gs.playerClass];startFloor();}
+function updateUI(){document.getElementById('current-floor').textContent=gs.currentFloor;document.getElementById('combo-count').textContent=gs.combo;document.getElementById('coin-count').textContent=gs.coins;}
+function updateHealthBars(){document.getElementById('player-health-bar').style.width=(gs.playerHealth/gs.playerMaxHealth*100)+'%';document.getElementById('monster-health-bar').style.width=(Math.max(0,gs.monsterHealth)/gs.monsterMaxHealth*100)+'%';document.getElementById('player-health-text').textContent=gs.playerHealth+'/'+gs.playerMaxHealth;document.getElementById('monster-health-text').textContent=Math.max(0,gs.monsterHealth)+'/'+gs.monsterMaxHealth;}
+function updateBuffs(){const area=document.getElementById('buff-area');area.innerHTML='';if(gs.attackBoostFloors>0){const t=document.createElement('span');t.className='buff-tag buff-attack';t.textContent='⚔️+20% ('+gs.attackBoostFloors+'층)';area.appendChild(t);}if(gs.timeBoostFloors>0){const t=document.createElement('span');t.className='buff-tag buff-time';t.textContent='⏱️+20% ('+gs.timeBoostFloors+'층)';area.appendChild(t);}if(gs.hintCount>0){const t=document.createElement('span');t.className='buff-tag buff-hint';t.textContent='💡 x'+gs.hintCount;area.appendChild(t);}}
+document.addEventListener('keydown',(e)=>{if(!gs.isGameActive)return;if(e.key>='0'&&e.key<='9')inputNumber(e.key);else if(e.key==='Backspace')backspace();else if(e.key==='Escape'||e.key==='c')clearAnswer();else if(e.key==='Enter')submitAnswer();else if(e.key==='-')toggleNegative();});
+checkSaveData();
+</script>
+</body>
+</html>
