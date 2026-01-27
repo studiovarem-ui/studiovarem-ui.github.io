@@ -2,106 +2,130 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="mobile-web-app-capable" content="yes">
-  <title>BIRD DROP - 새똥 맞추기</title>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <meta name="theme-color" content="#0D0221">
+  <title>BIRD DROP</title>
+  <link rel="manifest" href="manifest.json">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    html, body { width: 100%; height: 100%; overflow: hidden; touch-action: none; font-family: 'Press Start 2P', monospace; background: #0D0221; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: repeating-linear-gradient(0deg, rgba(0,0,0,0.1), rgba(0,0,0,0.1) 1px, transparent 1px, transparent 2px); pointer-events: none; z-index: 1000; }
-    #gameContainer { position: relative; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; background: #0D0221; }
-    #gameCanvas { display: block; background: #0D0221; image-rendering: pixelated; }
-    #mobileControls { position: fixed; bottom: 0; left: 0; width: 100%; height: 180px; display: none; justify-content: space-between; align-items: center; padding: 10px 20px; z-index: 500; pointer-events: none; }
+    html, body { width: 100%; height: 100%; overflow: hidden; touch-action: none; font-family: 'Press Start 2P', monospace; background: #0D0221; position: fixed; top: 0; left: 0; }
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+    #gameContainer { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; height: 100dvh; display: flex; flex-direction: column; background: #0D0221; }
+    #gameArea { flex: 1; display: flex; justify-content: center; align-items: center; position: relative; min-height: 0; }
+    #gameCanvas { display: block; background: #0D0221; image-rendering: pixelated; max-width: 100%; max-height: 100%; }
+    #mobileControls { display: none; height: 140px; min-height: 140px; justify-content: space-between; align-items: center; padding: 10px 15px; background: rgba(13,2,33,0.95); border-top: 2px solid #A855F7; }
     .mobile-visible #mobileControls { display: flex; }
-    #joystickArea { width: 140px; height: 140px; position: relative; pointer-events: auto; }
-    #joystickBase { width: 120px; height: 120px; background: radial-gradient(circle, rgba(168,85,247,0.3) 0%, rgba(168,85,247,0.1) 100%); border: 3px solid rgba(168,85,247,0.6); border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 20px rgba(168,85,247,0.3); }
-    #joystickKnob { width: 50px; height: 50px; background: radial-gradient(circle, #A855F7 0%, #7C3AED 100%); border: 2px solid #C084FC; border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 15px #A855F7; transition: none; }
-    #actionButtons { display: flex; flex-direction: column; gap: 10px; align-items: flex-end; pointer-events: auto; }
-    #poopButton { width: 90px; height: 90px; background: radial-gradient(circle, #FF6B9D 0%, #E11D48 100%); border: 3px solid #FF8FAB; border-radius: 50%; font-size: 40px; display: flex; justify-content: center; align-items: center; box-shadow: 0 0 25px rgba(255,107,157,0.6); cursor: pointer; user-select: none; }
-    #poopButton:active { transform: scale(0.95); box-shadow: 0 0 35px rgba(255,107,157,0.9); }
-    #itemButtons { display: flex; gap: 8px; pointer-events: auto; }
-    .item-btn { width: 50px; height: 50px; background: linear-gradient(180deg, #1E1E3F 0%, #0D0D2B 100%); border: 2px solid #A855F7; border-radius: 10px; font-size: 24px; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; cursor: pointer; }
-    .item-btn:active { background: linear-gradient(180deg, #A855F7 0%, #7C3AED 100%); box-shadow: 0 0 15px #A855F7; }
-    .item-btn .count { position: absolute; bottom: 2px; right: 4px; font-size: 8px; color: #00D4FF; font-family: 'Press Start 2P', monospace; }
-    #pauseBtn { position: fixed; top: 10px; right: 10px; width: 44px; height: 44px; background: rgba(13,2,33,0.8); border: 2px solid #A855F7; border-radius: 8px; color: #A855F7; font-size: 20px; display: none; justify-content: center; align-items: center; z-index: 600; cursor: pointer; }
+    #joystickArea { width: 110px; height: 110px; position: relative; }
+    #joystickBase { width: 100px; height: 100px; background: radial-gradient(circle, rgba(168,85,247,0.3) 0%, rgba(168,85,247,0.1) 100%); border: 3px solid rgba(168,85,247,0.6); border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+    #joystickKnob { width: 45px; height: 45px; background: radial-gradient(circle, #A855F7 0%, #7C3AED 100%); border: 2px solid #C084FC; border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 15px #A855F7; }
+    #actionButtons { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+    #poopButton { width: 80px; height: 80px; background: radial-gradient(circle, #FF6B9D 0%, #E11D48 100%); border: 3px solid #FF8FAB; border-radius: 50%; font-size: 36px; display: flex; justify-content: center; align-items: center; box-shadow: 0 0 20px rgba(255,107,157,0.6); }
+    #itemButtons { display: flex; gap: 6px; }
+    .item-btn { width: 44px; height: 44px; background: linear-gradient(180deg, #1E1E3F 0%, #0D0D2B 100%); border: 2px solid #A855F7; border-radius: 8px; font-size: 20px; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
+    .item-btn .count { position: absolute; bottom: 1px; right: 3px; font-size: 7px; color: #00D4FF; font-family: 'Press Start 2P', monospace; }
+    #pauseBtn { position: fixed; top: 10px; right: 10px; width: 40px; height: 40px; background: rgba(13,2,33,0.9); border: 2px solid #A855F7; border-radius: 8px; color: #A855F7; font-size: 18px; display: none; justify-content: center; align-items: center; z-index: 600; }
     .mobile-visible #pauseBtn { display: flex; }
-    .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(180deg, #0D0221 0%, #1A0A2E 100%); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 100; padding: 20px; overflow-y: auto; }
+    #fullscreenBtn { position: fixed; top: 10px; left: 10px; width: 40px; height: 40px; background: rgba(13,2,33,0.9); border: 2px solid #00D4FF; border-radius: 8px; color: #00D4FF; font-size: 18px; display: none; justify-content: center; align-items: center; z-index: 600; cursor: pointer; }
+    .mobile-visible #fullscreenBtn { display: flex; }
+    .overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; height: 100dvh; background: linear-gradient(180deg, #0D0221 0%, #1A0A2E 100%); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 100; padding: 20px; overflow-y: auto; }
     .overlay.active { display: flex; }
     .grid-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(90deg, rgba(168,85,247,0.1) 1px, transparent 1px), linear-gradient(rgba(168,85,247,0.1) 1px, transparent 1px); background-size: 40px 40px; animation: gridMove 20s linear infinite; pointer-events: none; }
     @keyframes gridMove { 0% { background-position: 0 0; } 100% { background-position: 40px 40px; } }
-    .menu-title { font-size: clamp(24px, 8vw, 36px); color: #FF6B9D; margin-bottom: 5px; text-shadow: 0 0 10px #FF6B9D, 0 0 20px #FF6B9D, 3px 3px 0 #A855F7; letter-spacing: 4px; animation: pulse 2s ease-in-out infinite; z-index: 10; text-align: center; }
+    .menu-title { font-size: clamp(20px, 7vw, 32px); color: #FF6B9D; margin-bottom: 5px; text-shadow: 0 0 10px #FF6B9D, 0 0 20px #FF6B9D, 3px 3px 0 #A855F7; letter-spacing: 3px; animation: pulse 2s ease-in-out infinite; z-index: 10; text-align: center; }
     @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.02); } }
-    .menu-subtitle { font-size: clamp(10px, 3vw, 14px); color: #00D4FF; margin-bottom: 30px; text-shadow: 0 0 10px #00D4FF; letter-spacing: 6px; z-index: 10; }
-    .pixel-btn { padding: clamp(12px, 3vw, 18px) clamp(30px, 8vw, 50px); font-family: 'Press Start 2P', monospace; font-size: clamp(10px, 3vw, 14px); border: none; cursor: pointer; margin: 8px; background: linear-gradient(180deg, #A855F7 0%, #7C3AED 100%); color: white; z-index: 10; min-width: 200px; text-align: center; }
-    .pixel-btn:active { background: linear-gradient(180deg, #FF6B9D 0%, #E11D48 100%); box-shadow: 0 0 20px #FF6B9D; }
+    .menu-subtitle { font-size: clamp(8px, 2.5vw, 12px); color: #00D4FF; margin-bottom: 20px; text-shadow: 0 0 10px #00D4FF; letter-spacing: 4px; z-index: 10; }
+    .pixel-btn { padding: 12px 30px; font-family: 'Press Start 2P', monospace; font-size: clamp(9px, 2.5vw, 12px); border: none; cursor: pointer; margin: 6px; background: linear-gradient(180deg, #A855F7 0%, #7C3AED 100%); color: white; z-index: 10; min-width: 180px; text-align: center; }
     .pixel-btn.secondary { background: linear-gradient(180deg, #1E1E3F 0%, #0D0D2B 100%); border: 2px solid #A855F7; }
-    .controls-info { margin-top: 20px; color: #6B7280; text-align: center; font-size: clamp(6px, 2vw, 8px); line-height: 2.2; z-index: 10; }
+    .controls-info { margin-top: 15px; color: #6B7280; text-align: center; font-size: 7px; line-height: 2; z-index: 10; }
     .controls-info.mobile-hide { display: block; }
     .mobile-visible .controls-info.mobile-hide { display: none; }
-    .controls-info kbd { background: #374151; padding: 3px 6px; margin: 0 2px; border: 1px solid #4B5563; color: #00D4FF; }
-    .bird-preview { width: 64px; height: 64px; margin: 15px auto; animation: birdFloat 1s ease-in-out infinite; z-index: 10; }
-    @keyframes birdFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-    .shop-overlay { padding: 15px; justify-content: flex-start; }
-    .shop-header { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 600px; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 2px solid #A855F7; flex-wrap: wrap; gap: 10px; }
-    .shop-title { font-size: clamp(14px, 4vw, 20px); color: #FF6B9D; text-shadow: 0 0 10px #FF6B9D; }
-    .shop-currency { display: flex; gap: 10px; font-size: clamp(8px, 2.5vw, 10px); }
-    .currency-box { background: linear-gradient(180deg, #1E1E3F 0%, #0D0D2B 100%); padding: 6px 12px; border: 2px solid #A855F7; color: #00D4FF; }
-    .shop-tabs { display: flex; gap: 5px; margin-bottom: 10px; flex-wrap: wrap; justify-content: center; }
-    .shop-tab { padding: 8px 16px; background: #1E1E3F; border: 2px solid #374151; color: #9CA3AF; font-family: 'Press Start 2P', monospace; font-size: clamp(6px, 2vw, 8px); cursor: pointer; }
+    .controls-info kbd { background: #374151; padding: 2px 5px; margin: 0 2px; border: 1px solid #4B5563; color: #00D4FF; }
+    .bird-preview { width: 56px; height: 56px; margin: 10px auto; animation: birdFloat 1s ease-in-out infinite; z-index: 10; }
+    @keyframes birdFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+    .shop-overlay { padding: 10px; justify-content: flex-start; }
+    .shop-header { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 500px; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 2px solid #A855F7; flex-wrap: wrap; gap: 8px; }
+    .shop-title { font-size: clamp(12px, 3.5vw, 16px); color: #FF6B9D; text-shadow: 0 0 10px #FF6B9D; }
+    .shop-currency { display: flex; gap: 8px; font-size: clamp(7px, 2vw, 9px); }
+    .currency-box { background: linear-gradient(180deg, #1E1E3F 0%, #0D0D2B 100%); padding: 5px 10px; border: 2px solid #A855F7; color: #00D4FF; }
+    .shop-tabs { display: flex; gap: 4px; margin-bottom: 8px; flex-wrap: wrap; justify-content: center; }
+    .shop-tab { padding: 6px 12px; background: #1E1E3F; border: 2px solid #374151; color: #9CA3AF; font-family: 'Press Start 2P', monospace; font-size: clamp(5px, 1.8vw, 7px); cursor: pointer; }
     .shop-tab.active { background: linear-gradient(180deg, #A855F7 0%, #7C3AED 100%); border-color: #A855F7; color: white; }
-    .shop-items { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; width: 100%; max-width: 600px; max-height: 50vh; overflow-y: auto; padding: 5px; }
-    .shop-item { background: linear-gradient(180deg, #1E1E3F 0%, #0D0D2B 100%); border: 2px solid #374151; padding: 10px; display: flex; flex-direction: column; align-items: center; cursor: pointer; }
-    .shop-item:active { border-color: #00D4FF; box-shadow: 0 0 15px rgba(0,212,255,0.3); }
+    .shop-items { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; width: 100%; max-width: 500px; max-height: 45vh; overflow-y: auto; padding: 4px; }
+    .shop-item { background: linear-gradient(180deg, #1E1E3F 0%, #0D0D2B 100%); border: 2px solid #374151; padding: 8px; display: flex; flex-direction: column; align-items: center; cursor: pointer; }
     .shop-item.owned { opacity: 0.5; }
-    .shop-item-icon { font-size: 28px; margin-bottom: 6px; }
-    .shop-item-name { color: #E5E7EB; font-size: clamp(6px, 2vw, 8px); margin-bottom: 3px; text-align: center; }
-    .shop-item-desc { color: #6B7280; font-size: clamp(5px, 1.5vw, 6px); text-align: center; margin-bottom: 6px; }
-    .shop-item-price { background: linear-gradient(180deg, #F59E0B 0%, #D97706 100%); padding: 3px 10px; font-size: clamp(6px, 2vw, 8px); color: #0D0221; }
+    .shop-item-icon { font-size: 24px; margin-bottom: 4px; }
+    .shop-item-name { color: #E5E7EB; font-size: clamp(5px, 1.8vw, 7px); margin-bottom: 2px; text-align: center; }
+    .shop-item-desc { color: #6B7280; font-size: clamp(4px, 1.5vw, 5px); text-align: center; margin-bottom: 4px; }
+    .shop-item-price { background: linear-gradient(180deg, #F59E0B 0%, #D97706 100%); padding: 2px 8px; font-size: clamp(5px, 1.8vw, 7px); color: #0D0221; }
     .shop-item-price.golden { background: linear-gradient(180deg, #FBBF24 0%, #F59E0B 100%); }
-    .shop-footer { display: flex; justify-content: center; margin-top: 10px; padding-top: 10px; border-top: 2px solid #A855F7; }
-    .stage-select-title { font-size: clamp(12px, 4vw, 18px); color: #00D4FF; margin-bottom: 25px; text-shadow: 0 0 15px #00D4FF; letter-spacing: 3px; z-index: 10; }
-    .stage-buttons { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; z-index: 10; }
-    .stage-btn { width: clamp(120px, 30vw, 160px); height: clamp(140px, 35vw, 180px); background: linear-gradient(180deg, #1E1E3F 0%, #0D0D2B 100%); border: 3px solid #A855F7; cursor: pointer; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; position: relative; }
-    .stage-btn:active { border-color: #FF6B9D; box-shadow: 0 0 20px rgba(255,107,157,0.5); }
+    .shop-footer { display: flex; justify-content: center; margin-top: 8px; padding-top: 8px; border-top: 2px solid #A855F7; }
+    .stage-select-title { font-size: clamp(10px, 3.5vw, 14px); color: #00D4FF; margin-bottom: 20px; text-shadow: 0 0 15px #00D4FF; letter-spacing: 2px; z-index: 10; }
+    .stage-buttons { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; z-index: 10; }
+    .stage-btn { width: clamp(100px, 28vw, 140px); height: clamp(120px, 32vw, 160px); background: linear-gradient(180deg, #1E1E3F 0%, #0D0D2B 100%); border: 3px solid #A855F7; cursor: pointer; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; position: relative; }
     .stage-btn.locked { opacity: 0.4; }
-    .stage-btn-icon { font-size: clamp(32px, 10vw, 48px); margin-bottom: 8px; }
-    .stage-btn-name { font-size: clamp(8px, 2.5vw, 12px); color: #E5E7EB; margin-bottom: 4px; }
-    .stage-btn-stars { font-size: clamp(10px, 3vw, 14px); color: #FBBF24; text-shadow: 0 0 10px #FBBF24; }
-    .stage-btn-locked { position: absolute; top: 8px; right: 8px; font-size: 18px; }
+    .stage-btn-icon { font-size: clamp(28px, 9vw, 42px); margin-bottom: 6px; }
+    .stage-btn-name { font-size: clamp(7px, 2.2vw, 10px); color: #E5E7EB; margin-bottom: 3px; }
+    .stage-btn-stars { font-size: clamp(9px, 2.8vw, 12px); color: #FBBF24; text-shadow: 0 0 10px #FBBF24; }
+    .stage-btn-locked { position: absolute; top: 6px; right: 6px; font-size: 16px; }
     .center-overlay { background: rgba(13,2,33,0.95); }
-    .clear-title { font-size: clamp(18px, 6vw, 28px); color: #FBBF24; margin-bottom: 10px; text-shadow: 0 0 10px #FBBF24, 3px 3px 0 #B45309; animation: pulse 1s ease-in-out infinite; }
-    .clear-stars { font-size: clamp(28px, 10vw, 40px); margin-bottom: 20px; color: #FBBF24; text-shadow: 0 0 20px #FBBF24; }
-    .clear-stats { background: linear-gradient(180deg, #1E1E3F 0%, #0D0D2B 100%); border: 2px solid #A855F7; padding: 15px 30px; margin-bottom: 20px; }
-    .clear-stat { display: flex; justify-content: space-between; color: #9CA3AF; font-size: clamp(8px, 2.5vw, 10px); margin: 8px 0; gap: 40px; }
+    .clear-title { font-size: clamp(16px, 5vw, 24px); color: #FBBF24; margin-bottom: 8px; text-shadow: 0 0 10px #FBBF24, 3px 3px 0 #B45309; animation: pulse 1s ease-in-out infinite; }
+    .clear-stars { font-size: clamp(24px, 8vw, 36px); margin-bottom: 15px; color: #FBBF24; text-shadow: 0 0 20px #FBBF24; }
+    .clear-stats { background: linear-gradient(180deg, #1E1E3F 0%, #0D0D2B 100%); border: 2px solid #A855F7; padding: 12px 25px; margin-bottom: 15px; }
+    .clear-stat { display: flex; justify-content: space-between; color: #9CA3AF; font-size: clamp(7px, 2.2vw, 9px); margin: 6px 0; gap: 30px; }
     .clear-stat-value { color: #00D4FF; text-shadow: 0 0 5px #00D4FF; }
-    .gameover-title { font-size: clamp(20px, 7vw, 32px); color: #EF4444; margin-bottom: 20px; text-shadow: 0 0 10px #EF4444, 3px 3px 0 #7F1D1D; animation: glitch 0.5s ease-in-out infinite; }
+    .gameover-title { font-size: clamp(18px, 6vw, 28px); color: #EF4444; margin-bottom: 15px; text-shadow: 0 0 10px #EF4444, 3px 3px 0 #7F1D1D; animation: glitch 0.5s ease-in-out infinite; }
     @keyframes glitch { 0%, 100% { transform: translate(0); } 25% { transform: translate(-2px, 2px); } 75% { transform: translate(2px, -2px); } }
-    .pause-title { font-size: clamp(18px, 6vw, 24px); color: #A855F7; margin-bottom: 25px; text-shadow: 0 0 20px #A855F7; }
-    .notification { position: fixed; top: 60px; left: 50%; transform: translateX(-50%); background: linear-gradient(180deg, #1E1E3F 0%, #0D0D2B 100%); border: 2px solid #00D4FF; box-shadow: 0 0 20px rgba(0,212,255,0.5); color: #00D4FF; padding: 8px 20px; font-size: clamp(8px, 2.5vw, 10px); z-index: 800; opacity: 0; transition: opacity 0.3s; white-space: nowrap; }
+    .pause-title { font-size: clamp(16px, 5vw, 22px); color: #A855F7; margin-bottom: 20px; text-shadow: 0 0 20px #A855F7; }
+    .notification { position: fixed; top: 55px; left: 50%; transform: translateX(-50%); background: linear-gradient(180deg, #1E1E3F 0%, #0D0D2B 100%); border: 2px solid #00D4FF; box-shadow: 0 0 20px rgba(0,212,255,0.5); color: #00D4FF; padding: 6px 15px; font-size: clamp(7px, 2.2vw, 9px); z-index: 800; opacity: 0; transition: opacity 0.3s; white-space: nowrap; }
     .notification.show { opacity: 1; }
-    #landscapeWarning { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0D0221; z-index: 2000; flex-direction: column; justify-content: center; align-items: center; color: #FF6B9D; text-align: center; padding: 20px; }
-    #landscapeWarning .icon { font-size: 60px; margin-bottom: 20px; animation: rotate 2s ease-in-out infinite; }
+    #landscapeWarning { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #0D0221; z-index: 2000; flex-direction: column; justify-content: center; align-items: center; color: #FF6B9D; text-align: center; padding: 20px; }
+    #landscapeWarning .icon { font-size: 50px; margin-bottom: 15px; animation: rotate 2s ease-in-out infinite; }
     @keyframes rotate { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(90deg); } }
-    #landscapeWarning .text { font-size: 12px; line-height: 2; }
-    @media (max-width: 600px) and (orientation: portrait) { #landscapeWarning { display: flex; } }
+    #landscapeWarning .text { font-size: 10px; line-height: 2; }
+    @media (max-width: 900px) and (orientation: portrait) { #landscapeWarning { display: flex; } }
   </style>
 </head>
 <body>
   <div id="gameContainer">
-    <canvas id="gameCanvas"></canvas>
+    <div id="gameArea"><canvas id="gameCanvas"></canvas></div>
+    <div id="mobileControls">
+      <div id="joystickArea"><div id="joystickBase"></div><div id="joystickKnob"></div></div>
+      <div id="actionButtons">
+        <div id="itemButtons">
+          <div class="item-btn" data-slot="0"><span class="icon">🍞</span><span class="count">0</span></div>
+          <div class="item-btn" data-slot="1"><span class="icon">💊</span><span class="count">0</span></div>
+          <div class="item-btn" data-slot="2"><span class="icon">🛡️</span><span class="count">0</span></div>
+          <div class="item-btn" data-slot="3"><span class="icon">💣</span><span class="count">0</span></div>
+        </div>
+        <div id="poopButton">💩</div>
+      </div>
+    </div>
     <div id="landscapeWarning"><div class="icon">📱</div><div class="text">화면을 가로로 돌려주세요!<br>ROTATE TO LANDSCAPE</div></div>
-    <div id="mobileControls"><div id="joystickArea"><div id="joystickBase"></div><div id="joystickKnob"></div></div><div id="actionButtons"><div id="itemButtons"><div class="item-btn" data-slot="0"><span class="icon">🍞</span><span class="count">0</span></div><div class="item-btn" data-slot="1"><span class="icon">💊</span><span class="count">0</span></div><div class="item-btn" data-slot="2"><span class="icon">🛡️</span><span class="count">0</span></div><div class="item-btn" data-slot="3"><span class="icon">💣</span><span class="count">0</span></div></div><div id="poopButton">💩</div></div></div>
     <div id="pauseBtn" onclick="togglePause()">⏸</div>
-    <div id="mainMenu" class="overlay active"><div class="grid-bg"></div><div class="menu-title">BIRD DROP</div><div class="menu-subtitle">새똥 맞추기</div><canvas id="birdPreview" class="bird-preview" width="64" height="64"></canvas><button class="pixel-btn" onclick="showStageSelect()">▶ START</button><button class="pixel-btn secondary" onclick="openShopFromMenu()">⬡ SHOP</button><div class="controls-info mobile-hide"><div><kbd>←</kbd><kbd>↑</kbd><kbd>→</kbd><kbd>↓</kbd> MOVE</div><div><kbd>SPACE</kbd> DROP</div><div><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><kbd>4</kbd> ITEM</div></div></div>
-    <div id="stageSelect" class="overlay"><div class="grid-bg"></div><div class="stage-select-title">[ SELECT STAGE ]</div><div class="stage-buttons"><div class="stage-btn" onclick="startStage(1)"><div class="stage-btn-icon">🏙️</div><div class="stage-btn-name">STAGE 1</div><div style="font-size:7px;color:#9CA3AF;margin-bottom:8px;">인 도</div><div class="stage-btn-stars" id="stage1Stars">☆☆☆</div></div><div class="stage-btn" id="stage2Btn" onclick="startStage(2)"><div class="stage-btn-icon">🌳</div><div class="stage-btn-name">STAGE 2</div><div style="font-size:7px;color:#9CA3AF;margin-bottom:8px;">공 원</div><div class="stage-btn-stars" id="stage2Stars">☆☆☆</div><div class="stage-btn-locked" id="stage2Lock">🔒</div></div></div><button class="pixel-btn secondary" style="margin-top:25px;" onclick="showMainMenu()">◀ BACK</button></div>
+    <div id="fullscreenBtn" onclick="goFullscreen()">⛶</div>
+    <div id="mainMenu" class="overlay active"><div class="grid-bg"></div><div class="menu-title">BIRD DROP</div><div class="menu-subtitle">새똥 맞추기</div><canvas id="birdPreview" class="bird-preview" width="56" height="56"></canvas><button class="pixel-btn" onclick="showStageSelect()">▶ START</button><button class="pixel-btn secondary" onclick="openShopFromMenu()">⬡ SHOP</button><div class="controls-info mobile-hide"><div><kbd>←</kbd><kbd>↑</kbd><kbd>→</kbd><kbd>↓</kbd> MOVE</div><div><kbd>SPACE</kbd> DROP</div><div><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><kbd>4</kbd> ITEM</div></div></div>
+    <div id="stageSelect" class="overlay"><div class="grid-bg"></div><div class="stage-select-title">[ SELECT STAGE ]</div><div class="stage-buttons"><div class="stage-btn" onclick="startStage(1)"><div class="stage-btn-icon">🏙️</div><div class="stage-btn-name">STAGE 1</div><div style="font-size:6px;color:#9CA3AF;margin-bottom:6px;">인 도</div><div class="stage-btn-stars" id="stage1Stars">☆☆☆</div></div><div class="stage-btn" id="stage2Btn" onclick="startStage(2)"><div class="stage-btn-icon">🌳</div><div class="stage-btn-name">STAGE 2</div><div style="font-size:6px;color:#9CA3AF;margin-bottom:6px;">공 원</div><div class="stage-btn-stars" id="stage2Stars">☆☆☆</div><div class="stage-btn-locked" id="stage2Lock">🔒</div></div></div><button class="pixel-btn secondary" style="margin-top:20px;" onclick="showMainMenu()">◀ BACK</button></div>
     <div id="shopOverlay" class="overlay shop-overlay"><div class="shop-header"><div class="shop-title">⬡ SHOP</div><div class="shop-currency"><div class="currency-box">🪶 <span id="shopFeathers">0</span></div><div class="currency-box">✦ <span id="shopGoldenFeathers">0</span></div></div></div><div class="shop-tabs"><button class="shop-tab active" onclick="switchShopTab(this,'consumables')">ITEMS</button><button class="shop-tab" onclick="switchShopTab(this,'upgrades')">UPGRADE</button><button class="shop-tab" onclick="switchShopTab(this,'birds')">BIRDS</button></div><div class="shop-items" id="shopItems"></div><div class="shop-footer"><button class="pixel-btn" onclick="closeShop()">◀ CONTINUE</button></div></div>
     <div id="stageClearOverlay" class="overlay center-overlay"><div class="clear-title">★ STAGE CLEAR ★</div><div class="clear-stars" id="clearStars">⭐⭐⭐</div><div class="clear-stats"><div class="clear-stat"><span>SCORE</span><span class="clear-stat-value" id="clearScore">0</span></div><div class="clear-stat"><span>ACCURACY</span><span class="clear-stat-value" id="clearAccuracy">0%</span></div><div class="clear-stat"><span>FEATHERS</span><span class="clear-stat-value" id="clearFeathers">🪶 0</span></div><div class="clear-stat"><span>GOLDEN</span><span class="clear-stat-value" id="clearGoldenFeathers">✦ 0</span></div></div><button class="pixel-btn" onclick="openShop()">⬡ SHOP</button><button class="pixel-btn secondary" onclick="showStageSelect()">▶ NEXT</button></div>
     <div id="gameoverOverlay" class="overlay center-overlay"><div class="gameover-title">GAME OVER</div><div class="clear-stats"><div class="clear-stat"><span>SCORE</span><span class="clear-stat-value" id="goScore">0</span></div><div class="clear-stat"><span>FEATHERS</span><span class="clear-stat-value" id="goFeathers">🪶 0</span></div></div><button class="pixel-btn" onclick="retryStage()">↻ RETRY</button><button class="pixel-btn secondary" onclick="showStageSelect()">◀ EXIT</button></div>
     <div id="pauseOverlay" class="overlay center-overlay"><div class="pause-title">II PAUSED</div><button class="pixel-btn" onclick="resumeGame()">▶ RESUME</button><button class="pixel-btn secondary" onclick="openShopFromPause()">⬡ SHOP</button><button class="pixel-btn secondary" onclick="quitToMenu()">✕ QUIT</button></div>
     <div id="notification" class="notification"></div>
   </div>
+  <script>
+    function goFullscreen() {
+      const el = document.documentElement;
+      if (el.requestFullscreen) el.requestFullscreen();
+      else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+      else if (el.msRequestFullscreen) el.msRequestFullscreen();
+    }
+    document.addEventListener('fullscreenchange', () => {
+      const btn = document.getElementById('fullscreenBtn');
+      btn.textContent = document.fullscreenElement ? '✖' : '⛶';
+    });
+  </script>
   <script src="game.js"></script>
 </body>
 </html>
