@@ -3,26 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dragon Adventure Prototype</title>
+    <title>용 모험 - Dragon Adventure</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <h1>🐉 Dragon Adventure</h1>
+        <h1>🐉 용 모험</h1>
         
         <div id="startScreen" class="screen">
-            <p class="intro-text">Embark on an epic journey to find and awaken the ancient dragon!</p>
-            <button id="startBtn" class="btn btn-primary">Start Adventure</button>
+            <p class="intro-text">전설의 용을 찾아 떠나는 신나는 모험!</p>
+            <button id="startBtn" class="btn btn-primary">모험 시작!</button>
         </div>
 
         <div id="gameScreen" class="screen hidden">
             <div class="chapter-header">
-                <span id="chapterNumber" class="chapter-number">Chapter 1</span>
+                <span id="chapterNumber" class="chapter-number">제1장</span>
                 <h2 id="chapterTitle" class="chapter-title"></h2>
             </div>
             
             <div class="mission-box">
-                <span class="mission-label">📋 Mission:</span>
+                <span class="mission-label">🎯 미션:</span>
                 <span id="missionText"></span>
             </div>
             
@@ -31,44 +31,56 @@
             </div>
             
             <div class="choices-section">
-                <h3>What will you do?</h3>
+                <h3>어떻게 할까?</h3>
                 <div id="choicesContainer"></div>
             </div>
             
             <div class="item-section">
-                <button id="getItemBtn" class="btn btn-item">🎁 Get Key Item</button>
+                <button id="getItemBtn" class="btn btn-item">🎁 아이템 얻기</button>
                 <p id="itemStatus" class="item-status"></p>
             </div>
             
             <div class="log-section">
-                <h3>📜 Adventure Log</h3>
+                <h3>📝 모험 기록</h3>
                 <div id="logContainer" class="log-container"></div>
             </div>
         </div>
 
-        <!-- Summary Card Modal -->
+        <!-- 요약 카드 모달 -->
         <div id="summaryModal" class="modal hidden">
             <div class="summary-card">
                 <div class="summary-header">
-                    <span class="summary-badge">✨ Chapter Complete!</span>
+                    <span class="summary-badge">✨ 이번 장 완료!</span>
                 </div>
                 <div class="summary-body">
-                    <p id="summaryText" class="summary-text"></p>
-                    <p id="summaryChoices" class="summary-choices"></p>
-                    <p id="summaryItem" class="summary-item"></p>
-                    <p id="summaryNext" class="summary-next"></p>
+                    <div class="summary-block">
+                        <span class="summary-label">✔ 이번 장 요약</span>
+                        <p id="summaryText" class="summary-text"></p>
+                    </div>
+                    <div class="summary-block">
+                        <span class="summary-label">✔ 내가 한 선택</span>
+                        <p id="summaryChoices" class="summary-choices"></p>
+                    </div>
+                    <div class="summary-block">
+                        <span class="summary-label">🎁 얻은 아이템</span>
+                        <p id="summaryItem" class="summary-item"></p>
+                    </div>
+                    <div class="summary-block">
+                        <span class="summary-label">➡ 다음 장</span>
+                        <p id="summaryNext" class="summary-next"></p>
+                    </div>
                 </div>
                 <div class="summary-buttons">
-                    <button id="nextChapterBtn" class="btn btn-primary">Next Chapter ➡️</button>
-                    <button id="replayChapterBtn" class="btn btn-secondary">🔄 Replay Chapter</button>
+                    <button id="nextChapterBtn" class="btn btn-primary">다음 장으로 ➡️</button>
+                    <button id="replayChapterBtn" class="btn btn-secondary">🔄 다시 해보기</button>
                 </div>
             </div>
         </div>
 
         <div id="endScreen" class="screen hidden">
-            <h2>🎉 Adventure Complete!</h2>
-            <p>You have awakened the ancient dragon and earned its blessing!</p>
-            <button id="restartBtn" class="btn btn-primary">Play Again</button>
+            <h2>🎉 모험 완료!</h2>
+            <p>용과 친구가 되었어! 정말 대단해!</p>
+            <button id="restartBtn" class="btn btn-primary">다시 하기</button>
         </div>
     </div>
     <script src="app.js"></script>

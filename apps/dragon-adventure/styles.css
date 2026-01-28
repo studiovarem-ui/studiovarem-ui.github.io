@@ -246,9 +246,9 @@ h1 {
     background: linear-gradient(145deg, #2c3e50, #1a252f);
     border-radius: 20px;
     padding: 1.5rem;
-    max-width: 400px;
+    max-width: 380px;
     width: 100%;
-    border: 2px solid #f39c12;
+    border: 3px solid #f39c12;
     box-shadow: 0 10px 40px rgba(243, 156, 18, 0.3);
     animation: popIn 0.3s ease-out;
 }
@@ -266,32 +266,49 @@ h1 {
 
 .summary-header {
     text-align: center;
-    margin-bottom: 1rem;
+    margin-bottom: 1.2rem;
 }
 
 .summary-badge {
     display: inline-block;
     background: linear-gradient(145deg, #f39c12, #e67e22);
     color: #1a1a2e;
-    padding: 0.5rem 1.5rem;
+    padding: 0.6rem 1.8rem;
     border-radius: 25px;
     font-weight: bold;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
 }
 
 .summary-body {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.2rem;
 }
 
-.summary-body p {
+.summary-block {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 0.8rem;
     margin-bottom: 0.6rem;
-    line-height: 1.5;
-    font-size: 0.95rem;
+}
+
+.summary-block:last-child {
+    margin-bottom: 0;
+}
+
+.summary-label {
+    display: block;
+    font-size: 0.85rem;
+    color: #888;
+    margin-bottom: 0.3rem;
+}
+
+.summary-block p {
+    margin: 0;
+    line-height: 1.4;
+    font-size: 1rem;
 }
 
 .summary-text {
     color: #fff;
-    font-weight: 500;
 }
 
 .summary-choices {
@@ -306,7 +323,6 @@ h1 {
 
 .summary-next {
     color: #f39c12;
-    font-style: italic;
 }
 
 .summary-buttons {

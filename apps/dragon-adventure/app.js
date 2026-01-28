@@ -1,46 +1,70 @@
-// Dragon Adventure - JSON-based Chapter System with Summary Cards
+// 용 모험 - 한국어 10살용 요약 카드 시스템
 (function() {
     'use strict';
 
-    // Game State
+    // 게임 상태
     const state = {
         chapters: [],
         currentChapter: 0,
         log: [],
         items: [],
-        chapterChoices: []  // Choices made in current chapter
+        chapterChoices: []
     };
 
-    // Chapter summaries (kid-friendly, 1 line each)
+    // 이번 장 요약 (10살용 쉽고 짧은 한국어)
     const chapterSummaries = {
-        1: "You explored the village and found a secret scroll!",
-        2: "You bravely walked through the magical forest!",
-        3: "You discovered the sparkling crystal caves!",
-        4: "You climbed the huge dragon mountain!",
-        5: "You woke up the ancient dragon and became friends!"
+        1: "마을에서 단서를 찾았어!",
+        2: "신비한 숲을 용감하게 통과했어!",
+        3: "반짝이는 수정 동굴을 탐험했어!",
+        4: "높은 용의 산을 올랐어!",
+        5: "용을 깨우고 친구가 되었어!"
     };
 
-    // Next chapter teasers with questions
+    // 다음 장 예고 + 질문 (10살용)
     const nextChapterTeasers = {
-        1: "A spooky forest awaits... Will you be brave?",
-        2: "Shiny caves are ahead... What will you find?",
-        3: "The dragon's mountain is near... Are you ready to climb?",
-        4: "The dragon is sleeping... How will you wake it?"
+        1: "속삭이는 숲으로 가볼까?",
+        2: "반짝이는 동굴에 뭐가 있을까?",
+        3: "높은 산을 올라갈 수 있을까?",
+        4: "자고 있는 용을 어떻게 깨울까?"
     };
 
-    // Item emoji mapping
-    const itemEmojis = {
-        "Ancient Scroll": "📜",
-        "Forest Compass": "🧭",
-        "Crystal Key": "🔑",
-        "Dragon Scale Amulet": "🧿",
-        "Dragon's Blessing": "🌟"
+    // 아이템 한국어 이름 + 이모지
+    const itemsKorean = {
+        "Ancient Scroll": { name: "고대의 두루마리", emoji: "📜" },
+        "Forest Compass": { name: "숲의 나침반", emoji: "🧭" },
+        "Crystal Key": { name: "수정 열쇠", emoji: "🔑" },
+        "Dragon Scale Amulet": { name: "용의 비늘 목걸이", emoji: "🧿" },
+        "Dragon's Blessing": { name: "용의 축복", emoji: "🌟" }
     };
 
-    // DOM Elements
+    // 선택지 한국어 변환
+    const choicesKorean = {
+        "Talk to the village elder": "마을 장로에게 물어봤어",
+        "Visit the old library": "오래된 도서관에 갔어",
+        "Explore the marketplace": "시장을 둘러봤어",
+        "Wander into the forest edge": "숲 근처를 걸어봤어",
+        "Follow the glowing mushrooms": "반짝이는 버섯을 따라갔어",
+        "Listen to where the wind blows strongest": "바람 소리를 들었어",
+        "Ask a friendly forest spirit for guidance": "숲의 요정에게 길을 물어봤어",
+        "Climb a tall tree to see above the canopy": "높은 나무에 올라갔어",
+        "Follow the warmest air current": "따뜻한 바람을 따라갔어",
+        "Examine the crystal patterns on the walls": "벽의 수정 무늬를 살펴봤어",
+        "Search for ancient markings or symbols": "오래된 표시를 찾아봤어",
+        "Listen for echoes from deeper within": "동굴 속 메아리를 들었어",
+        "Take the main stone stairway": "돌 계단으로 올라갔어",
+        "Find an alternative climbing route": "다른 길을 찾아봤어",
+        "Search for a hidden tunnel entrance": "숨겨진 터널을 찾았어",
+        "Call out to announce your peaceful intentions": "큰 소리로 인사했어",
+        "Approach slowly and bow respectfully": "천천히 다가가서 절했어",
+        "Sing an ancient dragon lullaby in reverse": "용의 자장가를 거꾸로 불렀어",
+        "Place the amulet near the dragon's heart": "목걸이를 용의 심장 근처에 놓았어",
+        "Speak words of friendship and peace": "친구가 되자고 말했어"
+    };
+
+    // DOM 요소
     const elements = {};
 
-    // Initialize
+    // 초기화
     document.addEventListener('DOMContentLoaded', init);
 
     async function init() {
@@ -63,7 +87,7 @@
         elements.getItemBtn = document.getElementById('getItemBtn');
         elements.itemStatus = document.getElementById('itemStatus');
         elements.logContainer = document.getElementById('logContainer');
-        // Summary modal elements
+        // 요약 카드 요소
         elements.summaryModal = document.getElementById('summaryModal');
         elements.summaryText = document.getElementById('summaryText');
         elements.summaryChoices = document.getElementById('summaryChoices');
@@ -82,7 +106,7 @@
             console.log('Chapters loaded:', state.chapters.length);
         } catch (error) {
             console.error('Error loading chapters:', error);
-            elements.startBtn.textContent = 'Error Loading Game';
+            elements.startBtn.textContent = '로딩 실패';
             elements.startBtn.disabled = true;
         }
     }
@@ -101,7 +125,7 @@
         state.items = [];
         state.chapterChoices = [];
         showScreen('game');
-        addLog('🐉 Adventure begins!', 'chapter');
+        addLog('🐉 모험이 시작됐어!', 'chapter');
         renderChapter();
     }
 
@@ -123,28 +147,29 @@
         const chapter = state.chapters[state.currentChapter];
         if (!chapter) return;
 
-        // Reset chapter choices
+        // 선택 초기화
         state.chapterChoices = [];
 
-        // Update header
-        elements.chapterNumber.textContent = `Chapter ${chapter.id}`;
+        // 헤더
+        elements.chapterNumber.textContent = `제${chapter.id}장`;
         elements.chapterTitle.textContent = chapter.title;
 
-        // Update content
+        // 내용
         elements.missionText.textContent = chapter.mission;
         elements.introText.textContent = chapter.intro;
 
-        // Render choices
+        // 선택지
         renderChoices(chapter.choices);
 
-        // Reset item button
+        // 아이템 버튼
+        const itemInfo = itemsKorean[chapter.keyItem] || { name: chapter.keyItem, emoji: '🎁' };
         elements.getItemBtn.disabled = false;
-        elements.getItemBtn.textContent = `🎁 Get Key Item: ${chapter.keyItem}`;
+        elements.getItemBtn.textContent = `🎁 아이템 얻기: ${itemInfo.name}`;
         elements.itemStatus.textContent = '';
 
-        // Log chapter start
+        // 로그
         if (state.currentChapter > 0) {
-            addLog(`📖 Entered ${chapter.title}`, 'chapter');
+            addLog(`📖 ${chapter.title}에 도착!`, 'chapter');
         }
     }
 
@@ -161,23 +186,23 @@
     }
 
     function makeChoice(choice) {
-        // Store choice for summary
         state.chapterChoices.push(choice);
-        addLog(`➡️ You chose: "${choice}"`, 'choice');
+        const koreanChoice = choicesKorean[choice] || choice;
+        addLog(`➡️ ${koreanChoice}`, 'choice');
     }
 
     function getKeyItem() {
         const chapter = state.chapters[state.currentChapter];
         const item = chapter.keyItem;
+        const itemInfo = itemsKorean[item] || { name: item, emoji: '🎁' };
 
         state.items.push(item);
-        addLog(`✨ Obtained: ${item}`, 'item');
+        addLog(`✨ ${itemInfo.emoji} ${itemInfo.name} 획득!`, 'item');
 
         elements.getItemBtn.disabled = true;
-        elements.getItemBtn.textContent = '✅ Item Obtained!';
-        elements.itemStatus.textContent = `You got the ${item}!`;
+        elements.getItemBtn.textContent = '✅ 아이템 획득!';
+        elements.itemStatus.textContent = `${itemInfo.name}을(를) 얻었어!`;
 
-        // Show summary card after short delay
         setTimeout(() => {
             showSummaryCard();
         }, 1000);
@@ -187,33 +212,34 @@
         const chapter = state.chapters[state.currentChapter];
         const chapterId = chapter.id;
         const isLastChapter = state.currentChapter >= state.chapters.length - 1;
+        const itemInfo = itemsKorean[chapter.keyItem] || { name: chapter.keyItem, emoji: '🎁' };
 
-        // 1. Chapter summary (1 line)
-        elements.summaryText.textContent = `📖 ${chapterSummaries[chapterId]}`;
+        // 1. 이번 장 요약
+        elements.summaryText.textContent = chapterSummaries[chapterId];
 
-        // 2. Top 2 choices (most recent)
+        // 2. 내가 한 선택 TOP 2
         const recentChoices = state.chapterChoices.slice(-2);
         if (recentChoices.length > 0) {
-            const choicesText = recentChoices.map((c, i) => `${i + 1}. ${c}`).join(' / ');
-            elements.summaryChoices.textContent = `🎯 Your choices: ${choicesText}`;
+            const choicesList = recentChoices
+                .map(c => `- ${choicesKorean[c] || c}`)
+                .join('\n');
+            elements.summaryChoices.innerHTML = choicesList.replace(/\n/g, '<br>');
         } else {
-            elements.summaryChoices.textContent = '🎯 No choices made yet!';
+            elements.summaryChoices.textContent = '아직 선택을 안 했어!';
         }
 
-        // 3. Key item with emoji
-        const emoji = itemEmojis[chapter.keyItem] || '🎁';
-        elements.summaryItem.textContent = `${emoji} Got: ${chapter.keyItem}!`;
+        // 3. 얻은 아이템
+        elements.summaryItem.textContent = `${itemInfo.emoji} ${itemInfo.name}`;
 
-        // 4. Next chapter teaser or ending
+        // 4. 다음 장 예고
         if (isLastChapter) {
-            elements.summaryNext.textContent = '🎉 You completed the adventure!';
-            elements.nextChapterBtn.textContent = 'See Ending 🌟';
+            elements.summaryNext.textContent = '모험이 끝났어! 정말 대단해!';
+            elements.nextChapterBtn.textContent = '엔딩 보기 🌟';
         } else {
-            elements.summaryNext.textContent = `🔮 ${nextChapterTeasers[chapterId]}`;
-            elements.nextChapterBtn.textContent = 'Next Chapter ➡️';
+            elements.summaryNext.textContent = nextChapterTeasers[chapterId];
+            elements.nextChapterBtn.textContent = '다음 장으로 ➡️';
         }
 
-        // Show modal
         elements.summaryModal.classList.remove('hidden');
     }
 
@@ -235,23 +261,16 @@
     function replayChapter() {
         hideSummaryCard();
         
-        // Remove the item we just got
         if (state.items.length > 0) {
             state.items.pop();
         }
-
-        // Clear chapter choices
         state.chapterChoices = [];
-
-        // Add replay log
-        addLog('🔄 Replaying chapter...', 'chapter');
-
-        // Re-render current chapter
+        addLog('🔄 다시 해보기!', 'chapter');
         renderChapter();
     }
 
     function endGame() {
-        addLog('🎉 Adventure Complete!', 'chapter');
+        addLog('🎉 모험 완료!', 'chapter');
         showScreen('end');
     }
 
