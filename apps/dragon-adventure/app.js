@@ -1,4 +1,4 @@
-// Dragon Adventure - JSON-based Chapter System
+// Dragon Adventure - JSON-based Chapter System with Summary Cards
 (function() {
     'use strict';
 
@@ -7,7 +7,34 @@
         chapters: [],
         currentChapter: 0,
         log: [],
-        items: []
+        items: [],
+        chapterChoices: []  // Choices made in current chapter
+    };
+
+    // Chapter summaries (kid-friendly, 1 line each)
+    const chapterSummaries = {
+        1: "You explored the village and found a secret scroll!",
+        2: "You bravely walked through the magical forest!",
+        3: "You discovered the sparkling crystal caves!",
+        4: "You climbed the huge dragon mountain!",
+        5: "You woke up the ancient dragon and became friends!"
+    };
+
+    // Next chapter teasers with questions
+    const nextChapterTeasers = {
+        1: "A spooky forest awaits... Will you be brave?",
+        2: "Shiny caves are ahead... What will you find?",
+        3: "The dragon's mountain is near... Are you ready to climb?",
+        4: "The dragon is sleeping... How will you wake it?"
+    };
+
+    // Item emoji mapping
+    const itemEmojis = {
+        "Ancient Scroll": "📜",
+        "Forest Compass": "🧭",
+        "Crystal Key": "🔑",
+        "Dragon Scale Amulet": "🧿",
+        "Dragon's Blessing": "🌟"
     };
 
     // DOM Elements
@@ -36,6 +63,14 @@
         elements.getItemBtn = document.getElementById('getItemBtn');
         elements.itemStatus = document.getElementById('itemStatus');
         elements.logContainer = document.getElementById('logContainer');
+        // Summary modal elements
+        elements.summaryModal = document.getElementById('summaryModal');
+        elements.summaryText = document.getElementById('summaryText');
+        elements.summaryChoices = document.getElementById('summaryChoices');
+        elements.summaryItem = document.getElementById('summaryItem');
+        elements.summaryNext = document.getElementById('summaryNext');
+        elements.nextChapterBtn = document.getElementById('nextChapterBtn');
+        elements.replayChapterBtn = document.getElementById('replayChapterBtn');
     }
 
     async function loadChapters() {
@@ -56,12 +91,15 @@
         elements.startBtn.addEventListener('click', startGame);
         elements.restartBtn.addEventListener('click', restartGame);
         elements.getItemBtn.addEventListener('click', getKeyItem);
+        elements.nextChapterBtn.addEventListener('click', goToNextChapter);
+        elements.replayChapterBtn.addEventListener('click', replayChapter);
     }
 
     function startGame() {
         state.currentChapter = 0;
         state.log = [];
         state.items = [];
+        state.chapterChoices = [];
         showScreen('game');
         addLog('🐉 Adventure begins!', 'chapter');
         renderChapter();
@@ -84,6 +122,9 @@
     function renderChapter() {
         const chapter = state.chapters[state.currentChapter];
         if (!chapter) return;
+
+        // Reset chapter choices
+        state.chapterChoices = [];
 
         // Update header
         elements.chapterNumber.textContent = `Chapter ${chapter.id}`;
@@ -120,6 +161,8 @@
     }
 
     function makeChoice(choice) {
+        // Store choice for summary
+        state.chapterChoices.push(choice);
         addLog(`➡️ You chose: "${choice}"`, 'choice');
     }
 
@@ -134,13 +177,52 @@
         elements.getItemBtn.textContent = '✅ Item Obtained!';
         elements.itemStatus.textContent = `You got the ${item}!`;
 
-        // Auto advance after short delay
+        // Show summary card after short delay
         setTimeout(() => {
-            advanceChapter();
-        }, 1500);
+            showSummaryCard();
+        }, 1000);
     }
 
-    function advanceChapter() {
+    function showSummaryCard() {
+        const chapter = state.chapters[state.currentChapter];
+        const chapterId = chapter.id;
+        const isLastChapter = state.currentChapter >= state.chapters.length - 1;
+
+        // 1. Chapter summary (1 line)
+        elements.summaryText.textContent = `📖 ${chapterSummaries[chapterId]}`;
+
+        // 2. Top 2 choices (most recent)
+        const recentChoices = state.chapterChoices.slice(-2);
+        if (recentChoices.length > 0) {
+            const choicesText = recentChoices.map((c, i) => `${i + 1}. ${c}`).join(' / ');
+            elements.summaryChoices.textContent = `🎯 Your choices: ${choicesText}`;
+        } else {
+            elements.summaryChoices.textContent = '🎯 No choices made yet!';
+        }
+
+        // 3. Key item with emoji
+        const emoji = itemEmojis[chapter.keyItem] || '🎁';
+        elements.summaryItem.textContent = `${emoji} Got: ${chapter.keyItem}!`;
+
+        // 4. Next chapter teaser or ending
+        if (isLastChapter) {
+            elements.summaryNext.textContent = '🎉 You completed the adventure!';
+            elements.nextChapterBtn.textContent = 'See Ending 🌟';
+        } else {
+            elements.summaryNext.textContent = `🔮 ${nextChapterTeasers[chapterId]}`;
+            elements.nextChapterBtn.textContent = 'Next Chapter ➡️';
+        }
+
+        // Show modal
+        elements.summaryModal.classList.remove('hidden');
+    }
+
+    function hideSummaryCard() {
+        elements.summaryModal.classList.add('hidden');
+    }
+
+    function goToNextChapter() {
+        hideSummaryCard();
         state.currentChapter++;
 
         if (state.currentChapter >= state.chapters.length) {
@@ -148,6 +230,24 @@
         } else {
             renderChapter();
         }
+    }
+
+    function replayChapter() {
+        hideSummaryCard();
+        
+        // Remove the item we just got
+        if (state.items.length > 0) {
+            state.items.pop();
+        }
+
+        // Clear chapter choices
+        state.chapterChoices = [];
+
+        // Add replay log
+        addLog('🔄 Replaying chapter...', 'chapter');
+
+        // Re-render current chapter
+        renderChapter();
     }
 
     function endGame() {

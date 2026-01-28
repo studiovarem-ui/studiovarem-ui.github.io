@@ -70,6 +70,17 @@ h1 {
     box-shadow: 0 6px 20px rgba(231, 76, 60, 0.6);
 }
 
+.btn-secondary {
+    background: rgba(149, 165, 166, 0.3);
+    color: #bdc3c7;
+    border: 1px solid #7f8c8d;
+}
+
+.btn-secondary:hover {
+    background: rgba(149, 165, 166, 0.5);
+    transform: translateY(-2px);
+}
+
 .btn-choice {
     background: rgba(52, 152, 219, 0.2);
     color: #3498db;
@@ -210,6 +221,98 @@ h1 {
 .log-entry.chapter {
     color: #f39c12;
     font-weight: bold;
+}
+
+/* Summary Card Modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 1rem;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.summary-card {
+    background: linear-gradient(145deg, #2c3e50, #1a252f);
+    border-radius: 20px;
+    padding: 1.5rem;
+    max-width: 400px;
+    width: 100%;
+    border: 2px solid #f39c12;
+    box-shadow: 0 10px 40px rgba(243, 156, 18, 0.3);
+    animation: popIn 0.3s ease-out;
+}
+
+@keyframes popIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.summary-header {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.summary-badge {
+    display: inline-block;
+    background: linear-gradient(145deg, #f39c12, #e67e22);
+    color: #1a1a2e;
+    padding: 0.5rem 1.5rem;
+    border-radius: 25px;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.summary-body {
+    margin-bottom: 1.5rem;
+}
+
+.summary-body p {
+    margin-bottom: 0.6rem;
+    line-height: 1.5;
+    font-size: 0.95rem;
+}
+
+.summary-text {
+    color: #fff;
+    font-weight: 500;
+}
+
+.summary-choices {
+    color: #3498db;
+}
+
+.summary-item {
+    color: #2ecc71;
+    font-weight: bold;
+    font-size: 1.1rem !important;
+}
+
+.summary-next {
+    color: #f39c12;
+    font-style: italic;
+}
+
+.summary-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 
 /* End Screen */
