@@ -1,0 +1,69 @@
+{
+  "chapters": [
+    {
+      "id": 1,
+      "title": "The Awakening Village",
+      "mission": "Find a clue about where the ancient dragon sleeps",
+      "intro": "You wake up in a small village at the edge of a misty forest. The villagers whisper about a legendary dragon that once protected these lands. They say someone here might know where it rests.",
+      "choices": [
+        "Talk to the village elder",
+        "Visit the old library",
+        "Explore the marketplace",
+        "Wander into the forest edge"
+      ],
+      "keyItem": "Ancient Scroll"
+    },
+    {
+      "id": 2,
+      "title": "The Whispering Forest",
+      "mission": "Navigate through the enchanted forest to find the hidden path",
+      "intro": "Armed with the Ancient Scroll, you enter the Whispering Forest. The trees seem alive, their leaves rustling with secrets. Strange creatures watch from the shadows, and multiple paths wind deeper into the woods.",
+      "choices": [
+        "Follow the glowing mushrooms",
+        "Listen to where the wind blows strongest",
+        "Ask a friendly forest spirit for guidance",
+        "Climb a tall tree to see above the canopy"
+      ],
+      "keyItem": "Forest Compass"
+    },
+    {
+      "id": 3,
+      "title": "The Crystal Caverns",
+      "mission": "Discover the secret entrance to the dragon's mountain",
+      "intro": "The forest path leads you to magnificent crystal caverns. Light dances off countless gems embedded in the walls. Somewhere within these sparkling tunnels lies the way to the Dragon's Mountain.",
+      "choices": [
+        "Follow the warmest air current",
+        "Examine the crystal patterns on the walls",
+        "Search for ancient markings or symbols",
+        "Listen for echoes from deeper within"
+      ],
+      "keyItem": "Crystal Key"
+    },
+    {
+      "id": 4,
+      "title": "The Dragon's Mountain",
+      "mission": "Reach the dragon's lair at the peak",
+      "intro": "You stand at the base of a towering mountain wreathed in clouds. The air grows warmer as you ascend. Ancient stairs carved into the rock wind upward, but the path is treacherous and guardians may lurk ahead.",
+      "choices": [
+        "Take the main stone stairway",
+        "Find an alternative climbing route",
+        "Search for a hidden tunnel entrance",
+        "Call out to announce your peaceful intentions"
+      ],
+      "keyItem": "Dragon Scale Amulet"
+    },
+    {
+      "id": 5,
+      "title": "The Awakening",
+      "mission": "Wake the ancient dragon and earn its trust",
+      "intro": "You finally reach the dragon's lair—a vast chamber filled with golden light. Before you lies the magnificent ancient dragon, slumbering peacefully. The Dragon Scale Amulet glows warmly in your hand. How will you approach this legendary creature?",
+      "choices": [
+        "Approach slowly and bow respectfully",
+        "Sing an ancient dragon lullaby in reverse",
+        "Place the amulet near the dragon's heart",
+        "Speak words of friendship and peace"
+      ],
+      "keyItem": "Dragon's Blessing"
+    }
+  ]
+}
