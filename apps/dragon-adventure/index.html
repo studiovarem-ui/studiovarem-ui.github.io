@@ -8,9 +8,49 @@
 </head>
 <body>
     <div class="container">
-        <h1>Dragon Adventure Prototype</h1>
-        <button id="startBtn" class="start-button">Start Chapter 1</button>
-        <div id="storyContent" class="story-content"></div>
+        <h1>🐉 Dragon Adventure</h1>
+        
+        <div id="startScreen" class="screen">
+            <p class="intro-text">Embark on an epic journey to find and awaken the ancient dragon!</p>
+            <button id="startBtn" class="btn btn-primary">Start Adventure</button>
+        </div>
+
+        <div id="gameScreen" class="screen hidden">
+            <div class="chapter-header">
+                <span id="chapterNumber" class="chapter-number">Chapter 1</span>
+                <h2 id="chapterTitle" class="chapter-title"></h2>
+            </div>
+            
+            <div class="mission-box">
+                <span class="mission-label">📋 Mission:</span>
+                <span id="missionText"></span>
+            </div>
+            
+            <div class="story-box">
+                <p id="introText"></p>
+            </div>
+            
+            <div class="choices-section">
+                <h3>What will you do?</h3>
+                <div id="choicesContainer"></div>
+            </div>
+            
+            <div class="item-section">
+                <button id="getItemBtn" class="btn btn-item">🎁 Get Key Item</button>
+                <p id="itemStatus" class="item-status"></p>
+            </div>
+            
+            <div class="log-section">
+                <h3>📜 Adventure Log</h3>
+                <div id="logContainer" class="log-container"></div>
+            </div>
+        </div>
+
+        <div id="endScreen" class="screen hidden">
+            <h2>🎉 Adventure Complete!</h2>
+            <p>You have awakened the ancient dragon and earned its blessing!</p>
+            <button id="restartBtn" class="btn btn-primary">Play Again</button>
+        </div>
     </div>
     <script src="app.js"></script>
 </body>
