@@ -37,28 +37,28 @@
         "Dragon's Blessing": { name: "용의 축복", emoji: "🌟" }
     };
 
-    // 선택지 한국어 변환
+    // 선택지 한국어 변환 (로그용)
     const choicesKorean = {
-        "Talk to the village elder": "마을 장로에게 물어봤어",
-        "Visit the old library": "오래된 도서관에 갔어",
-        "Explore the marketplace": "시장을 둘러봤어",
-        "Wander into the forest edge": "숲 근처를 걸어봤어",
-        "Follow the glowing mushrooms": "반짝이는 버섯을 따라갔어",
-        "Listen to where the wind blows strongest": "바람 소리를 들었어",
-        "Ask a friendly forest spirit for guidance": "숲의 요정에게 길을 물어봤어",
-        "Climb a tall tree to see above the canopy": "높은 나무에 올라갔어",
-        "Follow the warmest air current": "따뜻한 바람을 따라갔어",
-        "Examine the crystal patterns on the walls": "벽의 수정 무늬를 살펴봤어",
-        "Search for ancient markings or symbols": "오래된 표시를 찾아봤어",
-        "Listen for echoes from deeper within": "동굴 속 메아리를 들었어",
-        "Take the main stone stairway": "돌 계단으로 올라갔어",
-        "Find an alternative climbing route": "다른 길을 찾아봤어",
-        "Search for a hidden tunnel entrance": "숨겨진 터널을 찾았어",
-        "Call out to announce your peaceful intentions": "큰 소리로 인사했어",
-        "Approach slowly and bow respectfully": "천천히 다가가서 절했어",
-        "Sing an ancient dragon lullaby in reverse": "용의 자장가를 거꾸로 불렀어",
-        "Place the amulet near the dragon's heart": "목걸이를 용의 심장 근처에 놓았어",
-        "Speak words of friendship and peace": "친구가 되자고 말했어"
+        "마을 장로에게 물어보기": "마을 장로에게 물어봤어",
+        "오래된 도서관 가보기": "오래된 도서관에 갔어",
+        "시장 구경하기": "시장을 구경했어",
+        "숲 근처 돌아다니기": "숲 근처를 돌아다녔어",
+        "반짝이는 버섯 따라가기": "반짝이는 버섯을 따라갔어",
+        "바람이 가장 세게 부는 곳 찾기": "바람 소리를 들었어",
+        "친절한 숲의 요정에게 길 물어보기": "숲의 요정에게 길을 물어봤어",
+        "높은 나무에 올라가 멀리 보기": "높은 나무에 올라갔어",
+        "따뜻한 바람이 불어오는 곳 따라가기": "따뜻한 바람을 따라갔어",
+        "벽의 수정 무늬 살펴보기": "벽의 수정 무늬를 살펴봤어",
+        "오래된 표시나 기호 찾기": "오래된 표시를 찾아봤어",
+        "동굴 안쪽에서 들려오는 메아리 듣기": "동굴 속 메아리를 들었어",
+        "돌 계단 길로 올라가기": "돌 계단으로 올라갔어",
+        "다른 등반 길 찾아보기": "다른 길을 찾아봤어",
+        "숨겨진 터널 입구 찾기": "숨겨진 터널을 찾았어",
+        "큰 소리로 평화로운 의도를 알리기": "큰 소리로 인사했어",
+        "천천히 다가가서 정중히 절하기": "천천히 다가가서 절했어",
+        "용의 자장가를 거꾸로 불러보기": "용의 자장가를 거꾸로 불렀어",
+        "목걸이를 용의 심장 근처에 놓기": "목걸이를 용의 심장 근처에 놓았어",
+        "우정과 평화의 말 건네기": "친구가 되자고 말했어"
     };
 
     // DOM 요소

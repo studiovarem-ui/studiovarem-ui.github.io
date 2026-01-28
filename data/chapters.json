@@ -2,66 +2,66 @@
   "chapters": [
     {
       "id": 1,
-      "title": "The Awakening Village",
-      "mission": "Find a clue about where the ancient dragon sleeps",
-      "intro": "You wake up in a small village at the edge of a misty forest. The villagers whisper about a legendary dragon that once protected these lands. They say someone here might know where it rests.",
+      "title": "시작의 마을",
+      "mission": "전설의 용이 자는 곳의 단서를 찾아라!",
+      "intro": "안개 무랩쿠레한 숲 근처 작은 마을에서 눈을 떠. 마을 사람들이 옛날 이 땅을 지켜주던 전설의 용 이야기를 속삭여. 누군가 용이 어디 있는지 알고 있대!",
       "choices": [
-        "Talk to the village elder",
-        "Visit the old library",
-        "Explore the marketplace",
-        "Wander into the forest edge"
+        "마을 장로에게 물어보기",
+        "오래된 도서관 가보기",
+        "시장 구경하기",
+        "숲 근처 돌아다니기"
       ],
       "keyItem": "Ancient Scroll"
     },
     {
       "id": 2,
-      "title": "The Whispering Forest",
-      "mission": "Navigate through the enchanted forest to find the hidden path",
-      "intro": "Armed with the Ancient Scroll, you enter the Whispering Forest. The trees seem alive, their leaves rustling with secrets. Strange creatures watch from the shadows, and multiple paths wind deeper into the woods.",
+      "title": "속삭이는 숲",
+      "mission": "신비한 숲을 지나 숨겨진 길을 찾아라!",
+      "intro": "고대의 두루마리를 들고 속삭이는 숲에 들어왔어. 나무들이 살아있는 것처럼 바스락바스락 소리를 내. 이상한 동물들이 그늘 속에서 지켜보고 있고, 여러 갈래길이 숲 깊은 곳으로 이어져.",
       "choices": [
-        "Follow the glowing mushrooms",
-        "Listen to where the wind blows strongest",
-        "Ask a friendly forest spirit for guidance",
-        "Climb a tall tree to see above the canopy"
+        "반짝이는 버섯 따라가기",
+        "바람이 가장 세게 부는 곳 찾기",
+        "친절한 숲의 요정에게 길 물어보기",
+        "높은 나무에 올라가 멀리 보기"
       ],
       "keyItem": "Forest Compass"
     },
     {
       "id": 3,
-      "title": "The Crystal Caverns",
-      "mission": "Discover the secret entrance to the dragon's mountain",
-      "intro": "The forest path leads you to magnificent crystal caverns. Light dances off countless gems embedded in the walls. Somewhere within these sparkling tunnels lies the way to the Dragon's Mountain.",
+      "title": "수정 동굴",
+      "mission": "용의 산으로 가는 비밀 입구를 찾아라!",
+      "intro": "숲길을 따라가니 멋진 수정 동굴이 나타났어! 벽에 박힌 수많은 보석에서 빛이 반짝반짝 쵤을 춰. 이 반짝이는 터널 어딘가에 용의 산으로 가는 길이 있어!",
       "choices": [
-        "Follow the warmest air current",
-        "Examine the crystal patterns on the walls",
-        "Search for ancient markings or symbols",
-        "Listen for echoes from deeper within"
+        "따뜻한 바람이 불어오는 곳 따라가기",
+        "벽의 수정 무늬 살펴보기",
+        "오래된 표시나 기호 찾기",
+        "동굴 안쪽에서 들려오는 메아리 듣기"
       ],
       "keyItem": "Crystal Key"
     },
     {
       "id": 4,
-      "title": "The Dragon's Mountain",
-      "mission": "Reach the dragon's lair at the peak",
-      "intro": "You stand at the base of a towering mountain wreathed in clouds. The air grows warmer as you ascend. Ancient stairs carved into the rock wind upward, but the path is treacherous and guardians may lurk ahead.",
+      "title": "용의 산",
+      "mission": "산 꼭대기에 있는 용의 둥지에 도착해라!",
+      "intro": "구름에 휘감긴 엄청나게 높은 산 앙에 서 있어. 위로 올라갈수록 공기가 따뜻해져. 바위에 새겨진 오래된 계단이 위로 이어지는데, 길이 험하고 수호자가 있을지도 몰라!",
       "choices": [
-        "Take the main stone stairway",
-        "Find an alternative climbing route",
-        "Search for a hidden tunnel entrance",
-        "Call out to announce your peaceful intentions"
+        "돌 계단 길로 올라가기",
+        "다른 등반 길 찾아보기",
+        "숨겨진 터널 입구 찾기",
+        "큰 소리로 평화로운 의도를 알리기"
       ],
       "keyItem": "Dragon Scale Amulet"
     },
     {
       "id": 5,
-      "title": "The Awakening",
-      "mission": "Wake the ancient dragon and earn its trust",
-      "intro": "You finally reach the dragon's lair—a vast chamber filled with golden light. Before you lies the magnificent ancient dragon, slumbering peacefully. The Dragon Scale Amulet glows warmly in your hand. How will you approach this legendary creature?",
+      "title": "각성",
+      "mission": "전설의 용을 깨우고 친구가 돼라!",
+      "intro": "드디어 용의 둥지에 도착했어! 황금빛 빛으로 가득 찬 거대한 공간이야. 멋진 전설의 용이 평화롭게 자고 있어. 손에 든 용의 비늘 목걸이가 따뜻하게 빛나고 있어. 이 전설의 용에게 어떻게 다가갈까?",
       "choices": [
-        "Approach slowly and bow respectfully",
-        "Sing an ancient dragon lullaby in reverse",
-        "Place the amulet near the dragon's heart",
-        "Speak words of friendship and peace"
+        "천천히 다가가서 정중히 절하기",
+        "용의 자장가를 거꾸로 불러보기",
+        "목걸이를 용의 심장 근처에 놓기",
+        "우정과 평화의 말 건네기"
       ],
       "keyItem": "Dragon's Blessing"
     }
