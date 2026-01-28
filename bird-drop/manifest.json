@@ -3,9 +3,9 @@
   "short_name": "BirdDrop",
   "start_url": ".",
   "display": "fullscreen",
-  "orientation": "landscape",
-  "background_color": "#0D0221",
-  "theme_color": "#0D0221",
+  "orientation": "portrait",
+  "background_color": "#87CEEB",
+  "theme_color": "#87CEEB",
   "description": "새똥 맞추기 게임",
   "icons": []
 }

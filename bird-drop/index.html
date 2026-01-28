@@ -6,126 +6,240 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="theme-color" content="#0D0221">
+  <meta name="theme-color" content="#87CEEB">
   <title>BIRD DROP</title>
   <link rel="manifest" href="manifest.json">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    html, body { width: 100%; height: 100%; overflow: hidden; touch-action: none; font-family: 'Press Start 2P', monospace; background: #0D0221; position: fixed; top: 0; left: 0; }
     @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-    #gameContainer { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; height: 100dvh; display: flex; flex-direction: column; background: #0D0221; }
-    #gameArea { flex: 1; display: flex; justify-content: center; align-items: center; position: relative; min-height: 0; }
-    #gameCanvas { display: block; background: #0D0221; image-rendering: pixelated; max-width: 100%; max-height: 100%; }
-    #mobileControls { display: none; height: 140px; min-height: 140px; justify-content: space-between; align-items: center; padding: 10px 15px; background: rgba(13,2,33,0.95); border-top: 2px solid #A855F7; }
-    .mobile-visible #mobileControls { display: flex; }
-    #joystickArea { width: 110px; height: 110px; position: relative; }
-    #joystickBase { width: 100px; height: 100px; background: radial-gradient(circle, rgba(168,85,247,0.3) 0%, rgba(168,85,247,0.1) 100%); border: 3px solid rgba(168,85,247,0.6); border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-    #joystickKnob { width: 45px; height: 45px; background: radial-gradient(circle, #A855F7 0%, #7C3AED 100%); border: 2px solid #C084FC; border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 15px #A855F7; }
-    #actionButtons { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
-    #poopButton { width: 80px; height: 80px; background: radial-gradient(circle, #FF6B9D 0%, #E11D48 100%); border: 3px solid #FF8FAB; border-radius: 50%; font-size: 36px; display: flex; justify-content: center; align-items: center; box-shadow: 0 0 20px rgba(255,107,157,0.6); }
-    #itemButtons { display: flex; gap: 6px; }
-    .item-btn { width: 44px; height: 44px; background: linear-gradient(180deg, #1E1E3F 0%, #0D0D2B 100%); border: 2px solid #A855F7; border-radius: 8px; font-size: 20px; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
-    .item-btn .count { position: absolute; bottom: 1px; right: 3px; font-size: 7px; color: #00D4FF; font-family: 'Press Start 2P', monospace; }
-    #pauseBtn { position: fixed; top: 10px; right: 10px; width: 40px; height: 40px; background: rgba(13,2,33,0.9); border: 2px solid #A855F7; border-radius: 8px; color: #A855F7; font-size: 18px; display: none; justify-content: center; align-items: center; z-index: 600; }
-    .mobile-visible #pauseBtn { display: flex; }
-    #fullscreenBtn { position: fixed; top: 10px; left: 10px; width: 40px; height: 40px; background: rgba(13,2,33,0.9); border: 2px solid #00D4FF; border-radius: 8px; color: #00D4FF; font-size: 18px; display: none; justify-content: center; align-items: center; z-index: 600; cursor: pointer; }
-    .mobile-visible #fullscreenBtn { display: flex; }
-    .overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; height: 100dvh; background: linear-gradient(180deg, #0D0221 0%, #1A0A2E 100%); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 100; padding: 20px; overflow-y: auto; }
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
+    html, body { width: 100%; height: 100%; overflow: hidden; touch-action: none; font-family: 'Press Start 2P', monospace; background: #87CEEB; position: fixed; }
+    #gameContainer { width: 100vw; height: 100vh; height: 100dvh; display: flex; flex-direction: column; background: linear-gradient(180deg, #87CEEB 0%, #E0F4FF 50%, #98D4BB 100%); }
+    
+    /* Top UI Bar */
+    #topUI { display: flex; flex-wrap: wrap; padding: 8px; gap: 6px; background: rgba(255,255,255,0.3); border-bottom: 3px solid #5B8C5A; }
+    .ui-box { background: #4A7C59; border: 3px solid #2D5A3D; border-radius: 8px; padding: 6px 10px; color: white; font-size: 10px; display: flex; align-items: center; gap: 4px; }
+    .ui-box.bird-box { min-width: 70px; flex-direction: column; }
+    .ui-box.energy-bar { flex: 1; min-width: 120px; }
+    .energy-fill { height: 16px; background: #FFD93D; border-radius: 4px; transition: width 0.2s; }
+    .energy-bg { flex: 1; background: #2D5A3D; border-radius: 4px; overflow: hidden; }
+    #topUI .right-section { display: flex; gap: 6px; margin-left: auto; }
+    .ui-box.clickable { cursor: pointer; }
+    .ui-box.clickable:active { transform: scale(0.95); }
+    
+    /* Game Canvas Area */
+    #gameArea { flex: 1; position: relative; overflow: hidden; }
+    #gameCanvas { width: 100%; height: 100%; display: block; image-rendering: pixelated; }
+    #comboDisplay { position: absolute; top: 10px; right: 10px; background: #FF6B6B; color: white; padding: 8px 12px; border-radius: 10px; border: 3px solid #C94C4C; font-size: 14px; display: none; }
+    #poopGauge { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 30px; height: 200px; background: #2D5A3D; border: 3px solid #4A7C59; border-radius: 15px; overflow: hidden; }
+    #poopGaugeFill { position: absolute; bottom: 0; width: 100%; background: linear-gradient(180deg, #8B6914 0%, #6B4F0A 100%); border-radius: 12px; transition: height 0.1s; }
+    
+    /* Bottom Controls */
+    #bottomControls { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: rgba(255,255,255,0.4); border-top: 3px solid #5B8C5A; height: 180px; }
+    #joystickArea { width: 120px; height: 120px; position: relative; }
+    #joystickBase { width: 100%; height: 100%; background: radial-gradient(circle, #98D4BB 0%, #5B8C5A 100%); border: 4px solid #2D5A3D; border-radius: 50%; position: absolute; }
+    #joystickKnob { width: 50px; height: 50px; background: radial-gradient(circle, #FFD93D 0%, #F4A623 100%); border: 3px solid #C17F17; border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
+    
+    #rightControls { display: flex; flex-direction: column; gap: 10px; align-items: flex-end; }
+    #itemButtons { display: flex; gap: 8px; }
+    .item-btn { width: 50px; height: 50px; background: linear-gradient(180deg, #98D4BB 0%, #5B8C5A 100%); border: 3px solid #2D5A3D; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
+    .item-btn .icon { font-size: 20px; }
+    .item-btn .count { position: absolute; bottom: 2px; right: 4px; font-size: 8px; color: #2D5A3D; }
+    .item-btn:active { transform: scale(0.9); background: linear-gradient(180deg, #FFD93D 0%, #F4A623 100%); }
+    
+    #poopButton { width: 90px; height: 90px; background: radial-gradient(circle, #C9A86C 0%, #8B6914 100%); border: 5px solid #6B4F0A; border-radius: 50%; font-size: 40px; display: flex; justify-content: center; align-items: center; box-shadow: 0 6px 12px rgba(0,0,0,0.4); }
+    #poopButton:active { transform: scale(0.9); box-shadow: 0 2px 4px rgba(0,0,0,0.4); }
+    
+    /* Overlays */
+    .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(180deg, #87CEEB 0%, #E0F4FF 50%, #98D4BB 100%); display: none; flex-direction: column; z-index: 100; overflow-y: auto; }
     .overlay.active { display: flex; }
-    .grid-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(90deg, rgba(168,85,247,0.1) 1px, transparent 1px), linear-gradient(rgba(168,85,247,0.1) 1px, transparent 1px); background-size: 40px 40px; animation: gridMove 20s linear infinite; pointer-events: none; }
-    @keyframes gridMove { 0% { background-position: 0 0; } 100% { background-position: 40px 40px; } }
-    .menu-title { font-size: clamp(20px, 7vw, 32px); color: #FF6B9D; margin-bottom: 5px; text-shadow: 0 0 10px #FF6B9D, 0 0 20px #FF6B9D, 3px 3px 0 #A855F7; letter-spacing: 3px; animation: pulse 2s ease-in-out infinite; z-index: 10; text-align: center; }
-    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.02); } }
-    .menu-subtitle { font-size: clamp(8px, 2.5vw, 12px); color: #00D4FF; margin-bottom: 20px; text-shadow: 0 0 10px #00D4FF; letter-spacing: 4px; z-index: 10; }
-    .pixel-btn { padding: 12px 30px; font-family: 'Press Start 2P', monospace; font-size: clamp(9px, 2.5vw, 12px); border: none; cursor: pointer; margin: 6px; background: linear-gradient(180deg, #A855F7 0%, #7C3AED 100%); color: white; z-index: 10; min-width: 180px; text-align: center; }
-    .pixel-btn.secondary { background: linear-gradient(180deg, #1E1E3F 0%, #0D0D2B 100%); border: 2px solid #A855F7; }
-    .controls-info { margin-top: 15px; color: #6B7280; text-align: center; font-size: 7px; line-height: 2; z-index: 10; }
-    .controls-info.mobile-hide { display: block; }
-    .mobile-visible .controls-info.mobile-hide { display: none; }
-    .controls-info kbd { background: #374151; padding: 2px 5px; margin: 0 2px; border: 1px solid #4B5563; color: #00D4FF; }
-    .bird-preview { width: 56px; height: 56px; margin: 10px auto; animation: birdFloat 1s ease-in-out infinite; z-index: 10; }
-    @keyframes birdFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-    .shop-overlay { padding: 10px; justify-content: flex-start; }
-    .shop-header { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 500px; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 2px solid #A855F7; flex-wrap: wrap; gap: 8px; }
-    .shop-title { font-size: clamp(12px, 3.5vw, 16px); color: #FF6B9D; text-shadow: 0 0 10px #FF6B9D; }
-    .shop-currency { display: flex; gap: 8px; font-size: clamp(7px, 2vw, 9px); }
-    .currency-box { background: linear-gradient(180deg, #1E1E3F 0%, #0D0D2B 100%); padding: 5px 10px; border: 2px solid #A855F7; color: #00D4FF; }
-    .shop-tabs { display: flex; gap: 4px; margin-bottom: 8px; flex-wrap: wrap; justify-content: center; }
-    .shop-tab { padding: 6px 12px; background: #1E1E3F; border: 2px solid #374151; color: #9CA3AF; font-family: 'Press Start 2P', monospace; font-size: clamp(5px, 1.8vw, 7px); cursor: pointer; }
-    .shop-tab.active { background: linear-gradient(180deg, #A855F7 0%, #7C3AED 100%); border-color: #A855F7; color: white; }
-    .shop-items { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; width: 100%; max-width: 500px; max-height: 45vh; overflow-y: auto; padding: 4px; }
-    .shop-item { background: linear-gradient(180deg, #1E1E3F 0%, #0D0D2B 100%); border: 2px solid #374151; padding: 8px; display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+    .overlay-content { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+    
+    .game-title { font-size: 28px; color: #2D5A3D; text-shadow: 3px 3px 0 #FFD93D, -1px -1px 0 white; margin-bottom: 10px; text-align: center; }
+    .game-subtitle { font-size: 12px; color: #4A7C59; margin-bottom: 30px; }
+    
+    .menu-btn { padding: 15px 40px; font-family: 'Press Start 2P', monospace; font-size: 14px; border: 4px solid #2D5A3D; border-radius: 15px; margin: 10px; background: linear-gradient(180deg, #98D4BB 0%, #5B8C5A 100%); color: #2D5A3D; min-width: 200px; cursor: pointer; }
+    .menu-btn:active { background: linear-gradient(180deg, #FFD93D 0%, #F4A623 100%); transform: scale(0.95); }
+    .menu-btn.secondary { background: linear-gradient(180deg, #E8E8E8 0%, #B8B8B8 100%); }
+    
+    /* Shop Overlay */
+    .shop-header { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: rgba(255,255,255,0.5); border-bottom: 3px solid #5B8C5A; width: 100%; }
+    .shop-title { font-size: 16px; color: #2D5A3D; }
+    .shop-currency { display: flex; gap: 10px; font-size: 10px; }
+    .currency-item { background: #4A7C59; padding: 6px 10px; border-radius: 8px; color: white; border: 2px solid #2D5A3D; }
+    
+    .shop-tabs { display: flex; width: 100%; border-bottom: 3px solid #5B8C5A; }
+    .shop-tab { flex: 1; padding: 12px; background: #B8D4BE; color: #4A7C59; font-size: 10px; text-align: center; border: none; cursor: pointer; }
+    .shop-tab.active { background: #4A7C59; color: white; }
+    
+    .shop-items { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 15px; width: 100%; max-width: 400px; }
+    .shop-item { background: linear-gradient(180deg, #E8F5E9 0%, #A5D6A7 100%); border: 3px solid #4A7C59; border-radius: 12px; padding: 12px 8px; display: flex; flex-direction: column; align-items: center; cursor: pointer; aspect-ratio: 1; }
+    .shop-item:active { border-color: #FFD93D; background: linear-gradient(180deg, #FFF8E1 0%, #FFD93D 100%); }
     .shop-item.owned { opacity: 0.5; }
+    .shop-item.selected { border-color: #FF6B6B; border-width: 4px; }
     .shop-item-icon { font-size: 24px; margin-bottom: 4px; }
-    .shop-item-name { color: #E5E7EB; font-size: clamp(5px, 1.8vw, 7px); margin-bottom: 2px; text-align: center; }
-    .shop-item-desc { color: #6B7280; font-size: clamp(4px, 1.5vw, 5px); text-align: center; margin-bottom: 4px; }
-    .shop-item-price { background: linear-gradient(180deg, #F59E0B 0%, #D97706 100%); padding: 2px 8px; font-size: clamp(5px, 1.8vw, 7px); color: #0D0221; }
-    .shop-item-price.golden { background: linear-gradient(180deg, #FBBF24 0%, #F59E0B 100%); }
-    .shop-footer { display: flex; justify-content: center; margin-top: 8px; padding-top: 8px; border-top: 2px solid #A855F7; }
-    .stage-select-title { font-size: clamp(10px, 3.5vw, 14px); color: #00D4FF; margin-bottom: 20px; text-shadow: 0 0 15px #00D4FF; letter-spacing: 2px; z-index: 10; }
-    .stage-buttons { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; z-index: 10; }
-    .stage-btn { width: clamp(100px, 28vw, 140px); height: clamp(120px, 32vw, 160px); background: linear-gradient(180deg, #1E1E3F 0%, #0D0D2B 100%); border: 3px solid #A855F7; cursor: pointer; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; position: relative; }
+    .shop-item-name { font-size: 7px; color: #2D5A3D; text-align: center; }
+    .shop-item-price { font-size: 8px; color: #6B4F0A; margin-top: 4px; }
+    
+    .shop-footer { padding: 15px; border-top: 3px solid #5B8C5A; width: 100%; display: flex; justify-content: center; background: rgba(255,255,255,0.3); }
+    
+    /* Stage Select */
+    .stage-grid { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; padding: 20px; }
+    .stage-btn { width: 140px; height: 160px; background: linear-gradient(180deg, #E8F5E9 0%, #A5D6A7 100%); border: 4px solid #4A7C59; border-radius: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; }
     .stage-btn.locked { opacity: 0.4; }
-    .stage-btn-icon { font-size: clamp(28px, 9vw, 42px); margin-bottom: 6px; }
-    .stage-btn-name { font-size: clamp(7px, 2.2vw, 10px); color: #E5E7EB; margin-bottom: 3px; }
-    .stage-btn-stars { font-size: clamp(9px, 2.8vw, 12px); color: #FBBF24; text-shadow: 0 0 10px #FBBF24; }
-    .stage-btn-locked { position: absolute; top: 6px; right: 6px; font-size: 16px; }
-    .center-overlay { background: rgba(13,2,33,0.95); }
-    .clear-title { font-size: clamp(16px, 5vw, 24px); color: #FBBF24; margin-bottom: 8px; text-shadow: 0 0 10px #FBBF24, 3px 3px 0 #B45309; animation: pulse 1s ease-in-out infinite; }
-    .clear-stars { font-size: clamp(24px, 8vw, 36px); margin-bottom: 15px; color: #FBBF24; text-shadow: 0 0 20px #FBBF24; }
-    .clear-stats { background: linear-gradient(180deg, #1E1E3F 0%, #0D0D2B 100%); border: 2px solid #A855F7; padding: 12px 25px; margin-bottom: 15px; }
-    .clear-stat { display: flex; justify-content: space-between; color: #9CA3AF; font-size: clamp(7px, 2.2vw, 9px); margin: 6px 0; gap: 30px; }
-    .clear-stat-value { color: #00D4FF; text-shadow: 0 0 5px #00D4FF; }
-    .gameover-title { font-size: clamp(18px, 6vw, 28px); color: #EF4444; margin-bottom: 15px; text-shadow: 0 0 10px #EF4444, 3px 3px 0 #7F1D1D; animation: glitch 0.5s ease-in-out infinite; }
-    @keyframes glitch { 0%, 100% { transform: translate(0); } 25% { transform: translate(-2px, 2px); } 75% { transform: translate(2px, -2px); } }
-    .pause-title { font-size: clamp(16px, 5vw, 22px); color: #A855F7; margin-bottom: 20px; text-shadow: 0 0 20px #A855F7; }
-    .notification { position: fixed; top: 55px; left: 50%; transform: translateX(-50%); background: linear-gradient(180deg, #1E1E3F 0%, #0D0D2B 100%); border: 2px solid #00D4FF; box-shadow: 0 0 20px rgba(0,212,255,0.5); color: #00D4FF; padding: 6px 15px; font-size: clamp(7px, 2.2vw, 9px); z-index: 800; opacity: 0; transition: opacity 0.3s; white-space: nowrap; }
+    .stage-btn:active:not(.locked) { border-color: #FFD93D; }
+    .stage-btn-icon { font-size: 40px; margin-bottom: 8px; }
+    .stage-btn-name { font-size: 12px; color: #2D5A3D; margin-bottom: 4px; }
+    .stage-btn-stars { font-size: 14px; color: #FFD93D; text-shadow: 1px 1px 0 #C17F17; }
+    
+    /* Game Over / Clear */
+    .result-box { background: rgba(255,255,255,0.9); border: 4px solid #4A7C59; border-radius: 20px; padding: 25px; margin: 20px; text-align: center; }
+    .result-title { font-size: 24px; margin-bottom: 15px; }
+    .result-title.clear { color: #FFD93D; text-shadow: 2px 2px 0 #C17F17; }
+    .result-title.gameover { color: #FF6B6B; text-shadow: 2px 2px 0 #C94C4C; }
+    .result-stars { font-size: 30px; margin-bottom: 15px; }
+    .result-stats { background: #E8F5E9; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
+    .result-stat { display: flex; justify-content: space-between; font-size: 10px; color: #2D5A3D; margin: 8px 0; }
+    
+    .notification { position: fixed; top: 100px; left: 50%; transform: translateX(-50%); background: #4A7C59; color: white; padding: 10px 20px; border-radius: 10px; border: 3px solid #2D5A3D; font-size: 10px; z-index: 500; opacity: 0; transition: opacity 0.3s; }
     .notification.show { opacity: 1; }
-    #landscapeWarning { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #0D0221; z-index: 2000; flex-direction: column; justify-content: center; align-items: center; color: #FF6B9D; text-align: center; padding: 20px; }
-    #landscapeWarning .icon { font-size: 50px; margin-bottom: 15px; animation: rotate 2s ease-in-out infinite; }
-    @keyframes rotate { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(90deg); } }
-    #landscapeWarning .text { font-size: 10px; line-height: 2; }
-    @media (max-width: 900px) and (orientation: portrait) { #landscapeWarning { display: flex; } }
   </style>
 </head>
 <body>
   <div id="gameContainer">
-    <div id="gameArea"><canvas id="gameCanvas"></canvas></div>
-    <div id="mobileControls">
-      <div id="joystickArea"><div id="joystickBase"></div><div id="joystickKnob"></div></div>
-      <div id="actionButtons">
+    <!-- Top UI -->
+    <div id="topUI">
+      <div class="ui-box bird-box">
+        <canvas id="birdIcon" width="32" height="32"></canvas>
+        <span id="levelText">Lv.1</span>
+      </div>
+      <div class="ui-box energy-bar">
+        <span>⚡</span>
+        <div class="energy-bg"><div class="energy-fill" id="energyFill" style="width:100%"></div></div>
+      </div>
+      <div class="ui-box" id="featherBox">🪶 <span id="featherCount">0</span></div>
+      <div class="ui-box" id="goldBox">✨ <span id="goldCount">0</span></div>
+      <div class="ui-box" id="stoneBox">💎 <span id="stoneCount">0</span></div>
+      <div class="right-section">
+        <div class="ui-box clickable" id="stageBtn" onclick="showStageSelect()">🎯</div>
+        <div class="ui-box clickable" id="pauseBtn" onclick="togglePause()">⏸</div>
+      </div>
+    </div>
+    
+    <!-- Game Area -->
+    <div id="gameArea">
+      <canvas id="gameCanvas"></canvas>
+      <div id="comboDisplay">0 COMBO</div>
+      <div id="poopGauge"><div id="poopGaugeFill" style="height:100%"></div></div>
+    </div>
+    
+    <!-- Bottom Controls -->
+    <div id="bottomControls">
+      <div id="joystickArea">
+        <div id="joystickBase"></div>
+        <div id="joystickKnob"></div>
+      </div>
+      <div id="rightControls">
         <div id="itemButtons">
           <div class="item-btn" data-slot="0"><span class="icon">🍞</span><span class="count">0</span></div>
           <div class="item-btn" data-slot="1"><span class="icon">💊</span><span class="count">0</span></div>
           <div class="item-btn" data-slot="2"><span class="icon">🛡️</span><span class="count">0</span></div>
-          <div class="item-btn" data-slot="3"><span class="icon">💣</span><span class="count">0</span></div>
         </div>
         <div id="poopButton">💩</div>
       </div>
     </div>
-    <div id="landscapeWarning"><div class="icon">📱</div><div class="text">화면을 가로로 돌려주세요!<br>ROTATE TO LANDSCAPE</div></div>
-    <div id="pauseBtn" onclick="togglePause()">⏸</div>
-    <div id="fullscreenBtn" onclick="goFullscreen()">⛶</div>
-    <div id="mainMenu" class="overlay active"><div class="grid-bg"></div><div class="menu-title">BIRD DROP</div><div class="menu-subtitle">새똥 맞추기</div><canvas id="birdPreview" class="bird-preview" width="56" height="56"></canvas><button class="pixel-btn" onclick="showStageSelect()">▶ START</button><button class="pixel-btn secondary" onclick="openShopFromMenu()">⬡ SHOP</button><div class="controls-info mobile-hide"><div><kbd>←</kbd><kbd>↑</kbd><kbd>→</kbd><kbd>↓</kbd> MOVE</div><div><kbd>SPACE</kbd> DROP</div><div><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><kbd>4</kbd> ITEM</div></div></div>
-    <div id="stageSelect" class="overlay"><div class="grid-bg"></div><div class="stage-select-title">[ SELECT STAGE ]</div><div class="stage-buttons"><div class="stage-btn" onclick="startStage(1)"><div class="stage-btn-icon">🏙️</div><div class="stage-btn-name">STAGE 1</div><div style="font-size:6px;color:#9CA3AF;margin-bottom:6px;">인 도</div><div class="stage-btn-stars" id="stage1Stars">☆☆☆</div></div><div class="stage-btn" id="stage2Btn" onclick="startStage(2)"><div class="stage-btn-icon">🌳</div><div class="stage-btn-name">STAGE 2</div><div style="font-size:6px;color:#9CA3AF;margin-bottom:6px;">공 원</div><div class="stage-btn-stars" id="stage2Stars">☆☆☆</div><div class="stage-btn-locked" id="stage2Lock">🔒</div></div></div><button class="pixel-btn secondary" style="margin-top:20px;" onclick="showMainMenu()">◀ BACK</button></div>
-    <div id="shopOverlay" class="overlay shop-overlay"><div class="shop-header"><div class="shop-title">⬡ SHOP</div><div class="shop-currency"><div class="currency-box">🪶 <span id="shopFeathers">0</span></div><div class="currency-box">✦ <span id="shopGoldenFeathers">0</span></div></div></div><div class="shop-tabs"><button class="shop-tab active" onclick="switchShopTab(this,'consumables')">ITEMS</button><button class="shop-tab" onclick="switchShopTab(this,'upgrades')">UPGRADE</button><button class="shop-tab" onclick="switchShopTab(this,'birds')">BIRDS</button></div><div class="shop-items" id="shopItems"></div><div class="shop-footer"><button class="pixel-btn" onclick="closeShop()">◀ CONTINUE</button></div></div>
-    <div id="stageClearOverlay" class="overlay center-overlay"><div class="clear-title">★ STAGE CLEAR ★</div><div class="clear-stars" id="clearStars">⭐⭐⭐</div><div class="clear-stats"><div class="clear-stat"><span>SCORE</span><span class="clear-stat-value" id="clearScore">0</span></div><div class="clear-stat"><span>ACCURACY</span><span class="clear-stat-value" id="clearAccuracy">0%</span></div><div class="clear-stat"><span>FEATHERS</span><span class="clear-stat-value" id="clearFeathers">🪶 0</span></div><div class="clear-stat"><span>GOLDEN</span><span class="clear-stat-value" id="clearGoldenFeathers">✦ 0</span></div></div><button class="pixel-btn" onclick="openShop()">⬡ SHOP</button><button class="pixel-btn secondary" onclick="showStageSelect()">▶ NEXT</button></div>
-    <div id="gameoverOverlay" class="overlay center-overlay"><div class="gameover-title">GAME OVER</div><div class="clear-stats"><div class="clear-stat"><span>SCORE</span><span class="clear-stat-value" id="goScore">0</span></div><div class="clear-stat"><span>FEATHERS</span><span class="clear-stat-value" id="goFeathers">🪶 0</span></div></div><button class="pixel-btn" onclick="retryStage()">↻ RETRY</button><button class="pixel-btn secondary" onclick="showStageSelect()">◀ EXIT</button></div>
-    <div id="pauseOverlay" class="overlay center-overlay"><div class="pause-title">II PAUSED</div><button class="pixel-btn" onclick="resumeGame()">▶ RESUME</button><button class="pixel-btn secondary" onclick="openShopFromPause()">⬡ SHOP</button><button class="pixel-btn secondary" onclick="quitToMenu()">✕ QUIT</button></div>
+    
+    <!-- Main Menu -->
+    <div id="mainMenu" class="overlay active">
+      <div class="overlay-content">
+        <div class="game-title">BIRD DROP</div>
+        <div class="game-subtitle">새똥 맞추기</div>
+        <canvas id="menuBird" width="80" height="80" style="margin:20px"></canvas>
+        <button class="menu-btn" onclick="showStageSelect()">시작</button>
+        <button class="menu-btn secondary" onclick="continueGame()">이어하기</button>
+      </div>
+    </div>
+    
+    <!-- Stage Select -->
+    <div id="stageSelect" class="overlay">
+      <div class="shop-header">
+        <span class="shop-title">스테이지 선택</span>
+        <button class="menu-btn" style="padding:8px 15px;font-size:10px;min-width:auto" onclick="showMainMenu()">뒤로</button>
+      </div>
+      <div class="overlay-content">
+        <div class="stage-grid" id="stageGrid"></div>
+      </div>
+    </div>
+    
+    <!-- Shop -->
+    <div id="shopOverlay" class="overlay">
+      <div class="shop-header">
+        <span class="shop-title">상점</span>
+        <div class="shop-currency">
+          <div class="currency-item">🪶 <span id="shopFeathers">0</span></div>
+          <div class="currency-item">✨ <span id="shopGold">0</span></div>
+          <div class="currency-item">💎 <span id="shopStones">0</span></div>
+        </div>
+      </div>
+      <div class="shop-tabs">
+        <button class="shop-tab active" onclick="switchShopTab(this,'items')">아이템</button>
+        <button class="shop-tab" onclick="switchShopTab(this,'upgrades')">업그레이드</button>
+        <button class="shop-tab" onclick="switchShopTab(this,'evolution')">진화</button>
+      </div>
+      <div class="overlay-content" style="justify-content:flex-start;padding-top:10px">
+        <div class="shop-items" id="shopItems"></div>
+      </div>
+      <div class="shop-footer">
+        <button class="menu-btn" onclick="closeShop()">닫기</button>
+      </div>
+    </div>
+    
+    <!-- Pause -->
+    <div id="pauseOverlay" class="overlay">
+      <div class="overlay-content">
+        <div class="result-box">
+          <div class="result-title" style="color:#4A7C59">일시정지</div>
+          <button class="menu-btn" onclick="resumeGame()">계속하기</button>
+          <button class="menu-btn secondary" onclick="openShopFromPause()">상점</button>
+          <button class="menu-btn secondary" onclick="quitToMenu()">나가기</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Stage Clear -->
+    <div id="clearOverlay" class="overlay">
+      <div class="overlay-content">
+        <div class="result-box">
+          <div class="result-title clear">★ CLEAR ★</div>
+          <div class="result-stars" id="clearStars">⭐⭐⭐</div>
+          <div class="result-stats">
+            <div class="result-stat"><span>점수</span><span id="clearScore">0</span></div>
+            <div class="result-stat"><span>명중률</span><span id="clearAccuracy">0%</span></div>
+            <div class="result-stat"><span>깃털</span><span id="clearFeathers">🪶 0</span></div>
+            <div class="result-stat"><span>보석</span><span id="clearGold">✨ 0</span></div>
+          </div>
+          <button class="menu-btn" onclick="openShop()">상점</button>
+          <button class="menu-btn secondary" onclick="showStageSelect()">다음</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Game Over -->
+    <div id="gameoverOverlay" class="overlay">
+      <div class="overlay-content">
+        <div class="result-box">
+          <div class="result-title gameover">GAME OVER</div>
+          <div class="result-stats">
+            <div class="result-stat"><span>점수</span><span id="goScore">0</span></div>
+            <div class="result-stat"><span>깃털</span><span id="goFeathers">🪶 0</span></div>
+          </div>
+          <button class="menu-btn" onclick="retryStage()">다시하기</button>
+          <button class="menu-btn secondary" onclick="showStageSelect()">나가기</button>
+        </div>
+      </div>
+    </div>
+    
     <div id="notification" class="notification"></div>
   </div>
-  <script>
-    function goFullscreen() {
-      const el = document.documentElement;
-      if (el.requestFullscreen) el.requestFullscreen();
-      else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-      else if (el.msRequestFullscreen) el.msRequestFullscreen();
-    }
-    document.addEventListener('fullscreenchange', () => {
-      const btn = document.getElementById('fullscreenBtn');
-      btn.textContent = document.fullscreenElement ? '✖' : '⛶';
-    });
-  </script>
   <script src="game.js"></script>
 </body>
 </html>

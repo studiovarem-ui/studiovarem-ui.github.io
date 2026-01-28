@@ -1,1 +1,1074 @@
-const canvas=document.getElementById('gameCanvas'),ctx=canvas.getContext('2d');ctx.imageSmoothingEnabled=false;let scale=1;const BASE_WIDTH=800,BASE_HEIGHT=500;function resizeCanvas(){const container=document.getElementById('gameArea'),cw=container.clientWidth,ch=container.clientHeight,scaleX=cw/BASE_WIDTH,scaleY=ch/BASE_HEIGHT;scale=Math.min(scaleX,scaleY);canvas.width=BASE_WIDTH*scale;canvas.height=BASE_HEIGHT*scale;canvas.style.width=canvas.width+'px';canvas.style.height=canvas.height+'px';ctx.setTransform(scale,0,0,scale,0,0);ctx.imageSmoothingEnabled=false;const isMobile='ontouchstart'in window||navigator.maxTouchPoints>0;if(isMobile)document.body.classList.add('mobile-visible');else document.body.classList.remove('mobile-visible')}window.addEventListener('resize',resizeCanvas);window.addEventListener('orientationchange',()=>setTimeout(resizeCanvas,100));const SPRITES={sparrow:['................','......####......','.....#8888#.....','....#888888#....','...#88FF888#W...','...#88FF888WW...','..#8888888O#....','..#8O888888#....','..#88888888#....','.#8888888888#...','.#88#8888#88#...','..##.#88#.##....','.....#88#.......','.....#..#.......','.....O..O.......','................'],pigeon:['................','.....#####......','....#GGGGG#.....','...#GGGGGGG#....','...#GGFFGGG#W...','...#GGFFGGGWW...','..#PPPPPPPP#....','..#POGGGGGG#....','..#GGGGGGGG#....','.#GGGGGGGGGG#...','.#GG#GGGG#GG#...','..##.#GG#.##....','.....#GG#.......','.....#..#.......','.....R..R.......','................'],crow:['................','.....#####......','....#00000#.....','...#0000000#....','...#00FF000#W...','...#00FF000WW...','..#0000000O#....','..#0O000000#....','..#00000000#....','.#0000000000#...','.#00#0000#00#...','..##.#00#.##....','.....#00#.......','.....#..#.......','.....0..0.......','................'],poop:['........','...##...','..####..','.##8###.','.######.','########','########','.######.']};const COLORS={'#':'#1a1a2e','8':'#8B4513','F':'#FFD700','W':'#FFFFFF','O':'#FF6600','G':'#708090','P':'#9370DB','R':'#DC143C','0':'#1a1a2e','.':null};const spriteCanvases={};function createSpriteCanvas(data,spriteScale=3){const h=data.length,w=data[0].length,c=document.createElement('canvas');c.width=w*spriteScale;c.height=h*spriteScale;const x=c.getContext('2d');x.imageSmoothingEnabled=false;for(let y=0;y<h;y++)for(let i=0;i<w;i++){const ch=data[y][i];if(COLORS[ch]){x.fillStyle=COLORS[ch];x.fillRect(i*spriteScale,y*spriteScale,spriteScale,spriteScale)}}return c}function initSprites(){Object.keys(SPRITES).forEach(k=>spriteCanvases[k]=createSpriteCanvas(SPRITES[k],3))}function drawMenuBird(){const preview=document.getElementById('birdPreview'),pctx=preview.getContext('2d');pctx.clearRect(0,0,56,56);pctx.shadowColor='#FF6B9D';pctx.shadowBlur=10;if(spriteCanvases['sparrow'])pctx.drawImage(spriteCanvases['sparrow'],4,4)}const BIRDS={sparrow:{name:'참새',sprite:'sparrow',speed:5,damage:1,poopCooldown:500,price:0},pigeon:{name:'비둘기',sprite:'pigeon',speed:4.5,damage:2,poopCooldown:600,price:10},crow:{name:'까마귀',sprite:'crow',speed:5.5,damage:3,poopCooldown:400,price:20}};const ITEMS={healFood:{name:'회복',icon:'🍞',price:30,desc:'HP +1'},laxative:{name:'설사약',icon:'💊',price:50,desc:'무한'},shield:{name:'방어막',icon:'🛡️',price:60,desc:'1회'},poopBomb:{name:'폭탄',icon:'💣',price:100,desc:'광역'}};const UPGRADES={poopCapacity:{name:'똥 주머니',icon:'💰',price:3,desc:'+20%',maxLevel:5},digestion:{name:'소화력',icon:'⚡',price:4,desc:'+15%',maxLevel:5},wingPower:{name:'날개',icon:'🦅',price:5,desc:'+10%',maxLevel:5}};const STAGES={1:{name:'인도',targetScore:200,duration:60,spawnRate:2000,boss:'cleaner'},2:{name:'공원',targetScore:350,duration:75,spawnRate:1600,boss:'gymBro'}};const BOSSES={cleaner:{name:'환경미화원',health:5,score:200,feathers:30,goldenFeathers:1},gymBro:{name:'헬창',health:7,score:300,feathers:50,goldenFeathers:2}};let gameState={screen:'menu',currentStage:1,score:0,feathers:100,goldenFeathers:5,health:3,maxHealth:3,poopGauge:100,maxPoopGauge:100,combo:0,hits:0,shots:0,time:0,bossSpawned:false,bossDefeated:false,stageFeathers:0,stageGoldenFeathers:0,inventory:{healFood:2,laxative:1,shield:1,poopBomb:0},quickSlots:['healFood','laxative','shield','poopBomb'],effects:{laxative:0,tripleShot:0,shield:false,invincible:0},upgrades:{poopCapacity:0,digestion:0,wingPower:0},currentBird:'sparrow',unlockedBirds:['sparrow'],stageStars:{1:0,2:0}};let bird={x:400,y:80,width:48,height:48},poops=[],humans=[],projectiles=[],particles=[],stars=[],boss=null,keys={},lastPoopTime=0,lastSpawnTime=0,gameStartTime=0,animationId=null,previousScreen='menu',joystick={active:false,startX:0,startY:0,moveX:0,moveY:0},poopPressed=false;function generateStars(){stars=[];for(let i=0;i<40;i++)stars.push({x:Math.random()*800,y:Math.random()*250,size:Math.random()*2+1,twinkle:Math.random()*Math.PI*2})}document.addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='Escape')togglePause();if(gameState.screen==='playing'){if(e.code==='Digit1')useQuickSlot(0);if(e.code==='Digit2')useQuickSlot(1);if(e.code==='Digit3')useQuickSlot(2);if(e.code==='Digit4')useQuickSlot(3)}});document.addEventListener('keyup',e=>keys[e.code]=false);const joystickArea=document.getElementById('joystickArea'),joystickKnob=document.getElementById('joystickKnob');function handleJoystickStart(e){e.preventDefault();const touch=e.touches?e.touches[0]:e,rect=joystickArea.getBoundingClientRect();joystick.active=true;joystick.startX=rect.left+rect.width/2;joystick.startY=rect.top+rect.height/2}function handleJoystickMove(e){if(!joystick.active)return;e.preventDefault();const touch=e.touches?e.touches[0]:e,dx=touch.clientX-joystick.startX,dy=touch.clientY-joystick.startY,maxDist=35,dist=Math.min(Math.sqrt(dx*dx+dy*dy),maxDist),angle=Math.atan2(dy,dx);joystick.moveX=(dist/maxDist)*Math.cos(angle);joystick.moveY=(dist/maxDist)*Math.sin(angle);const knobX=joystick.moveX*maxDist,knobY=joystick.moveY*maxDist;joystickKnob.style.transform=`translate(calc(-50% + ${knobX}px), calc(-50% + ${knobY}px))`}function handleJoystickEnd(){joystick.active=false;joystick.moveX=0;joystick.moveY=0;joystickKnob.style.transform='translate(-50%, -50%)'}joystickArea.addEventListener('touchstart',handleJoystickStart,{passive:false});joystickArea.addEventListener('touchmove',handleJoystickMove,{passive:false});joystickArea.addEventListener('touchend',handleJoystickEnd);joystickArea.addEventListener('touchcancel',handleJoystickEnd);const poopButton=document.getElementById('poopButton');poopButton.addEventListener('touchstart',e=>{e.preventDefault();poopPressed=true},{passive:false});poopButton.addEventListener('touchend',()=>poopPressed=false);poopButton.addEventListener('touchcancel',()=>poopPressed=false);document.querySelectorAll('.item-btn').forEach(btn=>{btn.addEventListener('touchstart',e=>{e.preventDefault();useQuickSlot(parseInt(btn.dataset.slot))},{passive:false})});function updateItemButtons(){document.querySelectorAll('.item-btn').forEach((btn,i)=>{const k=gameState.quickSlots[i];if(k&&ITEMS[k]){btn.querySelector('.icon').textContent=ITEMS[k].icon;btn.querySelector('.count').textContent=gameState.inventory[k]||0}})}function togglePause(){if(gameState.screen==='playing')pauseGame();else if(gameState.screen==='paused')resumeGame()}function hideAllOverlays(){document.getElementById('mainMenu').classList.remove('active');['stageSelect','shopOverlay','stageClearOverlay','gameoverOverlay','pauseOverlay'].forEach(id=>document.getElementById(id).classList.remove('active'))}function showMainMenu(){gameState.screen='menu';hideAllOverlays();document.getElementById('mainMenu').classList.add('active');if(animationId)cancelAnimationFrame(animationId);drawMenuBird()}function showStageSelect(){gameState.screen='stageSelect';hideAllOverlays();document.getElementById('stageSelect').classList.add('active');updateStageStars();const s2=document.getElementById('stage2Btn'),lock=document.getElementById('stage2Lock');if(gameState.stageStars[1]>0){s2.classList.remove('locked');lock.style.display='none'}else{s2.classList.add('locked');lock.style.display='block'}}function updateStageStars(){[1,2].forEach(i=>{const s=gameState.stageStars[i];document.getElementById(`stage${i}Stars`).textContent='★'.repeat(s)+'☆'.repeat(3-s)})}function quitToMenu(){if(animationId)cancelAnimationFrame(animationId);showStageSelect()}function startStage(num){if(num===2&&gameState.stageStars[1]===0){showNotification('STAGE 1 클리어 필요!');return}gameState.currentStage=num;gameState.screen='playing';gameState.score=0;gameState.health=gameState.maxHealth;gameState.poopGauge=gameState.maxPoopGauge;gameState.combo=0;gameState.hits=0;gameState.shots=0;gameState.bossSpawned=false;gameState.bossDefeated=false;gameState.stageFeathers=0;gameState.stageGoldenFeathers=0;gameState.effects={laxative:0,tripleShot:0,shield:false,invincible:0};bird.x=400;bird.y=80;poops=[];humans=[];projectiles=[];particles=[];boss=null;generateStars();gameStartTime=Date.now();lastSpawnTime=0;hideAllOverlays();updateItemButtons();gameLoop()}function retryStage(){startStage(gameState.currentStage)}function pauseGame(){gameState.screen='paused';document.getElementById('pauseOverlay').classList.add('active')}function resumeGame(){gameState.screen='playing';document.getElementById('pauseOverlay').classList.remove('active');gameLoop()}function openShop(){previousScreen=gameState.screen;gameState.screen='shop';hideAllOverlays();document.getElementById('shopOverlay').classList.add('active');updateShopDisplay();switchShopTab(document.querySelector('.shop-tab'),'consumables')}function openShopFromMenu(){previousScreen='menu';openShop()}function openShopFromPause(){previousScreen='paused';document.getElementById('pauseOverlay').classList.remove('active');openShop()}function closeShop(){document.getElementById('shopOverlay').classList.remove('active');if(previousScreen==='paused'){gameState.screen='paused';document.getElementById('pauseOverlay').classList.add('active')}else showStageSelect()}function updateShopDisplay(){document.getElementById('shopFeathers').textContent=gameState.feathers;document.getElementById('shopGoldenFeathers').textContent=gameState.goldenFeathers}function switchShopTab(el,tab){document.querySelectorAll('.shop-tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');const container=document.getElementById('shopItems');container.innerHTML='';if(tab==='consumables'){Object.entries(ITEMS).forEach(([k,item])=>{const owned=gameState.inventory[k]||0,div=document.createElement('div');div.className='shop-item';div.innerHTML=`<div class="shop-item-icon">${item.icon}</div><div class="shop-item-name">${item.name}</div><div class="shop-item-desc">${item.desc}</div><div class="shop-item-desc">보유: ${owned}</div><div class="shop-item-price">🪶 ${item.price}</div>`;div.onclick=()=>buyItem(k);container.appendChild(div)})}else if(tab==='upgrades'){Object.entries(UPGRADES).forEach(([k,up])=>{const lv=gameState.upgrades[k],maxed=lv>=up.maxLevel,div=document.createElement('div');div.className=`shop-item ${maxed?'owned':''}`;div.innerHTML=`<div class="shop-item-icon">${up.icon}</div><div class="shop-item-name">${up.name}</div><div class="shop-item-desc">${up.desc}</div><div class="shop-item-desc">Lv.${lv}/${up.maxLevel}</div><div class="shop-item-price golden">${maxed?'MAX':`✦ ${up.price}`}</div>`;if(!maxed)div.onclick=()=>buyUpgrade(k);container.appendChild(div)})}else if(tab==='birds'){Object.entries(BIRDS).forEach(([k,b])=>{const owned=gameState.unlockedBirds.includes(k),sel=gameState.currentBird===k,div=document.createElement('div');div.className=`shop-item ${owned&&sel?'owned':''}`;div.innerHTML=`<div class="shop-item-icon" style="font-size:36px;">🐦</div><div class="shop-item-name">${b.name}</div><div class="shop-item-desc">SPD:${b.speed} DMG:${b.damage}</div><div class="shop-item-price golden">${owned?(sel?'선택됨':'선택'):`✦ ${b.price}`}</div>`;div.onclick=()=>{if(owned){gameState.currentBird=k;switchShopTab(el,'birds');showNotification(`${b.name} 선택!`)}else buyBird(k)};container.appendChild(div)})}}function buyItem(k){const item=ITEMS[k];if(gameState.feathers>=item.price){gameState.feathers-=item.price;gameState.inventory[k]=(gameState.inventory[k]||0)+1;updateShopDisplay();switchShopTab(document.querySelector('.shop-tab.active'),'consumables');showNotification(`${item.name} 구매!`)}else showNotification('깃털 부족!')}function buyUpgrade(k){const up=UPGRADES[k];if(gameState.goldenFeathers>=up.price&&gameState.upgrades[k]<up.maxLevel){gameState.goldenFeathers-=up.price;gameState.upgrades[k]++;if(k==='poopCapacity')gameState.maxPoopGauge=100+gameState.upgrades[k]*20;updateShopDisplay();switchShopTab(document.querySelector('.shop-tab.active'),'upgrades');showNotification(`${up.name} UP!`)}else showNotification('황금깃털 부족!')}function buyBird(k){const b=BIRDS[k];if(gameState.goldenFeathers>=b.price){gameState.goldenFeathers-=b.price;gameState.unlockedBirds.push(k);gameState.currentBird=k;updateShopDisplay();switchShopTab(document.querySelector('.shop-tab.active'),'birds');showNotification(`${b.name} 해금!`)}else showNotification('황금깃털 부족!')}function useQuickSlot(i){const k=gameState.quickSlots[i];if(!k||!gameState.inventory[k])return;gameState.inventory[k]--;updateItemButtons();switch(k){case'healFood':gameState.health=Math.min(gameState.health+1,gameState.maxHealth);showNotification('HP +1!');createParticles(bird.x,bird.y,'#FF6B9D',10);break;case'laxative':gameState.effects.laxative=Date.now()+10000;showNotification('UNLIMITED!');break;case'shield':gameState.effects.shield=true;showNotification('SHIELD!');break;case'poopBomb':activatePoopBomb();break}}function activatePoopBomb(){showNotification('💣 BOOM!');humans.forEach(h=>{h.hit=true;gameState.score+=20;gameState.stageFeathers+=2;createParticles(h.x,h.y,'#8B4513',10)});if(boss&&!boss.defeated){boss.health-=2;createParticles(boss.x,boss.y,'#FF6B9D',20)}createParticles(400,250,'#FBBF24',30)}function spawnHuman(){const side=Math.random()<0.5?'left':'right',types=['normal','child','drunk'],type=types[Math.floor(Math.random()*types.length)],speeds={normal:1.5,child:2.5,drunk:1.8},scores={normal:10,child:30,drunk:25};humans.push({x:side==='left'?-30:830,y:380+Math.random()*60,width:30,height:45,type,speed:speeds[type],score:scores[type],direction:side==='left'?1:-1,hit:false,zigzagTimer:0,randomTimer:0})}function spawnBoss(){const stage=STAGES[gameState.currentStage],bossData=BOSSES[stage.boss];boss={x:400,y:400,width:50,height:60,...bossData,currentHealth:bossData.health,defeated:false,attackTimer:0,direction:1};showNotification(`⚠ BOSS: ${bossData.name}!`)}function update(){if(gameState.screen!=='playing')return;const currentBird=BIRDS[gameState.currentBird],speedBonus=1+gameState.upgrades.wingPower*0.1,speed=currentBird.speed*speedBonus;if(keys['ArrowLeft']||keys['KeyA'])bird.x-=speed;if(keys['ArrowRight']||keys['KeyD'])bird.x+=speed;if(keys['ArrowUp']||keys['KeyW'])bird.y-=speed;if(keys['ArrowDown']||keys['KeyS'])bird.y+=speed;if(joystick.active){bird.x+=joystick.moveX*speed;bird.y+=joystick.moveY*speed}bird.x=Math.max(30,Math.min(770,bird.x));bird.y=Math.max(30,Math.min(160,bird.y));const now=Date.now(),isLaxative=gameState.effects.laxative>now,shouldShoot=keys['Space']||poopPressed;if(shouldShoot&&(now-lastPoopTime>currentBird.poopCooldown||isLaxative)){if(gameState.poopGauge>=10||isLaxative){shootPoop();lastPoopTime=now;if(!isLaxative)gameState.poopGauge-=10}}const regenBonus=1+gameState.upgrades.digestion*0.15;gameState.poopGauge=Math.min(gameState.maxPoopGauge,gameState.poopGauge+15*regenBonus/60);if(gameState.effects.invincible>0)gameState.effects.invincible--;gameState.time=Math.floor((now-gameStartTime)/1000);const stage=STAGES[gameState.currentStage];if(now-lastSpawnTime>stage.spawnRate&&!boss){spawnHuman();lastSpawnTime=now}if(gameState.time>=stage.duration&&!gameState.bossSpawned){gameState.bossSpawned=true;spawnBoss()}poops.forEach(p=>{p.y+=p.speed;p.rotation+=0.15});poops=poops.filter(p=>p.y<500);humans.forEach(h=>{if(h.hit)return;if(h.type==='child'){h.randomTimer++;if(h.randomTimer>30){h.direction=Math.random()<0.3?-h.direction:h.direction;h.randomTimer=0}}if(h.type==='drunk'){h.zigzagTimer++;h.y+=Math.sin(h.zigzagTimer*0.1)*2;if(Math.random()<0.003)projectiles.push({x:h.x,y:h.y-30,vx:(bird.x-h.x)*0.02,vy:-5})}h.x+=h.speed*h.direction});humans=humans.filter(h=>h.x>-50&&h.x<850&&!h.hit);if(boss&&!boss.defeated){boss.x+=1.2*boss.direction;if(boss.x<100||boss.x>700)boss.direction*=-1;boss.attackTimer++;if(boss.attackTimer>100){bossAttack();boss.attackTimer=0}if(boss.currentHealth<=0){boss.defeated=true;gameState.bossDefeated=true;gameState.score+=boss.score;gameState.stageFeathers+=boss.feathers;gameState.stageGoldenFeathers+=boss.goldenFeathers;createParticles(boss.x,boss.y,'#FF6B9D',30);showNotification('★ BOSS DEFEATED! ★');setTimeout(()=>stageClear(),1500)}}projectiles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=0.2});projectiles=projectiles.filter(p=>p.y<500&&p.y>0);particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=0.1;p.life--;p.size*=0.98});particles=particles.filter(p=>p.life>0);poops.forEach(poop=>{humans.forEach(h=>{if(!h.hit&&collision(poop,h)){h.hit=true;poop.hit=true;const mult=gameState.combo>=20?3:gameState.combo>=10?2:gameState.combo>=5?1.5:1;gameState.score+=h.score*mult;gameState.hits++;gameState.combo++;gameState.stageFeathers+=1+Math.floor(gameState.combo/5);createParticles(h.x,h.y,'#8B4513',8)}});if(boss&&!boss.defeated&&collision(poop,boss)){boss.currentHealth--;poop.hit=true;gameState.hits++;createParticles(boss.x,boss.y,'#FF6B9D',10)}});poops=poops.filter(p=>!p.hit);projectiles.forEach(p=>{if(collision(p,bird)){p.hit=true;if(gameState.effects.shield){gameState.effects.shield=false;showNotification('SHIELD BREAK!');createParticles(bird.x,bird.y,'#00D4FF',15)}else if(gameState.effects.invincible<=0){gameState.health--;gameState.effects.invincible=60;gameState.combo=0;createParticles(bird.x,bird.y,'#EF4444',10);if(gameState.health<=0)gameOver()}}});projectiles=projectiles.filter(p=>!p.hit)}function shootPoop(){gameState.shots++;poops.push({x:bird.x,y:bird.y+30,width:24,height:24,speed:8,rotation:0})}function bossAttack(){if(!boss)return;for(let i=0;i<3;i++)setTimeout(()=>{if(boss&&!boss.defeated)projectiles.push({x:boss.x,y:boss.y-20,vx:(bird.x-boss.x)*0.025+(Math.random()-0.5)*3,vy:-7-Math.random()*3})},i*150)}function collision(a,b){const ax=a.x-(a.width||20)/2,ay=a.y-(a.height||20)/2,bx=b.x-b.width/2,by=b.y-b.height/2;return ax<bx+b.width&&ax+(a.width||20)>bx&&ay<by+b.height&&ay+(a.height||20)>by}function createParticles(x,y,color,count){for(let i=0;i<count;i++)particles.push({x,y,vx:(Math.random()-0.5)*8,vy:(Math.random()-0.5)*8-2,color,size:Math.random()*6+3,life:40+Math.random()*20})}function render(){const gradient=ctx.createLinearGradient(0,0,0,500);gradient.addColorStop(0,'#1a1a3e');gradient.addColorStop(0.5,'#0f0f2d');gradient.addColorStop(1,'#2d2d4a');ctx.fillStyle=gradient;ctx.fillRect(0,0,800,500);ctx.strokeStyle='rgba(168,85,247,0.1)';ctx.lineWidth=1;for(let i=0;i<17;i++){ctx.beginPath();ctx.moveTo(i*50,0);ctx.lineTo(i*50,500);ctx.stroke()}for(let i=0;i<11;i++){ctx.beginPath();ctx.moveTo(0,i*50);ctx.lineTo(800,i*50);ctx.stroke()}const time=Date.now()/1000;stars.forEach(s=>{const tw=Math.sin(time*2+s.twinkle)*0.5+0.5;ctx.fillStyle=`rgba(255,255,255,${0.3+tw*0.7})`;ctx.fillRect(s.x,s.y,s.size,s.size)});ctx.fillStyle='#0a0a1a';ctx.fillRect(50,280,50,80);ctx.fillRect(110,260,60,100);ctx.fillRect(450,270,55,90);ctx.fillRect(520,285,70,75);const colors=['#FF6B9D','#00D4FF','#A855F7','#FBBF24'];[[55,290],[75,290],[115,270],[145,270],[455,280],[480,280],[530,295],[570,295]].forEach((p,i)=>{ctx.fillStyle=colors[i%colors.length];ctx.shadowColor=colors[i%colors.length];ctx.shadowBlur=5;ctx.fillRect(p[0],p[1],10,12)});ctx.shadowBlur=0;ctx.fillStyle='#2d2d4a';ctx.fillRect(0,360,800,140);ctx.font='30px Arial';ctx.textAlign='center';humans.forEach(h=>{if(!h.hit){const emoji=h.type==='child'?'🧒':h.type==='drunk'?'🍺':'🚶';ctx.fillText(emoji,h.x,h.y)}});if(boss&&!boss.defeated){ctx.font='45px Arial';ctx.shadowColor='#FF6B9D';ctx.shadowBlur=20;ctx.fillText(gameState.currentStage===1?'🧹':'💪',boss.x,boss.y);ctx.shadowBlur=0;const bw=70;ctx.fillStyle='#1a1a2e';ctx.fillRect(boss.x-bw/2-2,boss.y-45,bw+4,10);ctx.fillStyle='#EF4444';ctx.fillRect(boss.x-bw/2,boss.y-43,bw*(boss.currentHealth/boss.health),6);ctx.fillStyle='#FF6B9D';ctx.font='7px "Press Start 2P"';ctx.fillText(boss.name,boss.x,boss.y-50)}const poopSprite=spriteCanvases['poop'];poops.forEach(p=>{ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rotation);if(poopSprite)ctx.drawImage(poopSprite,-12,-12);ctx.restore()});ctx.font='18px Arial';projectiles.forEach(p=>ctx.fillText('🍾',p.x,p.y));const birdSprite=spriteCanvases[BIRDS[gameState.currentBird].sprite];if(gameState.effects.invincible<=0||Math.floor(gameState.effects.invincible/5)%2===0){ctx.shadowColor='#00D4FF';ctx.shadowBlur=15;if(birdSprite)ctx.drawImage(birdSprite,bird.x-24,bird.y-24);ctx.shadowBlur=0}if(gameState.effects.shield){ctx.strokeStyle='#00D4FF';ctx.lineWidth=3;ctx.shadowColor='#00D4FF';ctx.shadowBlur=15;ctx.beginPath();ctx.arc(bird.x,bird.y,32,0,Math.PI*2);ctx.stroke();ctx.shadowBlur=0}particles.forEach(p=>{ctx.fillStyle=p.color;ctx.fillRect(p.x-p.size/2,p.y-p.size/2,p.size,p.size)});drawUI()}function drawUI(){const stage=STAGES[gameState.currentStage];ctx.fillStyle='rgba(13,2,33,0.9)';ctx.fillRect(0,0,800,38);ctx.strokeStyle='#A855F7';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,38);ctx.lineTo(800,38);ctx.stroke();ctx.font='14px Arial';for(let i=0;i<gameState.maxHealth;i++){ctx.fillStyle=i<gameState.health?'#FF6B9D':'#374151';ctx.shadowColor=i<gameState.health?'#FF6B9D':'transparent';ctx.shadowBlur=i<gameState.health?8:0;ctx.fillText('♥',12+i*22,26)}ctx.shadowBlur=0;ctx.fillStyle='#00D4FF';ctx.font='10px "Press Start 2P"';ctx.textAlign='left';ctx.fillText(`${gameState.score}`,100,24);if(gameState.combo>1){ctx.fillStyle='#FBBF24';ctx.font='9px "Press Start 2P"';ctx.fillText(`${gameState.combo}x`,190,24)}ctx.fillStyle='#E5E7EB';ctx.font='9px "Press Start 2P"';ctx.fillText(`🪶${gameState.feathers+gameState.stageFeathers}`,280,24);if(!gameState.bossSpawned){const rem=Math.max(0,stage.duration-gameState.time);ctx.fillStyle=rem<10?'#EF4444':'#A855F7';ctx.fillText(`⏱${rem}`,400,24)}else if(!gameState.bossDefeated){ctx.fillStyle='#EF4444';ctx.fillText('⚔BOSS',400,24)}ctx.fillStyle='#9CA3AF';ctx.font='7px "Press Start 2P"';ctx.fillText(`STG${gameState.currentStage}`,720,24);const gw=120,gx=550,gy=12;ctx.fillStyle='#1a1a2e';ctx.fillRect(gx,gy,gw,14);const isLax=gameState.effects.laxative>Date.now();ctx.fillStyle=isLax?'#A855F7':'#8B4513';ctx.fillRect(gx+2,gy+2,(gw-4)*(gameState.poopGauge/gameState.maxPoopGauge),10);ctx.strokeStyle=isLax?'#FF6B9D':'#A855F7';ctx.strokeRect(gx,gy,gw,14);let ey=50;ctx.font='7px "Press Start 2P"';ctx.textAlign='left';if(gameState.effects.laxative>Date.now()){ctx.fillStyle='#A855F7';ctx.fillText(`💊${Math.ceil((gameState.effects.laxative-Date.now())/1000)}s`,10,ey);ey+=12}if(gameState.effects.shield){ctx.fillStyle='#00D4FF';ctx.fillText('🛡️ON',10,ey)}}function stageClear(){gameState.screen='stageClear';const stage=STAGES[gameState.currentStage];let starCount=1;if(gameState.score>=stage.targetScore)starCount=2;if(gameState.score>=stage.targetScore&&gameState.health===gameState.maxHealth)starCount=3;if(starCount===3)gameState.stageGoldenFeathers+=3;gameState.stageStars[gameState.currentStage]=Math.max(gameState.stageStars[gameState.currentStage],starCount);gameState.feathers+=gameState.stageFeathers;gameState.goldenFeathers+=gameState.stageGoldenFeathers;hideAllOverlays();document.getElementById('stageClearOverlay').classList.add('active');document.getElementById('clearStars').textContent='★'.repeat(starCount)+'☆'.repeat(3-starCount);document.getElementById('clearScore').textContent=gameState.score;document.getElementById('clearAccuracy').textContent=gameState.shots>0?Math.round(gameState.hits/gameState.shots*100)+'%':'0%';document.getElementById('clearFeathers').textContent=`🪶 ${gameState.stageFeathers}`;document.getElementById('clearGoldenFeathers').textContent=`✦ ${gameState.stageGoldenFeathers}`}function gameOver(){gameState.screen='gameover';gameState.feathers+=Math.floor(gameState.stageFeathers*0.5);hideAllOverlays();document.getElementById('gameoverOverlay').classList.add('active');document.getElementById('goScore').textContent=gameState.score;document.getElementById('goFeathers').textContent=`🪶 ${Math.floor(gameState.stageFeathers*0.5)}`}function showNotification(text){const n=document.getElementById('notification');n.textContent=text;n.classList.add('show');setTimeout(()=>n.classList.remove('show'),2000)}function gameLoop(){if(gameState.screen==='playing'){update();render();animationId=requestAnimationFrame(gameLoop)}}function init(){initSprites();resizeCanvas();gameState.maxPoopGauge=100+gameState.upgrades.poopCapacity*20;gameState.poopGauge=gameState.maxPoopGauge;generateStars();updateItemButtons();drawMenuBird()}init();
+// Canvas setup
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+function resizeCanvas() {
+  const area = document.getElementById('gameArea');
+  canvas.width = area.clientWidth;
+  canvas.height = area.clientHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+// Pixel Art Sprites (all characters in consistent dot style)
+const SPRITES = {
+  // Birds
+  sparrow: [
+    '....BBBB....',
+    '...BYYYBB...',
+    '..BYYYYYWB..',
+    '..BYFFYYWB..',
+    '.BYYYYYYYYB.',
+    '.BOYYYYYYY..',
+    '..BYYYYYYY..',
+    '...BYYYYB...',
+    '....BYYB....',
+    '....B..B....'
+  ],
+  pigeon: [
+    '....GGGG....',
+    '...GGGGGG...',
+    '..GGFFGGWB..',
+    '..GGFFGGWB..',
+    '.GPPPPPPPG..',
+    '.GOGGGGGG...',
+    '..GGGGGGGG..',
+    '...GGGGGG...',
+    '....RRRR....',
+    '....R..R....'
+  ],
+  crow: [
+    '....KKKK....',
+    '...KKKKKK...',
+    '..KKFFKKWB..',
+    '..KKFFKKWB..',
+    '.KKKKKKKKKK.',
+    '.KOKKKKKK...',
+    '..KKKKKKKK..',
+    '...KKKKKK...',
+    '....KKKK....',
+    '....K..K....'
+  ],
+  eagle: [
+    '...DDDDDD...',
+    '..DDDDDDDD..',
+    '.DDFFDDDDWB.',
+    '.DDFFDDDDWB.',
+    'DDDDDDDDDDDD',
+    'DODDDDDDDD..',
+    '.DDDDDDDDDD.',
+    '..DDDDDDDD..',
+    '...OYYYOO...',
+    '...O....O...'
+  ],
+  archaeopteryx: [
+    '..TTTTTTTT..',
+    '.TTTTTTTTTT.',
+    '.TTFFTTTWWB.',
+    '.TTFFTTTTTB.',
+    'TTTTTTTTTTTT',
+    'TOTTTTTTT...',
+    '.TTTTTTTTTT.',
+    '..TTGGGGTT..',
+    '...GGGGGG...',
+    '...G....G...'
+  ],
+  phoenix: [
+    '..RROORROO..',
+    '.RROOOOOOORR',
+    '.OOFFOOOWWB.',
+    '.OOFFOOOYYB.',
+    'OOOOOOOOOOOO',
+    'YOYYYYYYYY..',
+    '.YYYYYYYYYY.',
+    '..YYYYYYYY..',
+    '...RRRRRR...',
+    '...R....R...'
+  ],
+  // Humans (pastel, cute style)
+  human_normal: [
+    '...PPPP...',
+    '..PPPPPP..',
+    '..P.PP.P..',
+    '..PPPPPP..',
+    '...PPPP...',
+    '..LLLLLL..',
+    '.LLLLLLLL.',
+    '..LLLLLL..',
+    '...L..L...',
+    '...B..B...'
+  ],
+  human_child: [
+    '...YYYY...',
+    '..YYYYYY..',
+    '..Y.YY.Y..',
+    '..YYYYYY..',
+    '...YYYY...',
+    '..CCCCCC..',
+    '..CCCCCC..',
+    '...CCCC...',
+    '...C..C...',
+    '...B..B...'
+  ],
+  human_fast: [
+    '...GGGG...',
+    '..GGGGGG..',
+    '..G.GG.G..',
+    '..GGGGGG..',
+    '...GGGG...',
+    '..MMMMMM..',
+    '.MMMMMMMM.',
+    '..MMMMMM..',
+    '..M....M..',
+    '..B....B..'
+  ],
+  // Boss
+  boss_cleaner: [
+    '....BBBB....',
+    '...BBBBBB...',
+    '..BB.BB.BB..',
+    '..BBBBBBBB..',
+    '...BBBBBB...',
+    '..OOOOOOOO..',
+    '.OOOOOOOOOO.',
+    '.OOOOOOOOOO.',
+    '..OO....OO..',
+    '..BB....BB..',
+    '....LLLL....',
+    '....LLLL....'
+  ],
+  // Poop
+  poop: [
+    '..CC..',
+    '.CCCC.',
+    '.CBCC.',
+    'CCCCCC',
+    'CCCCCC',
+    '.CCCC.'
+  ],
+  // Projectile
+  projectile: [
+    '.RR.',
+    'RRRR',
+    'RRRR',
+    '.RR.'
+  ]
+};
+
+const COLORS = {
+  'B': '#5D4E37', // Brown
+  'Y': '#FFE66D', // Yellow
+  'W': '#FFFFFF', // White
+  'F': '#2D2D2D', // Black (eyes)
+  'O': '#FF8C42', // Orange
+  'G': '#95A5A6', // Gray
+  'P': '#DDA0DD', // Pink/Purple (pigeon)
+  'R': '#FF6B6B', // Red
+  'K': '#2D3436', // Dark (crow)
+  'D': '#8B4513', // Dark brown (eagle)
+  'T': '#20B2AA', // Teal (archaeopteryx)
+  'L': '#87CEEB', // Light blue
+  'C': '#C9A86C', // Poop color
+  'M': '#98D4BB', // Mint
+  '.': null
+};
+
+const spriteCache = {};
+
+function createSprite(data, scale = 3) {
+  const key = data.join('') + scale;
+  if (spriteCache[key]) return spriteCache[key];
+  
+  const h = data.length, w = data[0].length;
+  const c = document.createElement('canvas');
+  c.width = w * scale;
+  c.height = h * scale;
+  const x = c.getContext('2d');
+  
+  for (let y = 0; y < h; y++) {
+    for (let i = 0; i < w; i++) {
+      const ch = data[y][i];
+      if (COLORS[ch]) {
+        x.fillStyle = COLORS[ch];
+        x.fillRect(i * scale, y * scale, scale, scale);
+      }
+    }
+  }
+  spriteCache[key] = c;
+  return c;
+}
+
+// Game Data
+const BIRDS = {
+  sparrow: { name: '참새', sprite: 'sparrow', speed: 5, damage: 1, poopSpeed: 6, poopSize: 1, price: 0, level: 1 },
+  pigeon: { name: '비둘기', sprite: 'pigeon', speed: 5.5, damage: 1.5, poopSpeed: 7, poopSize: 1.1, price: 5, level: 2 },
+  crow: { name: '까마귀', sprite: 'crow', speed: 6, damage: 2, poopSpeed: 8, poopSize: 1.2, price: 10, level: 3 },
+  eagle: { name: '독수리', sprite: 'eagle', speed: 7, damage: 3, poopSpeed: 9, poopSize: 1.3, price: 20, level: 4 },
+  archaeopteryx: { name: '시조새', sprite: 'archaeopteryx', speed: 8, damage: 4, poopSpeed: 10, poopSize: 1.5, price: 35, level: 5 },
+  phoenix: { name: '피닉스', sprite: 'phoenix', speed: 10, damage: 6, poopSpeed: 12, poopSize: 2, price: 50, level: 6 }
+};
+
+const ITEMS = {
+  bread: { name: '빵', icon: '🍞', price: 30, desc: 'HP +1', effect: 'heal' },
+  chili: { name: '고추', icon: '🌶️', price: 50, desc: '무한똥', effect: 'unlimited' },
+  shield: { name: '방패', icon: '🛡️', price: 60, desc: '보호', effect: 'shield' }
+};
+
+const UPGRADES = {
+  energy: { name: '에너지', icon: '⚡', price: 50, desc: '+20%', maxLevel: 5, stat: 'maxEnergy', bonus: 20 },
+  speed: { name: '스피드', icon: '💨', price: 60, desc: '+10%', maxLevel: 5, stat: 'speedBonus', bonus: 0.1 },
+  poopSpeed: { name: '똥스피드', icon: '💩', price: 70, desc: '+15%', maxLevel: 5, stat: 'poopSpeedBonus', bonus: 0.15 },
+  poopDamage: { name: '똥데미지', icon: '💥', price: 80, desc: '+20%', maxLevel: 5, stat: 'damageBonus', bonus: 0.2 },
+  poopSize: { name: '똥크기', icon: '🟤', price: 90, desc: '+15%', maxLevel: 5, stat: 'sizeBonus', bonus: 0.15 }
+};
+
+const STAGES = [
+  { id: 1, name: '공원', icon: '🌳', targetScore: 100, duration: 45, spawnRate: 2500 },
+  { id: 2, name: '도시', icon: '🏙️', targetScore: 200, duration: 50, spawnRate: 2200 },
+  { id: 3, name: '해변', icon: '🏖️', targetScore: 300, duration: 55, spawnRate: 2000 },
+  { id: 4, name: '운동장', icon: '🏟️', targetScore: 400, duration: 60, spawnRate: 1800, boss: true },
+  { id: 5, name: '성', icon: '🏰', targetScore: 500, duration: 65, spawnRate: 1600 },
+  { id: 6, name: '화산', icon: '🌋', targetScore: 600, duration: 70, spawnRate: 1400, boss: true }
+];
+
+// Game State
+let gameState = {
+  screen: 'menu',
+  currentStage: 1,
+  score: 0,
+  feathers: 100,
+  gold: 10,
+  stones: 3,
+  health: 3,
+  maxHealth: 3,
+  energy: 100,
+  maxEnergy: 100,
+  combo: 0,
+  maxCombo: 0,
+  hits: 0,
+  shots: 0,
+  stageFeathers: 0,
+  stageGold: 0,
+  
+  inventory: { bread: 3, chili: 1, shield: 1 },
+  quickSlots: ['bread', 'chili', 'shield'],
+  
+  effects: { unlimited: 0, shield: false, invincible: 0 },
+  
+  upgrades: { energy: 0, speed: 0, poopSpeed: 0, poopDamage: 0, poopSize: 0 },
+  
+  currentBird: 'sparrow',
+  unlockedBirds: ['sparrow'],
+  
+  stageStars: {},
+  bossSpawned: false,
+  bossDefeated: false
+};
+
+let bird = { x: 0, y: 0, width: 36, height: 30 };
+let poops = [], humans = [], projectiles = [], particles = [];
+let boss = null;
+let lastPoopTime = 0, lastSpawnTime = 0, gameStartTime = 0;
+let animationId = null, previousScreen = 'menu';
+
+// Joystick
+let joystick = { active: false, startX: 0, startY: 0, moveX: 0, moveY: 0 };
+let poopPressed = false;
+
+// Input handlers
+const joystickArea = document.getElementById('joystickArea');
+const joystickKnob = document.getElementById('joystickKnob');
+
+function handleJoystickStart(e) {
+  e.preventDefault();
+  const touch = e.touches ? e.touches[0] : e;
+  const rect = joystickArea.getBoundingClientRect();
+  joystick.active = true;
+  joystick.startX = rect.left + rect.width / 2;
+  joystick.startY = rect.top + rect.height / 2;
+}
+
+function handleJoystickMove(e) {
+  if (!joystick.active) return;
+  e.preventDefault();
+  const touch = e.touches ? e.touches[0] : e;
+  const dx = touch.clientX - joystick.startX;
+  const dy = touch.clientY - joystick.startY;
+  const maxDist = 40;
+  const dist = Math.min(Math.sqrt(dx*dx + dy*dy), maxDist);
+  const angle = Math.atan2(dy, dx);
+  
+  joystick.moveX = (dist / maxDist) * Math.cos(angle);
+  joystick.moveY = (dist / maxDist) * Math.sin(angle);
+  
+  const knobX = joystick.moveX * maxDist;
+  const knobY = joystick.moveY * maxDist;
+  joystickKnob.style.transform = `translate(calc(-50% + ${knobX}px), calc(-50% + ${knobY}px))`;
+}
+
+function handleJoystickEnd() {
+  joystick.active = false;
+  joystick.moveX = 0;
+  joystick.moveY = 0;
+  joystickKnob.style.transform = 'translate(-50%, -50%)';
+}
+
+joystickArea.addEventListener('touchstart', handleJoystickStart, { passive: false });
+joystickArea.addEventListener('touchmove', handleJoystickMove, { passive: false });
+joystickArea.addEventListener('touchend', handleJoystickEnd);
+joystickArea.addEventListener('touchcancel', handleJoystickEnd);
+
+const poopButton = document.getElementById('poopButton');
+poopButton.addEventListener('touchstart', e => { e.preventDefault(); poopPressed = true; }, { passive: false });
+poopButton.addEventListener('touchend', () => poopPressed = false);
+poopButton.addEventListener('touchcancel', () => poopPressed = false);
+
+document.querySelectorAll('.item-btn').forEach(btn => {
+  btn.addEventListener('touchstart', e => {
+    e.preventDefault();
+    useQuickSlot(parseInt(btn.dataset.slot));
+  }, { passive: false });
+});
+
+// UI Functions
+function updateUI() {
+  document.getElementById('energyFill').style.width = (gameState.energy / gameState.maxEnergy * 100) + '%';
+  document.getElementById('poopGaugeFill').style.height = (gameState.energy / gameState.maxEnergy * 100) + '%';
+  document.getElementById('featherCount').textContent = gameState.feathers + gameState.stageFeathers;
+  document.getElementById('goldCount').textContent = gameState.gold + gameState.stageGold;
+  document.getElementById('stoneCount').textContent = gameState.stones;
+  document.getElementById('levelText').textContent = 'Lv.' + BIRDS[gameState.currentBird].level;
+  
+  // Combo display
+  const comboEl = document.getElementById('comboDisplay');
+  if (gameState.combo > 1) {
+    comboEl.style.display = 'block';
+    comboEl.textContent = gameState.combo + ' COMBO';
+  } else {
+    comboEl.style.display = 'none';
+  }
+  
+  updateItemButtons();
+}
+
+function updateItemButtons() {
+  document.querySelectorAll('.item-btn').forEach((btn, i) => {
+    const k = gameState.quickSlots[i];
+    if (k && ITEMS[k]) {
+      btn.querySelector('.icon').textContent = ITEMS[k].icon;
+      btn.querySelector('.count').textContent = gameState.inventory[k] || 0;
+    }
+  });
+}
+
+function showNotification(text) {
+  const n = document.getElementById('notification');
+  n.textContent = text;
+  n.classList.add('show');
+  setTimeout(() => n.classList.remove('show'), 2000);
+}
+
+// Screen management
+function hideAllOverlays() {
+  ['mainMenu', 'stageSelect', 'shopOverlay', 'pauseOverlay', 'clearOverlay', 'gameoverOverlay'].forEach(id => {
+    document.getElementById(id).classList.remove('active');
+  });
+}
+
+function showMainMenu() {
+  gameState.screen = 'menu';
+  hideAllOverlays();
+  document.getElementById('mainMenu').classList.add('active');
+  if (animationId) cancelAnimationFrame(animationId);
+  drawMenuBird();
+}
+
+function showStageSelect() {
+  gameState.screen = 'stageSelect';
+  hideAllOverlays();
+  document.getElementById('stageSelect').classList.add('active');
+  renderStageGrid();
+}
+
+function renderStageGrid() {
+  const grid = document.getElementById('stageGrid');
+  grid.innerHTML = '';
+  
+  STAGES.forEach((stage, i) => {
+    const unlocked = i === 0 || gameState.stageStars[i] > 0;
+    const stars = gameState.stageStars[stage.id] || 0;
+    
+    const btn = document.createElement('div');
+    btn.className = 'stage-btn' + (unlocked ? '' : ' locked');
+    btn.innerHTML = `
+      <div class="stage-btn-icon">${stage.icon}</div>
+      <div class="stage-btn-name">${stage.name}</div>
+      <div class="stage-btn-stars">${'★'.repeat(stars)}${'☆'.repeat(3-stars)}</div>
+      ${!unlocked ? '<div style="font-size:20px">🔒</div>' : ''}
+    `;
+    if (unlocked) {
+      btn.onclick = () => startStage(stage.id);
+    }
+    grid.appendChild(btn);
+  });
+}
+
+function continueGame() {
+  showStageSelect();
+}
+
+function togglePause() {
+  if (gameState.screen === 'playing') pauseGame();
+  else if (gameState.screen === 'paused') resumeGame();
+}
+
+function pauseGame() {
+  gameState.screen = 'paused';
+  document.getElementById('pauseOverlay').classList.add('active');
+}
+
+function resumeGame() {
+  gameState.screen = 'playing';
+  document.getElementById('pauseOverlay').classList.remove('active');
+  gameLoop();
+}
+
+function quitToMenu() {
+  if (animationId) cancelAnimationFrame(animationId);
+  hideAllOverlays();
+  showStageSelect();
+}
+
+// Shop
+function openShop() {
+  previousScreen = gameState.screen;
+  gameState.screen = 'shop';
+  hideAllOverlays();
+  document.getElementById('shopOverlay').classList.add('active');
+  updateShopDisplay();
+  switchShopTab(document.querySelector('.shop-tab'), 'items');
+}
+
+function openShopFromPause() {
+  previousScreen = 'paused';
+  document.getElementById('pauseOverlay').classList.remove('active');
+  openShop();
+}
+
+function closeShop() {
+  document.getElementById('shopOverlay').classList.remove('active');
+  if (previousScreen === 'paused') {
+    gameState.screen = 'paused';
+    document.getElementById('pauseOverlay').classList.add('active');
+  } else {
+    showStageSelect();
+  }
+}
+
+function updateShopDisplay() {
+  document.getElementById('shopFeathers').textContent = gameState.feathers;
+  document.getElementById('shopGold').textContent = gameState.gold;
+  document.getElementById('shopStones').textContent = gameState.stones;
+}
+
+function switchShopTab(el, tab) {
+  document.querySelectorAll('.shop-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  
+  const container = document.getElementById('shopItems');
+  container.innerHTML = '';
+  
+  if (tab === 'items') {
+    Object.entries(ITEMS).forEach(([k, item]) => {
+      const owned = gameState.inventory[k] || 0;
+      const div = document.createElement('div');
+      div.className = 'shop-item';
+      div.innerHTML = `
+        <div class="shop-item-icon">${item.icon}</div>
+        <div class="shop-item-name">${item.name}</div>
+        <div class="shop-item-price">🪶${item.price}</div>
+        <div style="font-size:8px;color:#666">보유:${owned}</div>
+      `;
+      div.onclick = () => buyItem(k);
+      container.appendChild(div);
+    });
+  } else if (tab === 'upgrades') {
+    Object.entries(UPGRADES).forEach(([k, up]) => {
+      const lv = gameState.upgrades[k];
+      const maxed = lv >= up.maxLevel;
+      const div = document.createElement('div');
+      div.className = 'shop-item' + (maxed ? ' owned' : '');
+      div.innerHTML = `
+        <div class="shop-item-icon">${up.icon}</div>
+        <div class="shop-item-name">${up.name}</div>
+        <div class="shop-item-price">${maxed ? 'MAX' : '✨' + up.price}</div>
+        <div style="font-size:8px;color:#666">Lv.${lv}/${up.maxLevel}</div>
+      `;
+      if (!maxed) div.onclick = () => buyUpgrade(k);
+      container.appendChild(div);
+    });
+  } else if (tab === 'evolution') {
+    Object.entries(BIRDS).forEach(([k, b]) => {
+      const owned = gameState.unlockedBirds.includes(k);
+      const selected = gameState.currentBird === k;
+      const div = document.createElement('div');
+      div.className = 'shop-item' + (selected ? ' selected' : '') + (owned && !selected ? '' : '');
+      div.innerHTML = `
+        <canvas class="bird-canvas" width="36" height="30" data-bird="${k}"></canvas>
+        <div class="shop-item-name">${b.name}</div>
+        <div class="shop-item-price">${owned ? (selected ? '✔' : '선택') : '💎' + b.price}</div>
+      `;
+      div.onclick = () => {
+        if (owned) {
+          gameState.currentBird = k;
+          switchShopTab(el, 'evolution');
+          showNotification(b.name + ' 선택!');
+        } else {
+          buyBird(k);
+        }
+      };
+      container.appendChild(div);
+      
+      // Draw bird sprite
+      setTimeout(() => {
+        const canv = div.querySelector('.bird-canvas');
+        if (canv) {
+          const sprite = createSprite(SPRITES[b.sprite], 3);
+          canv.getContext('2d').drawImage(sprite, 0, 0, 36, 30);
+        }
+      }, 0);
+    });
+  }
+}
+
+function buyItem(k) {
+  const item = ITEMS[k];
+  if (gameState.feathers >= item.price) {
+    gameState.feathers -= item.price;
+    gameState.inventory[k] = (gameState.inventory[k] || 0) + 1;
+    updateShopDisplay();
+    switchShopTab(document.querySelector('.shop-tab.active'), 'items');
+    showNotification(item.name + ' 구매!');
+  } else {
+    showNotification('깃털 부족!');
+  }
+}
+
+function buyUpgrade(k) {
+  const up = UPGRADES[k];
+  if (gameState.gold >= up.price && gameState.upgrades[k] < up.maxLevel) {
+    gameState.gold -= up.price;
+    gameState.upgrades[k]++;
+    if (k === 'energy') gameState.maxEnergy = 100 + gameState.upgrades[k] * up.bonus;
+    updateShopDisplay();
+    switchShopTab(document.querySelector('.shop-tab.active'), 'upgrades');
+    showNotification(up.name + ' UP!');
+  } else {
+    showNotification('보석 부족!');
+  }
+}
+
+function buyBird(k) {
+  const b = BIRDS[k];
+  if (gameState.stones >= b.price) {
+    gameState.stones -= b.price;
+    gameState.unlockedBirds.push(k);
+    gameState.currentBird = k;
+    updateShopDisplay();
+    switchShopTab(document.querySelector('.shop-tab.active'), 'evolution');
+    showNotification(b.name + ' 해금!');
+  } else {
+    showNotification('진화석 부족!');
+  }
+}
+
+function useQuickSlot(i) {
+  const k = gameState.quickSlots[i];
+  if (!k || !gameState.inventory[k]) return;
+  
+  gameState.inventory[k]--;
+  updateItemButtons();
+  
+  switch (ITEMS[k].effect) {
+    case 'heal':
+      gameState.health = Math.min(gameState.health + 1, gameState.maxHealth);
+      showNotification('HP +1!');
+      createParticles(bird.x, bird.y, '#FF6B6B', 10);
+      break;
+    case 'unlimited':
+      gameState.effects.unlimited = Date.now() + 8000;
+      showNotification('무한 똥!');
+      break;
+    case 'shield':
+      gameState.effects.shield = true;
+      showNotification('보호막!');
+      break;
+  }
+}
+
+// Game Logic
+function startStage(num) {
+  const stage = STAGES.find(s => s.id === num);
+  if (!stage) return;
+  
+  gameState.currentStage = num;
+  gameState.screen = 'playing';
+  gameState.score = 0;
+  gameState.health = gameState.maxHealth;
+  gameState.energy = gameState.maxEnergy;
+  gameState.combo = 0;
+  gameState.maxCombo = 0;
+  gameState.hits = 0;
+  gameState.shots = 0;
+  gameState.stageFeathers = 0;
+  gameState.stageGold = 0;
+  gameState.bossSpawned = false;
+  gameState.bossDefeated = false;
+  gameState.effects = { unlimited: 0, shield: false, invincible: 0 };
+  
+  bird.x = canvas.width / 2;
+  bird.y = canvas.height * 0.15;
+  poops = [];
+  humans = [];
+  projectiles = [];
+  particles = [];
+  boss = null;
+  
+  gameStartTime = Date.now();
+  lastSpawnTime = 0;
+  
+  hideAllOverlays();
+  updateUI();
+  gameLoop();
+}
+
+function retryStage() {
+  startStage(gameState.currentStage);
+}
+
+function spawnHuman() {
+  const types = ['normal', 'child', 'fast'];
+  const type = types[Math.floor(Math.random() * types.length)];
+  const side = Math.random() < 0.5 ? 'left' : 'right';
+  
+  const stats = {
+    normal: { speed: 1.5, score: 10, sprite: 'human_normal' },
+    child: { speed: 2.5, score: 20, sprite: 'human_child' },
+    fast: { speed: 3, score: 15, sprite: 'human_fast' }
+  };
+  
+  const s = stats[type];
+  humans.push({
+    x: side === 'left' ? -30 : canvas.width + 30,
+    y: canvas.height * 0.7 + Math.random() * (canvas.height * 0.2),
+    width: 30,
+    height: 40,
+    type,
+    speed: s.speed,
+    score: s.score,
+    sprite: s.sprite,
+    direction: side === 'left' ? 1 : -1,
+    hit: false
+  });
+}
+
+function spawnBoss() {
+  boss = {
+    x: canvas.width / 2,
+    y: canvas.height * 0.75,
+    width: 50,
+    height: 60,
+    health: 10,
+    maxHealth: 10,
+    score: 200,
+    direction: 1,
+    attackTimer: 0,
+    defeated: false
+  };
+  showNotification('⚠️ BOSS!');
+}
+
+function shootPoop() {
+  gameState.shots++;
+  const birdData = BIRDS[gameState.currentBird];
+  const sizeBonus = 1 + gameState.upgrades.poopSize * 0.15;
+  const size = 18 * birdData.poopSize * sizeBonus;
+  
+  poops.push({
+    x: bird.x,
+    y: bird.y + 20,
+    width: size,
+    height: size,
+    speed: (birdData.poopSpeed + gameState.upgrades.poopSpeed * 1.5) * (1 + gameState.upgrades.poopSpeed * 0.15),
+    damage: birdData.damage * (1 + gameState.upgrades.poopDamage * 0.2),
+    rotation: 0
+  });
+}
+
+function bossAttack() {
+  if (!boss || boss.defeated) return;
+  
+  // Boss throws projectiles that can reach bird's height
+  const targetY = bird.y + 50; // Slightly below bird so it can hit
+  const dx = bird.x - boss.x;
+  const dy = targetY - boss.y;
+  const dist = Math.sqrt(dx*dx + dy*dy);
+  const speed = 5;
+  
+  projectiles.push({
+    x: boss.x,
+    y: boss.y - 20,
+    vx: (dx / dist) * speed + (Math.random() - 0.5) * 2,
+    vy: (dy / dist) * speed,
+    width: 12,
+    height: 12
+  });
+}
+
+function update() {
+  if (gameState.screen !== 'playing') return;
+  
+  const birdData = BIRDS[gameState.currentBird];
+  const speedBonus = 1 + gameState.upgrades.speed * 0.1;
+  const speed = birdData.speed * speedBonus;
+  
+  // Bird movement
+  if (joystick.active) {
+    bird.x += joystick.moveX * speed;
+    bird.y += joystick.moveY * speed;
+  }
+  
+  bird.x = Math.max(30, Math.min(canvas.width - 30, bird.x));
+  bird.y = Math.max(30, Math.min(canvas.height * 0.35, bird.y));
+  
+  const now = Date.now();
+  const isUnlimited = gameState.effects.unlimited > now;
+  
+  // Shooting
+  if (poopPressed && (now - lastPoopTime > 250 || isUnlimited)) {
+    if (gameState.energy >= 10 || isUnlimited) {
+      shootPoop();
+      lastPoopTime = now;
+      if (!isUnlimited) gameState.energy -= 10;
+    }
+  }
+  
+  // Energy regen
+  gameState.energy = Math.min(gameState.maxEnergy, gameState.energy + 0.5);
+  
+  if (gameState.effects.invincible > 0) gameState.effects.invincible--;
+  
+  const stage = STAGES.find(s => s.id === gameState.currentStage);
+  const elapsed = (now - gameStartTime) / 1000;
+  
+  // Spawn humans
+  if (now - lastSpawnTime > stage.spawnRate && !boss) {
+    spawnHuman();
+    lastSpawnTime = now;
+  }
+  
+  // Boss spawn
+  if (stage.boss && elapsed >= stage.duration * 0.7 && !gameState.bossSpawned) {
+    gameState.bossSpawned = true;
+    spawnBoss();
+  }
+  
+  // Update poops
+  poops.forEach(p => {
+    p.y += p.speed;
+    p.rotation += 0.1;
+  });
+  poops = poops.filter(p => p.y < canvas.height);
+  
+  // Update humans
+  humans.forEach(h => {
+    if (!h.hit) h.x += h.speed * h.direction;
+  });
+  humans = humans.filter(h => h.x > -50 && h.x < canvas.width + 50 && !h.hit);
+  
+  // Update boss
+  if (boss && !boss.defeated) {
+    boss.x += 2 * boss.direction;
+    if (boss.x < 80 || boss.x > canvas.width - 80) boss.direction *= -1;
+    
+    boss.attackTimer++;
+    if (boss.attackTimer > 80) {
+      bossAttack();
+      boss.attackTimer = 0;
+    }
+    
+    if (boss.health <= 0) {
+      boss.defeated = true;
+      gameState.bossDefeated = true;
+      gameState.score += boss.score;
+      gameState.stageGold += 5;
+      createParticles(boss.x, boss.y, '#FFD93D', 30);
+      showNotification('BOSS 처치!');
+      setTimeout(() => stageClear(), 1500);
+    }
+  }
+  
+  // Update projectiles
+  projectiles.forEach(p => {
+    p.x += p.vx;
+    p.y += p.vy;
+  });
+  projectiles = projectiles.filter(p => p.y > 0 && p.y < canvas.height && p.x > 0 && p.x < canvas.width);
+  
+  // Update particles
+  particles.forEach(p => {
+    p.x += p.vx;
+    p.y += p.vy;
+    p.vy += 0.2;
+    p.life--;
+  });
+  particles = particles.filter(p => p.life > 0);
+  
+  // Collision: poop vs humans
+  poops.forEach(poop => {
+    humans.forEach(h => {
+      if (!h.hit && collision(poop, h)) {
+        h.hit = true;
+        poop.hit = true;
+        gameState.score += h.score * (1 + gameState.combo * 0.1);
+        gameState.hits++;
+        gameState.combo++;
+        if (gameState.combo > gameState.maxCombo) gameState.maxCombo = gameState.combo;
+        gameState.stageFeathers += 1 + Math.floor(gameState.combo / 5);
+        if (Math.random() < 0.1) gameState.stageGold++;
+        createParticles(h.x, h.y, '#C9A86C', 8);
+      }
+    });
+    
+    if (boss && !boss.defeated && collision(poop, boss)) {
+      boss.health -= poop.damage;
+      poop.hit = true;
+      gameState.hits++;
+      createParticles(boss.x, boss.y, '#FF6B6B', 10);
+    }
+  });
+  poops = poops.filter(p => !p.hit);
+  
+  // Collision: projectiles vs bird
+  projectiles.forEach(p => {
+    if (collision(p, bird)) {
+      p.hit = true;
+      if (gameState.effects.shield) {
+        gameState.effects.shield = false;
+        showNotification('보호막 파괴!');
+        createParticles(bird.x, bird.y, '#87CEEB', 15);
+      } else if (gameState.effects.invincible <= 0) {
+        gameState.health--;
+        gameState.effects.invincible = 60;
+        gameState.combo = 0;
+        createParticles(bird.x, bird.y, '#FF6B6B', 10);
+        if (gameState.health <= 0) gameOver();
+      }
+    }
+  });
+  projectiles = projectiles.filter(p => !p.hit);
+  
+  // Check time/score for clear
+  if (!stage.boss && (elapsed >= stage.duration || gameState.score >= stage.targetScore * 1.5)) {
+    stageClear();
+  }
+  
+  updateUI();
+}
+
+function collision(a, b) {
+  return a.x - a.width/2 < b.x + b.width/2 &&
+         a.x + a.width/2 > b.x - b.width/2 &&
+         a.y - a.height/2 < b.y + b.height/2 &&
+         a.y + a.height/2 > b.y - b.height/2;
+}
+
+function createParticles(x, y, color, count) {
+  for (let i = 0; i < count; i++) {
+    particles.push({
+      x, y,
+      vx: (Math.random() - 0.5) * 8,
+      vy: (Math.random() - 0.5) * 8 - 2,
+      color,
+      size: Math.random() * 6 + 3,
+      life: 30 + Math.random() * 20
+    });
+  }
+}
+
+function render() {
+  // Clear with gradient background
+  const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  gradient.addColorStop(0, '#87CEEB');
+  gradient.addColorStop(0.5, '#E0F4FF');
+  gradient.addColorStop(1, '#98D4BB');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+  // Draw clouds
+  ctx.fillStyle = 'rgba(255,255,255,0.8)';
+  for (let i = 0; i < 5; i++) {
+    const x = ((Date.now() / 50 + i * 150) % (canvas.width + 100)) - 50;
+    const y = 30 + i * 20;
+    ctx.beginPath();
+    ctx.arc(x, y, 20, 0, Math.PI * 2);
+    ctx.arc(x + 25, y - 5, 25, 0, Math.PI * 2);
+    ctx.arc(x + 50, y, 20, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  
+  // Draw ground
+  ctx.fillStyle = '#7CB342';
+  ctx.fillRect(0, canvas.height * 0.85, canvas.width, canvas.height * 0.15);
+  
+  // Draw path
+  ctx.fillStyle = '#D7CCC8';
+  ctx.fillRect(0, canvas.height * 0.75, canvas.width, canvas.height * 0.1);
+  
+  // Draw humans
+  humans.forEach(h => {
+    if (!h.hit) {
+      const sprite = createSprite(SPRITES[h.sprite], 3);
+      ctx.save();
+      if (h.direction < 0) {
+        ctx.scale(-1, 1);
+        ctx.drawImage(sprite, -h.x - h.width/2, h.y - h.height/2);
+      } else {
+        ctx.drawImage(sprite, h.x - h.width/2, h.y - h.height/2);
+      }
+      ctx.restore();
+    }
+  });
+  
+  // Draw boss
+  if (boss && !boss.defeated) {
+    const sprite = createSprite(SPRITES.boss_cleaner, 4);
+    ctx.drawImage(sprite, boss.x - boss.width/2, boss.y - boss.height/2);
+    
+    // Health bar
+    ctx.fillStyle = '#2D5A3D';
+    ctx.fillRect(boss.x - 40, boss.y - boss.height/2 - 15, 80, 10);
+    ctx.fillStyle = '#FF6B6B';
+    ctx.fillRect(boss.x - 38, boss.y - boss.height/2 - 13, 76 * (boss.health / boss.maxHealth), 6);
+  }
+  
+  // Draw poops
+  const poopSprite = createSprite(SPRITES.poop, 3);
+  poops.forEach(p => {
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.rotation);
+    ctx.drawImage(poopSprite, -p.width/2, -p.height/2, p.width, p.height);
+    ctx.restore();
+  });
+  
+  // Draw projectiles
+  const projSprite = createSprite(SPRITES.projectile, 3);
+  projectiles.forEach(p => {
+    ctx.drawImage(projSprite, p.x - p.width/2, p.y - p.height/2);
+  });
+  
+  // Draw bird
+  const birdData = BIRDS[gameState.currentBird];
+  const birdSprite = createSprite(SPRITES[birdData.sprite], 3);
+  
+  if (gameState.effects.invincible <= 0 || Math.floor(gameState.effects.invincible / 5) % 2 === 0) {
+    ctx.drawImage(birdSprite, bird.x - bird.width/2, bird.y - bird.height/2);
+  }
+  
+  // Shield effect
+  if (gameState.effects.shield) {
+    ctx.strokeStyle = '#87CEEB';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(bird.x, bird.y, 25, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  
+  // Draw particles
+  particles.forEach(p => {
+    ctx.fillStyle = p.color;
+    ctx.fillRect(p.x - p.size/2, p.y - p.size/2, p.size, p.size);
+  });
+  
+  // Draw HP hearts
+  for (let i = 0; i < gameState.maxHealth; i++) {
+    ctx.font = '20px Arial';
+    ctx.fillText(i < gameState.health ? '❤️' : '🩶', 10 + i * 25, 30);
+  }
+}
+
+function stageClear() {
+  gameState.screen = 'stageClear';
+  if (animationId) cancelAnimationFrame(animationId);
+  
+  const stage = STAGES.find(s => s.id === gameState.currentStage);
+  let stars = 1;
+  if (gameState.score >= stage.targetScore) stars = 2;
+  if (gameState.score >= stage.targetScore && gameState.health === gameState.maxHealth) stars = 3;
+  
+  gameState.stageStars[gameState.currentStage] = Math.max(gameState.stageStars[gameState.currentStage] || 0, stars);
+  
+  if (stars === 3) gameState.stageGold += 3;
+  if (Math.random() < 0.2 * stars) gameState.stones++;
+  
+  gameState.feathers += gameState.stageFeathers;
+  gameState.gold += gameState.stageGold;
+  
+  hideAllOverlays();
+  document.getElementById('clearOverlay').classList.add('active');
+  document.getElementById('clearStars').textContent = '⭐'.repeat(stars) + '☆'.repeat(3 - stars);
+  document.getElementById('clearScore').textContent = Math.floor(gameState.score);
+  document.getElementById('clearAccuracy').textContent = gameState.shots > 0 ? Math.round(gameState.hits / gameState.shots * 100) + '%' : '0%';
+  document.getElementById('clearFeathers').textContent = '🪶 ' + gameState.stageFeathers;
+  document.getElementById('clearGold').textContent = '✨ ' + gameState.stageGold;
+}
+
+function gameOver() {
+  gameState.screen = 'gameover';
+  if (animationId) cancelAnimationFrame(animationId);
+  
+  gameState.feathers += Math.floor(gameState.stageFeathers * 0.3);
+  
+  hideAllOverlays();
+  document.getElementById('gameoverOverlay').classList.add('active');
+  document.getElementById('goScore').textContent = Math.floor(gameState.score);
+  document.getElementById('goFeathers').textContent = '🪶 ' + Math.floor(gameState.stageFeathers * 0.3);
+}
+
+function gameLoop() {
+  if (gameState.screen === 'playing') {
+    update();
+    render();
+    animationId = requestAnimationFrame(gameLoop);
+  }
+}
+
+function drawMenuBird() {
+  const menuCanvas = document.getElementById('menuBird');
+  const mctx = menuCanvas.getContext('2d');
+  mctx.clearRect(0, 0, 80, 80);
+  
+  const sprite = createSprite(SPRITES.sparrow, 5);
+  mctx.drawImage(sprite, 10, 10);
+}
+
+function drawBirdIcon() {
+  const iconCanvas = document.getElementById('birdIcon');
+  const ictx = iconCanvas.getContext('2d');
+  ictx.clearRect(0, 0, 32, 32);
+  
+  const birdData = BIRDS[gameState.currentBird];
+  const sprite = createSprite(SPRITES[birdData.sprite], 2);
+  ictx.drawImage(sprite, 4, 4);
+}
+
+// Initialize
+function init() {
+  resizeCanvas();
+  drawMenuBird();
+  drawBirdIcon();
+  updateUI();
+}
+
+init();
