@@ -8,131 +8,146 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#87CEEB">
   <title>BIRD DROP</title>
-  <link rel="manifest" href="manifest.json">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
     html, body { width: 100%; height: 100%; overflow: hidden; touch-action: none; font-family: 'Press Start 2P', monospace; background: #87CEEB; position: fixed; }
-    #gameContainer { width: 100vw; height: 100vh; height: 100dvh; display: flex; flex-direction: column; background: linear-gradient(180deg, #87CEEB 0%, #E0F4FF 50%, #98D4BB 100%); }
+    #gameContainer { width: 100vw; height: 100vh; height: 100dvh; display: flex; flex-direction: column; }
     
-    /* Top UI Bar */
-    #topUI { display: flex; flex-wrap: wrap; padding: 8px; gap: 6px; background: rgba(255,255,255,0.3); border-bottom: 3px solid #5B8C5A; }
-    .ui-box { background: #4A7C59; border: 3px solid #2D5A3D; border-radius: 8px; padding: 6px 10px; color: white; font-size: 10px; display: flex; align-items: center; gap: 4px; }
-    .ui-box.bird-box { min-width: 70px; flex-direction: column; }
-    .ui-box.energy-bar { flex: 1; min-width: 120px; }
-    .energy-fill { height: 16px; background: #FFD93D; border-radius: 4px; transition: width 0.2s; }
-    .energy-bg { flex: 1; background: #2D5A3D; border-radius: 4px; overflow: hidden; }
-    #topUI .right-section { display: flex; gap: 6px; margin-left: auto; }
+    #topUI { display: flex; flex-wrap: wrap; padding: 6px; gap: 4px; background: rgba(0,0,0,0.3); border-bottom: 3px solid rgba(255,255,255,0.3); align-items: center; }
+    .ui-box { background: rgba(255,255,255,0.9); border: 2px solid #333; border-radius: 6px; padding: 4px 8px; color: #333; font-size: 9px; display: flex; align-items: center; gap: 3px; }
+    .ui-box.bird-box { flex-direction: column; padding: 4px; }
+    #levelText { font-size: 7px; }
+    .energy-bar { flex: 1; min-width: 80px; }
+    .energy-fill { height: 12px; background: linear-gradient(90deg, #FFD93D, #FF6B6B); border-radius: 3px; transition: width 0.2s; }
+    .energy-bg { flex: 1; background: #333; border-radius: 3px; overflow: hidden; margin-left: 4px; }
+    .right-section { display: flex; gap: 4px; margin-left: auto; }
     .ui-box.clickable { cursor: pointer; }
-    .ui-box.clickable:active { transform: scale(0.95); }
+    .ui-box.clickable:active { transform: scale(0.95); background: #FFD93D; }
     
-    /* Game Canvas Area */
+    #progressMap { display: flex; align-items: center; gap: 2px; background: rgba(0,0,0,0.5); padding: 4px 8px; border-radius: 10px; margin: 0 4px; }
+    .progress-dot { width: 8px; height: 8px; background: #555; border-radius: 50%; }
+    .progress-dot.passed { background: #4CAF50; }
+    .progress-dot.current { background: #FFD93D; animation: pulse 0.5s infinite; }
+    .progress-dot.boss { background: #FF6B6B; }
+    .progress-line { width: 12px; height: 2px; background: #555; }
+    .progress-line.passed { background: #4CAF50; }
+    @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.3); } }
+    
+    .difficulty-badge { font-size: 7px; padding: 2px 6px; border-radius: 4px; }
+    .difficulty-badge.normal { background: #4CAF50; color: white; }
+    .difficulty-badge.hell { background: #FF0000; color: white; animation: hellPulse 0.3s infinite; }
+    @keyframes hellPulse { 0%,100% { opacity: 1; } 50% { opacity: 0.7; } }
+    
     #gameArea { flex: 1; position: relative; overflow: hidden; }
     #gameCanvas { width: 100%; height: 100%; display: block; image-rendering: pixelated; }
-    #comboDisplay { position: absolute; top: 10px; right: 10px; background: #FF6B6B; color: white; padding: 8px 12px; border-radius: 10px; border: 3px solid #C94C4C; font-size: 14px; display: none; }
-    #poopGauge { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 30px; height: 200px; background: #2D5A3D; border: 3px solid #4A7C59; border-radius: 15px; overflow: hidden; }
-    #poopGaugeFill { position: absolute; bottom: 0; width: 100%; background: linear-gradient(180deg, #8B6914 0%, #6B4F0A 100%); border-radius: 12px; transition: height 0.1s; }
+    #comboDisplay { position: absolute; top: 10px; right: 10px; background: linear-gradient(135deg, #FF6B6B, #FF8E53); color: white; padding: 6px 10px; border-radius: 8px; border: 2px solid #fff; font-size: 12px; display: none; text-shadow: 1px 1px 0 #000; }
+    #poopGauge { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); width: 24px; height: 150px; background: rgba(0,0,0,0.5); border: 2px solid #fff; border-radius: 12px; overflow: hidden; }
+    #poopGaugeFill { position: absolute; bottom: 0; width: 100%; background: linear-gradient(180deg, #C9A86C, #8B6914); border-radius: 10px; transition: height 0.1s; }
+    #bossWarning { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 24px; color: #FF0000; text-shadow: 0 0 10px #FF0000; display: none; animation: bossWarn 0.5s infinite; }
+    @keyframes bossWarn { 0%,100% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 50% { opacity: 0.5; transform: translate(-50%, -50%) scale(1.1); } }
     
-    /* Bottom Controls */
-    #bottomControls { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: rgba(255,255,255,0.4); border-top: 3px solid #5B8C5A; height: 180px; }
-    #joystickArea { width: 120px; height: 120px; position: relative; }
-    #joystickBase { width: 100%; height: 100%; background: radial-gradient(circle, #98D4BB 0%, #5B8C5A 100%); border: 4px solid #2D5A3D; border-radius: 50%; position: absolute; }
-    #joystickKnob { width: 50px; height: 50px; background: radial-gradient(circle, #FFD93D 0%, #F4A623 100%); border: 3px solid #C17F17; border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
+    #bottomControls { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(0,0,0,0.4); border-top: 3px solid rgba(255,255,255,0.3); height: 160px; }
+    #joystickArea { width: 100px; height: 100px; position: relative; }
+    #joystickBase { width: 100%; height: 100%; background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.1) 100%); border: 3px solid rgba(255,255,255,0.5); border-radius: 50%; position: absolute; }
+    #joystickKnob { width: 45px; height: 45px; background: radial-gradient(circle, #FFD93D 0%, #F4A623 100%); border: 3px solid #fff; border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
     
-    #rightControls { display: flex; flex-direction: column; gap: 10px; align-items: flex-end; }
-    #itemButtons { display: flex; gap: 8px; }
-    .item-btn { width: 50px; height: 50px; background: linear-gradient(180deg, #98D4BB 0%, #5B8C5A 100%); border: 3px solid #2D5A3D; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
-    .item-btn .icon { font-size: 20px; }
-    .item-btn .count { position: absolute; bottom: 2px; right: 4px; font-size: 8px; color: #2D5A3D; }
-    .item-btn:active { transform: scale(0.9); background: linear-gradient(180deg, #FFD93D 0%, #F4A623 100%); }
+    #rightControls { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+    #itemButtons { display: flex; gap: 6px; }
+    .item-btn { width: 44px; height: 44px; background: rgba(255,255,255,0.9); border: 2px solid #333; border-radius: 10px; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
+    .item-btn .icon { font-size: 18px; }
+    .item-btn .count { position: absolute; bottom: 1px; right: 3px; font-size: 7px; color: #333; font-weight: bold; }
+    .item-btn:active { transform: scale(0.9); background: #FFD93D; }
     
-    #poopButton { width: 90px; height: 90px; background: radial-gradient(circle, #C9A86C 0%, #8B6914 100%); border: 5px solid #6B4F0A; border-radius: 50%; font-size: 40px; display: flex; justify-content: center; align-items: center; box-shadow: 0 6px 12px rgba(0,0,0,0.4); }
+    #poopButton { width: 80px; height: 80px; background: radial-gradient(circle, #C9A86C 0%, #8B6914 100%); border: 4px solid #6B4F0A; border-radius: 50%; font-size: 36px; display: flex; justify-content: center; align-items: center; box-shadow: 0 6px 12px rgba(0,0,0,0.4); }
     #poopButton:active { transform: scale(0.9); box-shadow: 0 2px 4px rgba(0,0,0,0.4); }
     
-    /* Overlays */
-    .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(180deg, #87CEEB 0%, #E0F4FF 50%, #98D4BB 100%); display: none; flex-direction: column; z-index: 100; overflow-y: auto; }
+    .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; z-index: 100; overflow-y: auto; }
     .overlay.active { display: flex; }
-    .overlay-content { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+    .overlay-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+    .overlay-content { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; position: relative; z-index: 1; }
     
-    .game-title { font-size: 28px; color: #2D5A3D; text-shadow: 3px 3px 0 #FFD93D, -1px -1px 0 white; margin-bottom: 10px; text-align: center; }
-    .game-subtitle { font-size: 12px; color: #4A7C59; margin-bottom: 30px; }
+    .game-title { font-size: 24px; color: #fff; text-shadow: 3px 3px 0 #333, -1px -1px 0 #333, 4px 4px 0 #FFD93D; margin-bottom: 8px; text-align: center; }
+    .game-subtitle { font-size: 10px; color: #FFD93D; margin-bottom: 20px; text-shadow: 1px 1px 0 #333; }
     
-    .menu-btn { padding: 15px 40px; font-family: 'Press Start 2P', monospace; font-size: 14px; border: 4px solid #2D5A3D; border-radius: 15px; margin: 10px; background: linear-gradient(180deg, #98D4BB 0%, #5B8C5A 100%); color: #2D5A3D; min-width: 200px; cursor: pointer; }
+    .menu-btn { padding: 12px 30px; font-family: 'Press Start 2P', monospace; font-size: 12px; border: 3px solid #333; border-radius: 12px; margin: 8px; background: linear-gradient(180deg, #fff 0%, #ddd 100%); color: #333; min-width: 180px; cursor: pointer; }
     .menu-btn:active { background: linear-gradient(180deg, #FFD93D 0%, #F4A623 100%); transform: scale(0.95); }
-    .menu-btn.secondary { background: linear-gradient(180deg, #E8E8E8 0%, #B8B8B8 100%); }
+    .menu-btn.secondary { background: linear-gradient(180deg, #666 0%, #444 100%); color: #fff; }
     
-    /* Shop Overlay */
-    .shop-header { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: rgba(255,255,255,0.5); border-bottom: 3px solid #5B8C5A; width: 100%; }
-    .shop-title { font-size: 16px; color: #2D5A3D; }
-    .shop-currency { display: flex; gap: 10px; font-size: 10px; }
-    .currency-item { background: #4A7C59; padding: 6px 10px; border-radius: 8px; color: white; border: 2px solid #2D5A3D; }
+    .shop-header { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(0,0,0,0.7); border-bottom: 3px solid #FFD93D; width: 100%; }
+    .shop-title { font-size: 14px; color: #FFD93D; text-shadow: 1px 1px 0 #000; }
+    .shop-currency { display: flex; gap: 8px; font-size: 9px; }
+    .currency-item { background: rgba(255,255,255,0.9); padding: 4px 8px; border-radius: 6px; color: #333; border: 2px solid #333; }
     
-    .shop-tabs { display: flex; width: 100%; border-bottom: 3px solid #5B8C5A; }
-    .shop-tab { flex: 1; padding: 12px; background: #B8D4BE; color: #4A7C59; font-size: 10px; text-align: center; border: none; cursor: pointer; }
-    .shop-tab.active { background: #4A7C59; color: white; }
+    .shop-tabs { display: flex; width: 100%; }
+    .shop-tab { flex: 1; padding: 10px; background: rgba(0,0,0,0.5); color: #aaa; font-size: 9px; text-align: center; border: none; cursor: pointer; }
+    .shop-tab.active { background: rgba(255,255,255,0.2); color: #FFD93D; border-bottom: 2px solid #FFD93D; }
     
-    .shop-items { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 15px; width: 100%; max-width: 400px; }
-    .shop-item { background: linear-gradient(180deg, #E8F5E9 0%, #A5D6A7 100%); border: 3px solid #4A7C59; border-radius: 12px; padding: 12px 8px; display: flex; flex-direction: column; align-items: center; cursor: pointer; aspect-ratio: 1; }
-    .shop-item:active { border-color: #FFD93D; background: linear-gradient(180deg, #FFF8E1 0%, #FFD93D 100%); }
+    .shop-items { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 12px; width: 100%; max-width: 360px; }
+    .shop-item { background: rgba(255,255,255,0.9); border: 2px solid #333; border-radius: 10px; padding: 10px 6px; display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+    .shop-item:active { border-color: #FFD93D; background: #FFF8DC; }
     .shop-item.owned { opacity: 0.5; }
-    .shop-item.selected { border-color: #FF6B6B; border-width: 4px; }
-    .shop-item-icon { font-size: 24px; margin-bottom: 4px; }
-    .shop-item-name { font-size: 7px; color: #2D5A3D; text-align: center; }
-    .shop-item-price { font-size: 8px; color: #6B4F0A; margin-top: 4px; }
+    .shop-item.selected { border-color: #FF6B6B; border-width: 3px; }
+    .shop-item-icon { font-size: 22px; margin-bottom: 4px; }
+    .shop-item-name { font-size: 6px; color: #333; text-align: center; }
+    .shop-item-price { font-size: 7px; color: #8B6914; margin-top: 3px; }
     
-    .shop-footer { padding: 15px; border-top: 3px solid #5B8C5A; width: 100%; display: flex; justify-content: center; background: rgba(255,255,255,0.3); }
+    .shop-footer { padding: 12px; border-top: 3px solid rgba(255,255,255,0.2); width: 100%; display: flex; justify-content: center; background: rgba(0,0,0,0.5); }
     
-    /* Stage Select */
-    .stage-grid { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; padding: 20px; }
-    .stage-btn { width: 140px; height: 160px; background: linear-gradient(180deg, #E8F5E9 0%, #A5D6A7 100%); border: 4px solid #4A7C59; border-radius: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; }
-    .stage-btn.locked { opacity: 0.4; }
-    .stage-btn:active:not(.locked) { border-color: #FFD93D; }
-    .stage-btn-icon { font-size: 40px; margin-bottom: 8px; }
-    .stage-btn-name { font-size: 12px; color: #2D5A3D; margin-bottom: 4px; }
-    .stage-btn-stars { font-size: 14px; color: #FFD93D; text-shadow: 1px 1px 0 #C17F17; }
+    .stage-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 15px; max-width: 320px; }
+    .stage-btn { background: rgba(255,255,255,0.9); border: 3px solid #333; border-radius: 12px; padding: 12px 8px; display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+    .stage-btn.locked { opacity: 0.4; background: #666; }
+    .stage-btn:active:not(.locked) { border-color: #FFD93D; transform: scale(0.95); }
+    .stage-btn-icon { font-size: 28px; margin-bottom: 6px; }
+    .stage-btn-name { font-size: 8px; color: #333; margin-bottom: 4px; }
+    .stage-btn-stars { font-size: 12px; color: #FFD93D; text-shadow: 1px 1px 0 #C17F17; }
     
-    /* Game Over / Clear */
-    .result-box { background: rgba(255,255,255,0.9); border: 4px solid #4A7C59; border-radius: 20px; padding: 25px; margin: 20px; text-align: center; }
-    .result-title { font-size: 24px; margin-bottom: 15px; }
+    .difficulty-select { display: flex; gap: 15px; margin: 15px 0; }
+    .diff-btn { padding: 15px 25px; border-radius: 15px; border: 3px solid #333; font-family: 'Press Start 2P', monospace; font-size: 11px; cursor: pointer; }
+    .diff-btn.normal { background: linear-gradient(180deg, #4CAF50 0%, #2E7D32 100%); color: white; }
+    .diff-btn.hell { background: linear-gradient(180deg, #FF0000 0%, #990000 100%); color: white; }
+    .diff-btn:active { transform: scale(0.95); }
+    
+    .result-box { background: rgba(255,255,255,0.95); border: 4px solid #333; border-radius: 20px; padding: 20px; margin: 15px; text-align: center; max-width: 300px; }
+    .result-title { font-size: 20px; margin-bottom: 12px; }
     .result-title.clear { color: #FFD93D; text-shadow: 2px 2px 0 #C17F17; }
     .result-title.gameover { color: #FF6B6B; text-shadow: 2px 2px 0 #C94C4C; }
-    .result-stars { font-size: 30px; margin-bottom: 15px; }
-    .result-stats { background: #E8F5E9; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
-    .result-stat { display: flex; justify-content: space-between; font-size: 10px; color: #2D5A3D; margin: 8px 0; }
+    .result-stars { font-size: 28px; margin-bottom: 12px; }
+    .result-stats { background: #f5f5f5; padding: 12px; border-radius: 10px; margin-bottom: 12px; }
+    .result-stat { display: flex; justify-content: space-between; font-size: 9px; color: #333; margin: 6px 0; }
     
-    .notification { position: fixed; top: 100px; left: 50%; transform: translateX(-50%); background: #4A7C59; color: white; padding: 10px 20px; border-radius: 10px; border: 3px solid #2D5A3D; font-size: 10px; z-index: 500; opacity: 0; transition: opacity 0.3s; }
+    .notification { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: #FFD93D; padding: 8px 16px; border-radius: 8px; border: 2px solid #FFD93D; font-size: 10px; z-index: 500; opacity: 0; transition: opacity 0.3s; }
     .notification.show { opacity: 1; }
   </style>
 </head>
 <body>
   <div id="gameContainer">
-    <!-- Top UI -->
     <div id="topUI">
       <div class="ui-box bird-box">
-        <canvas id="birdIcon" width="32" height="32"></canvas>
+        <canvas id="birdIcon" width="28" height="24"></canvas>
         <span id="levelText">Lv.1</span>
       </div>
       <div class="ui-box energy-bar">
         <span>⚡</span>
         <div class="energy-bg"><div class="energy-fill" id="energyFill" style="width:100%"></div></div>
       </div>
-      <div class="ui-box" id="featherBox">🪶 <span id="featherCount">0</span></div>
-      <div class="ui-box" id="goldBox">✨ <span id="goldCount">0</span></div>
-      <div class="ui-box" id="stoneBox">💎 <span id="stoneCount">0</span></div>
+      <div id="progressMap"></div>
+      <div class="ui-box" id="featherBox">🪶<span id="featherCount">0</span></div>
+      <div class="ui-box" id="goldBox">✨<span id="goldCount">0</span></div>
+      <div class="ui-box" id="stoneBox">💎<span id="stoneCount">0</span></div>
       <div class="right-section">
-        <div class="ui-box clickable" id="stageBtn" onclick="showStageSelect()">🎯</div>
-        <div class="ui-box clickable" id="pauseBtn" onclick="togglePause()">⏸</div>
+        <span class="difficulty-badge" id="diffBadge">NORMAL</span>
+        <div class="ui-box clickable" onclick="togglePause()">⏸</div>
       </div>
     </div>
     
-    <!-- Game Area -->
     <div id="gameArea">
       <canvas id="gameCanvas"></canvas>
       <div id="comboDisplay">0 COMBO</div>
       <div id="poopGauge"><div id="poopGaugeFill" style="height:100%"></div></div>
+      <div id="bossWarning">⚠️ BOSS ⚠️</div>
     </div>
     
-    <!-- Bottom Controls -->
     <div id="bottomControls">
       <div id="joystickArea">
         <div id="joystickBase"></div>
@@ -141,43 +156,47 @@
       <div id="rightControls">
         <div id="itemButtons">
           <div class="item-btn" data-slot="0"><span class="icon">🍞</span><span class="count">0</span></div>
-          <div class="item-btn" data-slot="1"><span class="icon">💊</span><span class="count">0</span></div>
+          <div class="item-btn" data-slot="1"><span class="icon">🌶️</span><span class="count">0</span></div>
           <div class="item-btn" data-slot="2"><span class="icon">🛡️</span><span class="count">0</span></div>
         </div>
         <div id="poopButton">💩</div>
       </div>
     </div>
     
-    <!-- Main Menu -->
     <div id="mainMenu" class="overlay active">
+      <canvas id="menuBg" class="overlay-bg"></canvas>
       <div class="overlay-content">
         <div class="game-title">BIRD DROP</div>
         <div class="game-subtitle">새똥 맞추기</div>
-        <canvas id="menuBird" width="80" height="80" style="margin:20px"></canvas>
+        <canvas id="menuBird" width="80" height="80" style="margin:15px"></canvas>
         <button class="menu-btn" onclick="showStageSelect()">시작</button>
-        <button class="menu-btn secondary" onclick="continueGame()">이어하기</button>
+        <button class="menu-btn secondary" onclick="openShop()">상점</button>
       </div>
     </div>
     
-    <!-- Stage Select -->
     <div id="stageSelect" class="overlay">
+      <canvas id="stageBg" class="overlay-bg"></canvas>
       <div class="shop-header">
         <span class="shop-title">스테이지 선택</span>
-        <button class="menu-btn" style="padding:8px 15px;font-size:10px;min-width:auto" onclick="showMainMenu()">뒤로</button>
+        <button class="menu-btn" style="padding:6px 12px;font-size:8px;min-width:auto;margin:0" onclick="showMainMenu()">뒤로</button>
       </div>
-      <div class="overlay-content">
+      <div class="overlay-content" style="justify-content:flex-start;padding-top:10px">
+        <div class="difficulty-select">
+          <button class="diff-btn normal" id="normalBtn" onclick="setDifficulty('normal')">NORMAL</button>
+          <button class="diff-btn hell" id="hellBtn" onclick="setDifficulty('hell')">HELL 🔥</button>
+        </div>
         <div class="stage-grid" id="stageGrid"></div>
       </div>
     </div>
     
-    <!-- Shop -->
     <div id="shopOverlay" class="overlay">
+      <canvas id="shopBg" class="overlay-bg"></canvas>
       <div class="shop-header">
         <span class="shop-title">상점</span>
         <div class="shop-currency">
-          <div class="currency-item">🪶 <span id="shopFeathers">0</span></div>
-          <div class="currency-item">✨ <span id="shopGold">0</span></div>
-          <div class="currency-item">💎 <span id="shopStones">0</span></div>
+          <div class="currency-item">🪶<span id="shopFeathers">0</span></div>
+          <div class="currency-item">✨<span id="shopGold">0</span></div>
+          <div class="currency-item">💎<span id="shopStones">0</span></div>
         </div>
       </div>
       <div class="shop-tabs">
@@ -185,7 +204,7 @@
         <button class="shop-tab" onclick="switchShopTab(this,'upgrades')">업그레이드</button>
         <button class="shop-tab" onclick="switchShopTab(this,'evolution')">진화</button>
       </div>
-      <div class="overlay-content" style="justify-content:flex-start;padding-top:10px">
+      <div class="overlay-content" style="justify-content:flex-start;padding-top:8px">
         <div class="shop-items" id="shopItems"></div>
       </div>
       <div class="shop-footer">
@@ -193,20 +212,20 @@
       </div>
     </div>
     
-    <!-- Pause -->
     <div id="pauseOverlay" class="overlay">
+      <div class="overlay-bg" style="background:rgba(0,0,0,0.7)"></div>
       <div class="overlay-content">
         <div class="result-box">
-          <div class="result-title" style="color:#4A7C59">일시정지</div>
-          <button class="menu-btn" onclick="resumeGame()">계속하기</button>
+          <div class="result-title" style="color:#333">일시정지</div>
+          <button class="menu-btn" onclick="resumeGame()">계속</button>
           <button class="menu-btn secondary" onclick="openShopFromPause()">상점</button>
           <button class="menu-btn secondary" onclick="quitToMenu()">나가기</button>
         </div>
       </div>
     </div>
     
-    <!-- Stage Clear -->
     <div id="clearOverlay" class="overlay">
+      <div class="overlay-bg" style="background:rgba(0,0,0,0.7)"></div>
       <div class="overlay-content">
         <div class="result-box">
           <div class="result-title clear">★ CLEAR ★</div>
@@ -214,25 +233,26 @@
           <div class="result-stats">
             <div class="result-stat"><span>점수</span><span id="clearScore">0</span></div>
             <div class="result-stat"><span>명중률</span><span id="clearAccuracy">0%</span></div>
-            <div class="result-stat"><span>깃털</span><span id="clearFeathers">🪶 0</span></div>
-            <div class="result-stat"><span>보석</span><span id="clearGold">✨ 0</span></div>
+            <div class="result-stat"><span>최대콤보</span><span id="clearCombo">0</span></div>
+            <div class="result-stat"><span>깃털</span><span id="clearFeathers">0</span></div>
+            <div class="result-stat"><span>보석</span><span id="clearGold">0</span></div>
           </div>
-          <button class="menu-btn" onclick="openShop()">상점</button>
-          <button class="menu-btn secondary" onclick="showStageSelect()">다음</button>
+          <button class="menu-btn" onclick="nextStage()">다음</button>
+          <button class="menu-btn secondary" onclick="showStageSelect()">선택</button>
         </div>
       </div>
     </div>
     
-    <!-- Game Over -->
     <div id="gameoverOverlay" class="overlay">
+      <div class="overlay-bg" style="background:rgba(0,0,0,0.8)"></div>
       <div class="overlay-content">
         <div class="result-box">
           <div class="result-title gameover">GAME OVER</div>
           <div class="result-stats">
             <div class="result-stat"><span>점수</span><span id="goScore">0</span></div>
-            <div class="result-stat"><span>깃털</span><span id="goFeathers">🪶 0</span></div>
+            <div class="result-stat"><span>깃털</span><span id="goFeathers">0</span></div>
           </div>
-          <button class="menu-btn" onclick="retryStage()">다시하기</button>
+          <button class="menu-btn" onclick="retryStage()">다시</button>
           <button class="menu-btn secondary" onclick="showStageSelect()">나가기</button>
         </div>
       </div>
@@ -240,6 +260,6 @@
     
     <div id="notification" class="notification"></div>
   </div>
-  <script src="game.js"></script>
+  <script src="game2.js"></script>
 </body>
 </html>
