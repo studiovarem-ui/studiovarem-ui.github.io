@@ -12,7 +12,6 @@ resizeCanvas();
 
 // ============ PIXEL ART SPRITES ============
 const SPRITES = {
-  // BIRDS
   sparrow: [
     '....yyyy....',
     '...yYYYYy...',
@@ -86,7 +85,6 @@ const SPRITES = {
     '...r....r...'
   ],
   
-  // HUMANS
   human_normal: [
     '...pppp...',
     '..pPPPPp..',
@@ -184,7 +182,6 @@ const SPRITES = {
     '...s..s...'
   ],
   
-  // BOSSES
   boss_cleaner: [
     '....bbbb....',
     '...bBBBBb...',
@@ -258,7 +255,6 @@ const SPRITES = {
     '..rr....rr..'
   ],
   
-  // ITEMS
   poop: [
     '..cc..',
     '.cCCc.',
@@ -417,6 +413,40 @@ let gameState = {
   bossWarningShown: false
 };
 
+// Load saved data
+function loadGame() {
+  try {
+    const saved = localStorage.getItem('birdDropSave');
+    if (saved) {
+      const data = JSON.parse(saved);
+      gameState.feathers = data.feathers || 150;
+      gameState.gold = data.gold || 15;
+      gameState.stones = data.stones || 5;
+      gameState.inventory = data.inventory || { bread: 3, chili: 2, shield: 2 };
+      gameState.upgrades = data.upgrades || { energy: 0, speed: 0, poopSpeed: 0, damage: 0, luck: 0 };
+      gameState.currentBird = data.currentBird || 'sparrow';
+      gameState.unlockedBirds = data.unlockedBirds || ['sparrow'];
+      gameState.stageStars = data.stageStars || {};
+      if (gameState.upgrades.energy) gameState.maxEnergy = 100 + gameState.upgrades.energy * 20;
+    }
+  } catch(e) { console.log('Load failed'); }
+}
+
+function saveGame() {
+  try {
+    localStorage.setItem('birdDropSave', JSON.stringify({
+      feathers: gameState.feathers,
+      gold: gameState.gold,
+      stones: gameState.stones,
+      inventory: gameState.inventory,
+      upgrades: gameState.upgrades,
+      currentBird: gameState.currentBird,
+      unlockedBirds: gameState.unlockedBirds,
+      stageStars: gameState.stageStars
+    }));
+  } catch(e) { console.log('Save failed'); }
+}
+
 let bird = { x: 0, y: 0, width: 36, height: 30 };
 let poops = [], humans = [], projectiles = [], particles = [];
 let boss = null;
@@ -424,6 +454,7 @@ let lastPoopTime = 0, lastSpawnTime = 0, gameStartTime = 0;
 let animationId = null, previousScreen = 'menu';
 let joystick = { active: false, startX: 0, startY: 0, moveX: 0, moveY: 0 };
 let poopPressed = false;
+let keys = {};
 
 // ============ INPUT ============
 const joystickArea = document.getElementById('joystickArea');
@@ -463,17 +494,38 @@ joystickArea.addEventListener('touchstart', handleJoystickStart, { passive: fals
 joystickArea.addEventListener('touchmove', handleJoystickMove, { passive: false });
 joystickArea.addEventListener('touchend', handleJoystickEnd);
 joystickArea.addEventListener('touchcancel', handleJoystickEnd);
+joystickArea.addEventListener('mousedown', handleJoystickStart);
+document.addEventListener('mousemove', handleJoystickMove);
+document.addEventListener('mouseup', handleJoystickEnd);
 
 const poopButton = document.getElementById('poopButton');
 poopButton.addEventListener('touchstart', e => { e.preventDefault(); poopPressed = true; }, { passive: false });
 poopButton.addEventListener('touchend', () => poopPressed = false);
 poopButton.addEventListener('touchcancel', () => poopPressed = false);
+poopButton.addEventListener('mousedown', () => poopPressed = true);
+poopButton.addEventListener('mouseup', () => poopPressed = false);
+poopButton.addEventListener('mouseleave', () => poopPressed = false);
+
+// Keyboard support
+document.addEventListener('keydown', e => {
+  keys[e.code] = true;
+  if (e.code === 'Space') poopPressed = true;
+  if (e.code === 'Digit1') useQuickSlot(0);
+  if (e.code === 'Digit2') useQuickSlot(1);
+  if (e.code === 'Digit3') useQuickSlot(2);
+  if (e.code === 'Escape' && gameState.screen === 'playing') togglePause();
+});
+document.addEventListener('keyup', e => {
+  keys[e.code] = false;
+  if (e.code === 'Space') poopPressed = false;
+});
 
 document.querySelectorAll('.item-btn').forEach(btn => {
   btn.addEventListener('touchstart', e => {
     e.preventDefault();
     useQuickSlot(parseInt(btn.dataset.slot));
   }, { passive: false });
+  btn.addEventListener('click', () => useQuickSlot(parseInt(btn.dataset.slot)));
 });
 
 // ============ UI ============
@@ -589,7 +641,9 @@ function renderStageGrid() {
   grid.innerHTML = '';
   
   STAGES.forEach((stage, i) => {
-    const prevStars = i === 0 ? 1 : (gameState.stageStars[i] || 0);
+    // FIX: Use stage.id for previous stage check
+    const prevStageId = i > 0 ? STAGES[i-1].id : 0;
+    const prevStars = i === 0 ? 1 : (gameState.stageStars[prevStageId] || 0);
     const unlocked = i === 0 || prevStars > 0;
     const stars = gameState.stageStars[stage.id] || 0;
     
@@ -713,6 +767,7 @@ function switchShopTab(el, tab) {
           switchShopTab(el, 'evolution');
           showNotification(b.name + ' 선택!');
           drawBirdIcon();
+          saveGame();
         } else {
           buyBird(k);
         }
@@ -738,6 +793,7 @@ function buyItem(k) {
     updateShopDisplay();
     switchShopTab(document.querySelector('.shop-tab.active'), 'items');
     showNotification(item.name + ' 구매!');
+    saveGame();
   } else {
     showNotification('깃털 부족!');
   }
@@ -752,6 +808,7 @@ function buyUpgrade(k) {
     updateShopDisplay();
     switchShopTab(document.querySelector('.shop-tab.active'), 'upgrades');
     showNotification(up.name + ' UP!');
+    saveGame();
   } else {
     showNotification('보석 부족!');
   }
@@ -767,12 +824,14 @@ function buyBird(k) {
     switchShopTab(document.querySelector('.shop-tab.active'), 'evolution');
     showNotification(b.name + ' 해금!');
     drawBirdIcon();
+    saveGame();
   } else {
     showNotification('진화석 부족!');
   }
 }
 
 function useQuickSlot(i) {
+  if (gameState.screen !== 'playing') return;
   const k = gameState.quickSlots[i];
   if (!k || !gameState.inventory[k]) return;
   
@@ -924,6 +983,13 @@ function update() {
   const speedBonus = 1 + gameState.upgrades.speed * 0.1;
   const speed = birdData.speed * speedBonus;
   
+  // Keyboard movement
+  if (keys['ArrowLeft'] || keys['KeyA']) bird.x -= speed;
+  if (keys['ArrowRight'] || keys['KeyD']) bird.x += speed;
+  if (keys['ArrowUp'] || keys['KeyW']) bird.y -= speed;
+  if (keys['ArrowDown'] || keys['KeyS']) bird.y += speed;
+  
+  // Joystick movement
   if (joystick.active) {
     bird.x += joystick.moveX * speed;
     bird.y += joystick.moveY * speed;
@@ -1066,7 +1132,6 @@ function createParticles(x, y, color, count) {
 function render() {
   const stage = STAGES.find(s => s.id === gameState.currentStage);
   
-  // Background
   const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
   gradient.addColorStop(0, stage.bgColors[0]);
   gradient.addColorStop(0.5, stage.bgColors[1]);
@@ -1074,7 +1139,6 @@ function render() {
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   
-  // Clouds
   ctx.fillStyle = 'rgba(255,255,255,0.6)';
   for (let i = 0; i < 4; i++) {
     const x = ((Date.now() / 40 + i * 120) % (canvas.width + 80)) - 40;
@@ -1086,15 +1150,12 @@ function render() {
     ctx.fill();
   }
   
-  // Ground
   ctx.fillStyle = stage.groundColor;
   ctx.fillRect(0, canvas.height * 0.82, canvas.width, canvas.height * 0.18);
   
-  // Path
   ctx.fillStyle = stage.pathColor;
   ctx.fillRect(0, canvas.height * 0.7, canvas.width, canvas.height * 0.12);
   
-  // Humans
   humans.forEach(h => {
     if (!h.hit) {
       const sprite = createSprite(SPRITES[h.sprite], 3);
@@ -1111,7 +1172,6 @@ function render() {
     }
   });
   
-  // Boss
   if (boss && !boss.defeated) {
     const sprite = createSprite(SPRITES[boss.sprite], 4);
     if (sprite) ctx.drawImage(sprite, boss.x - boss.width/2, boss.y - boss.height/2);
@@ -1125,7 +1185,6 @@ function render() {
     ctx.strokeRect(boss.x - barWidth/2 - 2, boss.y - boss.height/2 - 18, barWidth + 4, 12);
   }
   
-  // Poops
   const poopSprite = createSprite(SPRITES.poop, 3);
   poops.forEach(p => {
     ctx.save();
@@ -1135,20 +1194,17 @@ function render() {
     ctx.restore();
   });
   
-  // Projectiles
   const projSprite = createSprite(SPRITES.projectile, 3);
   projectiles.forEach(p => {
     if (projSprite) ctx.drawImage(projSprite, p.x - p.width/2, p.y - p.height/2);
   });
   
-  // Bird
   const birdData = BIRDS[gameState.currentBird];
   const birdSprite = createSprite(SPRITES[birdData.sprite], 3);
   if (gameState.effects.invincible <= 0 || Math.floor(gameState.effects.invincible / 5) % 2 === 0) {
     if (birdSprite) ctx.drawImage(birdSprite, bird.x - bird.width/2, bird.y - bird.height/2);
   }
   
-  // Shield
   if (gameState.effects.shield) {
     ctx.strokeStyle = 'rgba(135, 206, 250, 0.8)';
     ctx.lineWidth = 3;
@@ -1157,13 +1213,11 @@ function render() {
     ctx.stroke();
   }
   
-  // Particles
   particles.forEach(p => {
     ctx.fillStyle = p.color;
     ctx.fillRect(p.x - p.size/2, p.y - p.size/2, p.size, p.size);
   });
   
-  // HP
   for (let i = 0; i < gameState.maxHealth; i++) {
     ctx.font = '18px Arial';
     ctx.fillText(i < gameState.health ? '❤️' : '🩶', 8 + i * 22, 25);
@@ -1186,6 +1240,8 @@ function stageClear() {
   gameState.feathers += gameState.stageFeathers;
   gameState.gold += gameState.stageGold;
   
+  saveGame();
+  
   hideAllOverlays();
   document.getElementById('clearOverlay').classList.add('active');
   document.getElementById('clearStars').textContent = '⭐'.repeat(stars) + '☆'.repeat(3 - stars);
@@ -1201,6 +1257,7 @@ function gameOver() {
   if (animationId) cancelAnimationFrame(animationId);
   
   gameState.feathers += Math.floor(gameState.stageFeathers * 0.3);
+  saveGame();
   
   hideAllOverlays();
   document.getElementById('gameoverOverlay').classList.add('active');
@@ -1248,8 +1305,8 @@ function drawMenuBackground() {
   bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
 }
 
-// Init
 function init() {
+  loadGame();
   resizeCanvas();
   drawMenuBird();
   drawBirdIcon();
