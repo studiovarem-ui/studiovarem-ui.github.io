@@ -1,3 +1,4 @@
+<!-- archive.html -->
 <!doctype html>
 <html lang="ko">
 <head>
@@ -34,14 +35,13 @@ body{
   background:rgba(255,255,255,.02);
 }
 
-/* ✅ 목록은 "5개 높이"만 보이게 + 스크롤은 전체 */
+/* 목록 5개 높이 + 스크롤 */
 .list{
   max-height: 270px;
   overflow:auto;
   -webkit-overflow-scrolling: touch;
 }
 
-/* 목록 줄 */
 .row{
   display:flex; justify-content:space-between; align-items:center;
   padding:14px 16px;
@@ -54,7 +54,7 @@ body{
 .day{ font-size:12px; opacity:.6; }
 .word{ font-size:16px; font-weight:700; }
 
-/* 상세(투데이 카드 스타일) */
+/* 상세 */
 .detail{
   border-top:1px solid rgba(255,255,255,.10);
   padding:18px 16px 18px;
@@ -82,11 +82,29 @@ body{
 }
 .lang.active{ opacity:1; border-color:rgba(255,255,255,.6); }
 
+.voiceBtn{
+  border:1px solid rgba(255,255,255,.18);
+  background:none; color:#fff;
+  padding:6px 10px; border-radius:999px;
+  font-size:12px; letter-spacing:.08em;
+  opacity:.45; cursor:pointer;
+  transition: all .2s ease;
+}
+.voiceBtn:hover{ opacity:.75; }
+.voiceBtn:active{ transform:scale(.96); }
+.voiceBtn.playing{
+  opacity:1;
+  border-color:rgba(255,255,255,.55);
+  box-shadow:0 0 0 3px rgba(255,255,255,.06);
+}
+
 .meaning{ margin-top:16px; font-size:18px; line-height:1.6; }
 .example{ margin-top:10px; font-size:16px; opacity:.88; line-height:1.6; }
-
 .hint{ margin-top:10px; font-size:12px; opacity:.35; }
 </style>
+
+<!-- ✅ data 로더 -->
+<script src="data/data.js"></script>
 </head>
 
 <body>
@@ -103,7 +121,7 @@ body{
 
     <div class="detail" id="detail">
       <div class="detailTop">
-        <div class="detailTitle">Archive</div>
+        <div class="detailTitle">아카이브</div>
         <div class="detailDay" id="dDay">Day -</div>
       </div>
 
@@ -111,7 +129,11 @@ body{
 
       <div class="meta">
         <div class="pill" id="dPos">POS</div>
+
         <button class="lang active" id="btnEN" type="button">English</button>
+
+        <button class="voiceBtn" id="btnSpeak" type="button" aria-label="voice">voice</button>
+
         <button class="lang" id="btnKO" type="button">Korean</button>
       </div>
 
@@ -122,9 +144,6 @@ body{
   </div>
 </div>
 
-<!-- ✅ data/data.js 로드 -->
-<script src="data/data.js"></script>
-
 <script>
 function kst(){
   const n=new Date();
@@ -134,20 +153,23 @@ function dayOfYear(d){
   return Math.floor((d-new Date(d.getFullYear(),0,1))/86400000);
 }
 
+let LIST = [];
+let todayIndex = 0; // 0-based (오늘)
+
 const listEl = document.getElementById("list");
 const detailEl = document.getElementById("detail");
 
-let currentIndex = null;
+let currentIndex = null; // 0-based day index
 let mode = "EN";
 
 function itemForDayIndex(i){
-  return window.VAREM_LIST[i % window.VAREM_LIST.length];
+  return LIST.length ? LIST[i % LIST.length] : null;
 }
 
-function renderList(todayIndex){
+function renderList(){
   listEl.innerHTML = "";
 
-  if(todayIndex <= 0){
+  if(todayIndex <= 0 || !LIST.length){
     const row = document.createElement("div");
     row.className = "row";
     row.style.cursor = "default";
@@ -159,10 +181,11 @@ function renderList(todayIndex){
   for(let i = todayIndex - 1; i >= 0; i--){
     const dayNum = i + 1;
     const it = itemForDayIndex(i);
+    const w = (it?.word || it?.w || "").toLowerCase();
 
     const row = document.createElement("div");
     row.className = "row";
-    row.innerHTML = `<div class="day">Day ${dayNum}</div><div class="word">${it.w.toLowerCase()}</div>`;
+    row.innerHTML = `<div class="day">Day ${dayNum}</div><div class="word">${w}</div>`;
     row.onclick = () => showDetail(i);
     listEl.appendChild(row);
   }
@@ -171,17 +194,21 @@ function renderList(todayIndex){
 function renderDetail(){
   if(currentIndex === null) return;
   const it = itemForDayIndex(currentIndex);
+  if(!it) return;
+
+  const w = (it.word || it.w || "").toLowerCase();
+  const p = (it.pos || it.p || "");
 
   dDay.innerText = "Day " + (currentIndex + 1);
-  dWord.innerText = it.w.toLowerCase();
-  dPos.innerText = it.p;
+  dWord.innerText = w;
+  dPos.innerText = p;
 
   if(mode === "EN"){
-    dMeaning.innerText = "Meaning: " + (it.m_en ?? it.m_ko ?? "");
-    dExample.innerText = "Example: " + (it.e_en ?? it.e_ko ?? "");
+    dMeaning.innerText = "Meaning: " + (it.meaning_en ?? it.m_en ?? it.meaning_ko ?? it.m_ko ?? "");
+    dExample.innerText = "Example: " + (it.example_en ?? it.e_en ?? it.example_ko ?? it.e_ko ?? "");
   }else{
-    dMeaning.innerText = "뜻: " + (it.m_ko ?? it.m_en ?? "");
-    dExample.innerText = "예문: " + (it.e_ko ?? it.e_en ?? "");
+    dMeaning.innerText = "뜻: " + (it.meaning_ko ?? it.m_ko ?? it.meaning_en ?? it.m_en ?? "");
+    dExample.innerText = "예문: " + (it.example_ko ?? it.e_ko ?? it.example_en ?? it.e_en ?? "");
   }
 
   btnEN.classList.toggle("active", mode==="EN");
@@ -199,9 +226,46 @@ function showDetail(dayIndex){
 btnEN.onclick = () => { mode="EN"; renderDetail(); };
 btnKO.onclick = () => { mode="KO"; renderDetail(); };
 
+// ✅ voice(TTS)
+function speakWord(text){
+  try{
+    if(!("speechSynthesis" in window)) return;
+
+    window.speechSynthesis.cancel();
+
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "en-US";
+    u.rate = 0.95;
+
+    u.onstart = () => btnSpeak.classList.add("playing");
+    u.onend   = () => btnSpeak.classList.remove("playing");
+    u.onerror = () => btnSpeak.classList.remove("playing");
+
+    const voices = window.speechSynthesis.getVoices?.() || [];
+    const v = voices.find(v=>/en-US/i.test(v.lang)) || voices.find(v=>/^en/i.test(v.lang));
+    if(v) u.voice = v;
+
+    window.speechSynthesis.speak(u);
+  }catch(e){
+    btnSpeak.classList.remove("playing");
+  }
+}
+if("speechSynthesis" in window){
+  window.speechSynthesis.onvoiceschanged = ()=>{};
+}
+btnSpeak.onclick = () => {
+  if(currentIndex !== null){
+    const it = itemForDayIndex(currentIndex);
+    const w = (it?.word || it?.w || "");
+    if(w) speakWord(w);
+  }
+};
+
+// ✅ data 로드 완료 후 렌더
 window.VAREM_onReady(function(){
-  const todayIndex = dayOfYear(kst()); // 0-based
-  renderList(todayIndex);
+  LIST = window.VAREM_LIST || [];
+  todayIndex = dayOfYear(kst());
+  renderList();
 });
 </script>
 </body>
