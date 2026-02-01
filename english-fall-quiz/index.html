@@ -135,6 +135,7 @@ body::before {
 .stat-value.score { color: var(--accent); }
 .stat-value.combo { color: var(--warning); }
 .stat-value.lives { color: var(--danger); }
+.stat-value.remaining { color: #a78bfa; }
 
 /* Game area */
 .game-area {
@@ -522,6 +523,10 @@ body::before {
       <div class="stat-value score" id="score">0</div>
     </div>
     <div class="stat-item">
+      <div class="stat-label">남은 단어</div>
+      <div class="stat-value remaining" id="remaining">30</div>
+    </div>
+    <div class="stat-item">
       <div class="stat-label">Combo</div>
       <div class="stat-value combo" id="combo">0</div>
     </div>
@@ -713,6 +718,7 @@ body::before {
     const scoreEl = $('score');
     const comboEl = $('combo');
     const livesEl = $('lives');
+    const remainingEl = $('remaining');
     const gameArea = $('gameArea');
     const readyText = $('readyText');
     const answersEl = $('answers');
@@ -812,6 +818,7 @@ body::before {
       scoreEl.textContent = state.score;
       comboEl.textContent = state.combo;
       livesEl.textContent = '♥'.repeat(state.lives) + '♡'.repeat(3 - state.lives);
+      remainingEl.textContent = state.wordPool.length;
     }
 
     // Show combo popup
@@ -923,7 +930,13 @@ body::before {
       updateUI();
 
       if (state.lives <= 0) {
-        endGame();
+        endGame(false); // 실패
+        return;
+      }
+
+      // 모든 단어 클리어 체크
+      if (state.wordPool.length === 0) {
+        endGame(true); // 성공
         return;
       }
 
@@ -959,9 +972,19 @@ body::before {
     }
 
     // End game
-    function endGame() {
+    function endGame(isCleared = false) {
       state.isPlaying = false;
       if (state.fallInterval) cancelAnimationFrame(state.fallInterval);
+
+      // 모달 타이틀 변경
+      const titleEl = gameOverModal.querySelector('.modal-title');
+      if (isCleared) {
+        titleEl.textContent = '🎉 CLEAR!';
+        titleEl.style.color = 'var(--accent)';
+      } else {
+        titleEl.textContent = 'GAME OVER';
+        titleEl.style.color = 'var(--danger)';
+      }
 
       $('finalScore').textContent = state.score;
       $('correctCount').textContent = state.correct;
