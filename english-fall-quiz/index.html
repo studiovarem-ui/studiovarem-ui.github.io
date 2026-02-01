@@ -1,633 +1,1014 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="ko">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>VAREM • Word Fall Quiz</title>
-
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
-    :root{
-      --bg:#000;
-      --text:#fff;
-      --card:#111;
-      --shadow: rgba(0,0,0,.85);
-      --ok:#22c55e;
-      --bad:#ff4d4f;
-    }
-    *{box-sizing:border-box}
-
-    /* ✅ 스크롤 완전 차단 */
-    html, body{
-      height:100%;
-      margin:0;
-      overflow:hidden;
-      overscroll-behavior:none;
-      background:var(--bg);
-      color:var(--text);
-      font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Apple SD Gothic Neo,Malgun Gothic,sans-serif;
-      -webkit-font-smoothing:antialiased;
-      touch-action: manipulation;
-    }
-    body{
-      padding: 18px 14px 18px;
+    :root {
+      --bg-dark: #0a0a0f;
+      --bg-card: #12121a;
+      --accent: #00f5d4;
+      --accent-dim: #00f5d433;
+      --danger: #ff6b6b;
+      --warning: #ffd93d;
+      --text: #e8e8e8;
+      --text-dim: #888;
+      --glass: rgba(255,255,255,0.03);
+      --glass-border: rgba(255,255,255,0.08);
     }
 
-    .wrap{
-      height:100%;
-      max-width: 980px;
-      margin:0 auto;
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-    }
+```
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
 
-    .brand{
-      text-align:center;
-      letter-spacing:.22em;
-      font-weight:900;
-      font-size:14px;
-      opacity:.9;
-      flex:0 0 auto;
-    }
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--bg-dark);
+  color: var(--text);
+  min-height: 100dvh;
+  overflow: hidden;
+  position: relative;
+}
 
-    /* 상단 HUD (DAY 삭제) */
-    .topbar{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
-      flex-wrap:wrap;
-      flex:0 0 auto;
-    }
-    .stat{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:8px 10px;
-      border-radius:999px;
-      background:#fff;
-      color:#111;
-      border:4px solid #000;
-      box-shadow: 0 10px 0 var(--shadow);
-      font-weight: 900;
-      font-size:12px;
-      white-space:nowrap;
-    }
+/* Animated background grid */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: 
+    linear-gradient(var(--glass-border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--glass-border) 1px, transparent 1px);
+  background-size: 50px 50px;
+  opacity: 0.3;
+  animation: gridMove 20s linear infinite;
+}
 
-    /* ✅ 2분할 레이아웃 */
-    .main{
-      flex:1 1 auto;
-      min-height:0; /* 중요: 내부 스크롤/넘침 방지 */
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:14px;
-      align-items:stretch;
-    }
+@keyframes gridMove {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(50px, 50px); }
+}
 
-    /* 왼쪽: stage */
-    .leftPanel{
-      position:relative;
-      border-radius:22px;
-      overflow:hidden;
-      min-height:0;
-    }
-    .stage{
-      position:relative;
-      height:100%;
-      border-radius:22px;
-      overflow:hidden;
-      background: transparent;
-    }
-    .floor{
-      position:absolute; left:0; right:0; bottom:0;
-      height:14px;
-      background: #111;
-      border-top:4px solid #000;
-    }
-    .wordCard{
-      position:absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      top: 0px;
-      min-width: 240px;
-      padding: 16px 18px;
-      border-radius: 22px;
-      background: var(--card);
-      border: 4px solid #000;
-      box-shadow: 0 16px 0 var(--shadow), 0 26px 60px rgba(0,0,0,.45);
-      text-align:center;
-      user-select:none;
-      will-change: top, transform;
-    }
-    .wordCard .label{
-      font-size:12px;
-      color:#fff;
-      font-weight:900;
-      letter-spacing:.18em;
-      opacity:1;
-    }
-    .wordCard .word{
-      margin-top:8px;
-      font-size:44px;
-      font-weight:900;
-      letter-spacing:.01em;
-      color:#fff;
-    }
-    .wordCard.good{
-      outline: 4px solid rgba(34,197,94,.85);
-      outline-offset: 2px;
-    }
-    .wordCard.bad{
-      outline: 4px solid rgba(255,77,79,.85);
-      outline-offset: 2px;
-    }
+/* Header */
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(to bottom, var(--bg-dark), transparent);
+  z-index: 100;
+}
 
-    /* 오른쪽: choices + controls */
-    .rightPanel{
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-      min-height:0;
-    }
-    .choices{
-      display:grid;
-      grid-template-rows: repeat(4, 1fr);
-      gap: 12px;
-      flex:1 1 auto;
-      min-height:0;
-    }
-    button.choice{
-      width:100%;
-      appearance:none;
-      border: 4px solid #000;
-      border-radius: 18px;
-      padding: 14px 16px;
-      font-size: 20px;
-      font-weight: 900;
-      color:#111;
-      cursor:pointer;
-      box-shadow: 0 12px 0 var(--shadow), 0 18px 40px rgba(0,0,0,.35);
-      background:#E5E7EB;
-      text-align:left;
-      letter-spacing:.01em;
-      display:flex;
-      align-items:center;
-      justify-content:flex-start;
-      user-select:none;
-      transform:none; /* ✅ 삐뚤빼뚤 제거 */
-    }
-    button.choice:active{
-      transform: translateY(6px);
-      box-shadow: 0 6px 0 var(--shadow), 0 12px 26px rgba(0,0,0,.35);
-    }
-    button.choice[disabled]{cursor:default; opacity:.95;}
-    button.choice.correct{
-      outline: 3px solid rgba(255,255,255,.9);
-      outline-offset: 3px;
-    }
-    button.choice.wrong{
-      opacity:.88;
-      filter: grayscale(.25);
-    }
+.logo {
+  font-family: 'Space Mono', monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 2px;
+}
 
-    .controls{
-      display:flex;
-      gap:10px;
-      justify-content:space-between;
-      flex:0 0 auto;
-    }
-    .btn{
-      flex:1;
-      border-radius: 999px;
-      padding: 10px 14px;
-      background:#fff;
-      border:4px solid #000;
-      color:#111;
-      font-weight: 900;
-      cursor:pointer;
-      box-shadow: 0 10px 0 var(--shadow);
-    }
-    .btn:active{
-      transform: translateY(6px);
-      box-shadow: 0 4px 0 var(--shadow);
-    }
+.settings-btn {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  background: var(--glass);
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
 
-    .hint{
-      flex:0 0 auto;
-      color: rgba(255,255,255,.72);
-      font-size: 12px;
-      line-height: 1.35;
-      padding: 2px 2px 0;
-    }
-    .kbd{
-      font-family: ui-monospace,SFMono-Regular,Menlo,monospace;
-      font-weight:900;
-      font-size:12px;
-      background:#111;
-      border:2px solid #000;
-      padding:2px 6px;
-      border-radius:10px;
-      color:#fff;
-    }
+.settings-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
 
-    /* Game over modal */
-    .overlay{
-      position:fixed; inset:0;
-      display:none;
-      align-items:center; justify-content:center;
-      background: rgba(0,0,0,.72);
-      padding: 18px 14px;
-      z-index: 50;
-    }
-    .modal{
-      width:min(520px, 100%);
-      background:#fff;
-      color:#111;
-      border:4px solid #000;
-      border-radius: 18px;
-      padding: 16px;
-      box-shadow: 0 18px 0 var(--shadow), 0 34px 80px rgba(0,0,0,.45);
-    }
-    .modal h2{margin:0 0 8px; font-size:20px; font-weight: 900;}
-    .modal .sub{color:rgba(0,0,0,.72); font-size:13px; margin-bottom:12px; font-weight:800;}
-    .scores{
-      margin-top:10px;
-      border-top:2px solid rgba(0,0,0,.15);
-      padding-top:10px;
-      font-size:13px;
-      font-weight:800;
-    }
-    .scores ol{margin:8px 0 0; padding-left:18px; font-weight:800;}
+/* Stats bar */
+.stats {
+  position: fixed;
+  top: 60px;
+  left: 20px;
+  right: 20px;
+  display: flex;
+  gap: 12px;
+  z-index: 90;
+}
 
-    /* 모바일 세로: 2분할 -> 위/아래 */
-    @media (max-width: 720px){
-      body{padding: 14px 12px;}
-      .main{
-        grid-template-columns: 1fr;
-        grid-template-rows: 1fr auto;
-      }
-      .choices{
-        grid-template-rows: repeat(4, auto);
-      }
-      button.choice{
-        border-radius: 999px; /* 모바일은 라벨 느낌 */
-        font-size: 18px;
-      }
-    }
+.stat-item {
+  flex: 1;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 10px 14px;
+  text-align: center;
+}
+
+.stat-label {
+  font-size: 10px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+.stat-value {
+  font-family: 'Space Mono', monospace;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.stat-value.score { color: var(--accent); }
+.stat-value.combo { color: var(--warning); }
+.stat-value.lives { color: var(--danger); }
+
+/* Game area */
+.game-area {
+  position: fixed;
+  top: 130px;
+  left: 0;
+  right: 0;
+  bottom: 200px;
+  overflow: hidden;
+}
+
+/* Falling word */
+.falling-word {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, var(--bg-card), #1a1a2e);
+  border: 2px solid var(--accent);
+  border-radius: 16px;
+  padding: 16px 28px;
+  text-align: center;
+  box-shadow: 
+    0 0 30px var(--accent-dim),
+    0 10px 40px rgba(0,0,0,0.5);
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from { box-shadow: 0 0 20px var(--accent-dim), 0 10px 40px rgba(0,0,0,0.5); }
+  to { box-shadow: 0 0 40px var(--accent-dim), 0 10px 40px rgba(0,0,0,0.5); }
+}
+
+.word-text {
+  font-family: 'Space Mono', monospace;
+  font-size: 24px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 6px;
+}
+
+.word-pos {
+  font-size: 11px;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Answer buttons */
+.answers {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px;
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  background: linear-gradient(to top, var(--bg-dark) 80%, transparent);
+}
+
+.answer-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  padding: 16px 12px;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+  overflow: hidden;
+}
+
+.answer-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--accent), #00a896);
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.answer-btn span {
+  position: relative;
+  z-index: 1;
+}
+
+.answer-btn:active {
+  transform: scale(0.97);
+}
+
+.answer-btn.correct::before {
+  opacity: 1;
+}
+
+.answer-btn.correct {
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.answer-btn.wrong {
+  border-color: var(--danger);
+  background: rgba(255,107,107,0.2);
+}
+
+.key-hint {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  color: var(--text-dim);
+  background: var(--glass);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* Modals */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s;
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal {
+  background: var(--bg-card);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  padding: 32px 28px;
+  width: 90%;
+  max-width: 360px;
+  text-align: center;
+  transform: scale(0.9) translateY(20px);
+  transition: transform 0.3s;
+}
+
+.modal-overlay.active .modal {
+  transform: scale(1) translateY(0);
+}
+
+.modal-title {
+  font-family: 'Space Mono', monospace;
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.modal-subtitle {
+  color: var(--text-dim);
+  margin-bottom: 24px;
+}
+
+/* Start modal specific */
+.day-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.day-chip {
+  padding: 8px 14px;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.day-chip:hover {
+  border-color: var(--accent);
+}
+
+.day-chip.selected {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg-dark);
+  font-weight: 700;
+}
+
+.difficulty-selector {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.diff-btn {
+  flex: 1;
+  padding: 12px;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.diff-btn:hover {
+  border-color: var(--accent);
+}
+
+.diff-btn.selected {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.diff-label {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.diff-desc {
+  font-size: 10px;
+  color: var(--text-dim);
+}
+
+.play-btn {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, var(--accent), #00a896);
+  border: none;
+  border-radius: 14px;
+  color: var(--bg-dark);
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.play-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px var(--accent-dim);
+}
+
+/* Game over modal */
+.final-score {
+  font-family: 'Space Mono', monospace;
+  font-size: 56px;
+  font-weight: 700;
+  color: var(--accent);
+  margin: 16px 0;
+}
+
+.score-breakdown {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 24px;
+  padding: 16px;
+  background: var(--glass);
+  border-radius: 12px;
+}
+
+.breakdown-item {
+  text-align: center;
+}
+
+.breakdown-value {
+  font-family: 'Space Mono', monospace;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.breakdown-label {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+/* Settings modal */
+.setting-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.setting-row:last-child {
+  border-bottom: none;
+}
+
+.setting-label {
+  font-size: 14px;
+}
+
+/* Ready state */
+.ready-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Space Mono', monospace;
+  font-size: 32px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 4px;
+}
+
+/* Combo popup */
+.combo-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Space Mono', monospace;
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--warning);
+  text-shadow: 0 0 30px var(--warning);
+  pointer-events: none;
+  opacity: 0;
+  z-index: 200;
+}
+
+.combo-popup.show {
+  animation: comboPop 0.6s ease-out forwards;
+}
+
+@keyframes comboPop {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+  100% { opacity: 0; transform: translate(-50%, -60%) scale(1); }
+}
+
+/* Floor line */
+.floor-line {
+  position: fixed;
+  bottom: 200px;
+  left: 20px;
+  right: 20px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--danger), transparent);
+  opacity: 0.5;
+}
+
+/* Hide on desktop */
+@media (min-width: 768px) {
+  .answers {
+    max-width: 500px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .game-area {
+    max-width: 600px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+```
+
   </style>
 </head>
-
 <body>
-  <div class="wrap">
-    <div class="brand">VAREM</div>
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">VAREM</div>
+    <button class="settings-btn" id="settingsBtn">⚙</button>
+  </header>
 
-    <!-- ✅ DAY 삭제 -->
-    <div class="topbar">
-      <div class="stat">Score <span id="score">0</span></div>
-      <div class="stat">Combo <span id="combo">0</span></div>
-      <div class="stat">♥ <span id="life">3</span></div>
+  <!-- Stats -->
+
+  <div class="stats">
+    <div class="stat-item">
+      <div class="stat-label">Score</div>
+      <div class="stat-value score" id="score">0</div>
     </div>
-
-    <!-- ✅ 2분할 -->
-    <div class="main">
-      <div class="leftPanel">
-        <div class="stage" id="stage" aria-label="Game stage">
-          <div class="wordCard" id="wordCard" role="group" aria-label="Falling word">
-            <div class="label">WORD</div>
-            <div class="word" id="wordText">ready</div>
-          </div>
-          <div class="floor"></div>
-        </div>
-      </div>
-
-      <div class="rightPanel">
-        <div class="choices" id="choices"></div>
-
-        <div class="controls">
-          <button class="btn" id="startBtn">Start</button>
-          <button class="btn" id="restartBtn">Restart</button>
-        </div>
-
-        <div class="hint">
-          규칙: 떨어지는 영단어의 <b>올바른 뜻</b>을 터치하세요. 바닥에 닿으면 ♥ 감소.<br/>
-          데스크탑: <span class="kbd">1</span>~<span class="kbd">4</span> 키 선택 가능.
-        </div>
-      </div>
+    <div class="stat-item">
+      <div class="stat-label">Combo</div>
+      <div class="stat-value combo" id="combo">0</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">Lives</div>
+      <div class="stat-value lives" id="lives">♥♥♥</div>
     </div>
   </div>
 
-  <div class="overlay" id="overlay">
+  <!-- Game Area -->
+
+  <div class="game-area" id="gameArea">
+    <div class="ready-text" id="readyText">READY</div>
+  </div>
+
+  <div class="floor-line"></div>
+
+  <!-- Answers -->
+
+  <div class="answers" id="answers">
+    <button class="answer-btn" data-idx="0">
+      <span class="key-hint">1</span>
+      <span class="answer-text">-</span>
+    </button>
+    <button class="answer-btn" data-idx="1">
+      <span class="key-hint">2</span>
+      <span class="answer-text">-</span>
+    </button>
+    <button class="answer-btn" data-idx="2">
+      <span class="key-hint">3</span>
+      <span class="answer-text">-</span>
+    </button>
+    <button class="answer-btn" data-idx="3">
+      <span class="key-hint">4</span>
+      <span class="answer-text">-</span>
+    </button>
+  </div>
+
+  <!-- Combo Popup -->
+
+  <div class="combo-popup" id="comboPopup"></div>
+
+  <!-- Start Modal -->
+
+  <div class="modal-overlay active" id="startModal">
     <div class="modal">
-      <h2 id="modalTitle">Game Over</h2>
-      <div class="sub" id="modalSub">Your score: 0</div>
-      <div style="display:flex; gap:10px; justify-content:space-between;">
-        <button class="btn" id="playAgainBtn">Play again</button>
-        <button class="btn" id="closeBtn">Close</button>
-      </div>
-      <div class="scores" id="scoreBox"></div>
-    </div>
+      <div class="modal-title">Word Fall</div>
+      <div class="modal-subtitle">중3 영어 단어 퀴즈</div>
+
+```
+  <div class="day-selector" id="daySelector"></div>
+  
+  <div class="difficulty-selector">
+    <button class="diff-btn selected" data-speed="slow">
+      <span class="diff-label">🐢 Easy</span>
+      <span class="diff-desc">느린 속도</span>
+    </button>
+    <button class="diff-btn" data-speed="normal">
+      <span class="diff-label">🚀 Normal</span>
+      <span class="diff-desc">보통 속도</span>
+    </button>
+    <button class="diff-btn" data-speed="fast">
+      <span class="diff-label">⚡ Hard</span>
+      <span class="diff-desc">빠른 속도</span>
+    </button>
+  </div>
+  
+  <button class="play-btn" id="startBtn">START</button>
+</div>
+```
+
   </div>
 
-  <script src="./data.js"></script>
+  <!-- Game Over Modal -->
+
+  <div class="modal-overlay" id="gameOverModal">
+    <div class="modal">
+      <div class="modal-title">GAME OVER</div>
+      <div class="final-score" id="finalScore">0</div>
+
+```
+  <div class="score-breakdown">
+    <div class="breakdown-item">
+      <div class="breakdown-value" id="correctCount">0</div>
+      <div class="breakdown-label">정답</div>
+    </div>
+    <div class="breakdown-item">
+      <div class="breakdown-value" id="maxCombo">0</div>
+      <div class="breakdown-label">최대 콤보</div>
+    </div>
+    <div class="breakdown-item">
+      <div class="breakdown-value" id="accuracy">0%</div>
+      <div class="breakdown-label">정확도</div>
+    </div>
+  </div>
+  
+  <button class="play-btn" id="restartBtn">PLAY AGAIN</button>
+</div>
+```
+
+  </div>
+
+  <!-- Settings Modal -->
+
+  <div class="modal-overlay" id="settingsModal">
+    <div class="modal">
+      <div class="modal-title">설정</div>
+
+```
+  <div class="setting-row">
+    <span class="setting-label">키보드 힌트 표시</span>
+    <input type="checkbox" id="showKeyHints" checked>
+  </div>
+  
+  <div class="setting-row">
+    <span class="setting-label">진동 피드백</span>
+    <input type="checkbox" id="vibration" checked>
+  </div>
+  
+  <button class="play-btn" id="closeSettings" style="margin-top: 20px;">닫기</button>
+</div>
+```
+
+  </div>
+
   <script>
-    // 스크롤/튕김 방지(특히 iOS)
-    document.addEventListener('touchmove', (e) => {
-      e.preventDefault();
-    }, { passive:false });
+    // Word Data - 중3 영어 30일 단어
+    const WORDS = [
+      {day:1,  w:"copyright",   p:"n",   m_en:"the legal right to control the use of a book, song, or work", m_ko:"저작권", e_en:"This photo is protected by copyright.", e_ko:"이 사진은 저작권으로 보호된다."},
+      {day:2,  w:"supporter",   p:"n",   m_en:"a person who supports a team, idea, or person", m_ko:"지지자; 응원하는 사람", e_en:"The team thanked its supporters.", e_ko:"그 팀은 지지자들에게 감사를 전했다."},
+      {day:3,  w:"identical",   p:"adj", m_en:"exactly the same", m_ko:"똑같은, 동일한", e_en:"Their answers were identical.", e_ko:"그들의 답은 똑같았다."},
+      {day:4,  w:"tray",        p:"n",   m_en:"a flat object used to carry things", m_ko:"쟁반, 트레이", e_en:"She carried cups on a tray.", e_ko:"그녀는 쟁반에 컵을 올려 옮겼다."},
+      {day:5,  w:"assign",      p:"v",   m_en:"to give someone a task or duty", m_ko:"(일을) 맡기다", e_en:"The teacher assigned homework.", e_ko:"선생님이 숙제를 내주셨다."},
+      {day:6,  w:"propose",     p:"v",   m_en:"to suggest a plan or idea", m_ko:"제안하다", e_en:"He proposed a new idea in class.", e_ko:"그는 수업에서 새로운 아이디어를 제안했다."},
+      {day:7,  w:"total",       p:"adj", m_en:"complete; the whole amount", m_ko:"전체의, 총", e_en:"The total cost was 10,000 won.", e_ko:"총비용은 1만 원이었다."},
+      {day:8,  w:"obedient",    p:"adj", m_en:"doing what you are told to do", m_ko:"순종적인, 말을 잘 듣는", e_en:"The dog is obedient and calm.", e_ko:"그 강아지는 말을 잘 듣고 차분하다."},
+      {day:9,  w:"stationery",  p:"n",   m_en:"things like pens, pencils, and paper", m_ko:"문구류", e_en:"I bought stationery for school.", e_ko:"나는 학교에 쓸 문구류를 샀다."},
+      {day:10, w:"roast",       p:"v",   m_en:"to cook food in an oven or over heat", m_ko:"굽다(로스트하다)", e_en:"We roasted chicken for dinner.", e_ko:"우리는 저녁으로 치킨을 구웠다."},
+      {day:11, w:"volunteer",   p:"v",   m_en:"to offer to help without being paid", m_ko:"자원봉사하다", e_en:"She volunteered at a community center.", e_ko:"그녀는 지역 센터에서 자원봉사를 했다."},
+      {day:12, w:"long for",    p:"phr", m_en:"to want something very much", m_ko:"간절히 바라다", e_en:"He longed for a chance to travel.", e_ko:"그는 여행할 기회를 간절히 바랐다."},
+      {day:13, w:"destructive", p:"adj", m_en:"causing a lot of damage", m_ko:"파괴적인", e_en:"The storm was destructive.", e_ko:"그 폭풍은 파괴적이었다."},
+      {day:14, w:"stereotype",  p:"n",   m_en:"a fixed idea about a group of people", m_ko:"고정관념", e_en:"We should not judge people by stereotypes.", e_ko:"우리는 고정관념으로 사람을 판단하면 안 된다."},
+      {day:15, w:"debate",      p:"n",   m_en:"a formal discussion with different opinions", m_ko:"토론", e_en:"Our class had a debate about school rules.", e_ko:"우리 반은 학교 규칙에 대해 토론했다."},
+      {day:16, w:"put off",     p:"phr", m_en:"to delay doing something", m_ko:"미루다", e_en:"Don't put off your homework.", e_ko:"숙제를 미루지 마."},
+      {day:17, w:"merchandise", p:"n",   m_en:"goods that are for sale", m_ko:"상품, 판매 물품", e_en:"The store sells sports merchandise.", e_ko:"그 가게는 스포츠 상품을 판다."},
+      {day:18, w:"wash away",   p:"phr", m_en:"to remove or carry away with water", m_ko:"씻겨 나가다; 쓸려가다", e_en:"Heavy rain washed away the dirt.", e_ko:"폭우가 흙을 씻겨 내려보냈다."},
+      {day:19, w:"custom",      p:"n",   m_en:"a traditional way of doing things", m_ko:"관습, 풍습", e_en:"It's a custom to bow in Korea.", e_ko:"한국에서는 인사로 절하는 것이 풍습이다."},
+      {day:20, w:"requirement", p:"n",   m_en:"something you must have or do", m_ko:"필수 조건", e_en:"Meeting the requirement is important.", e_ko:"조건을 충족하는 것이 중요하다."},
+      {day:21, w:"claim",       p:"v",   m_en:"to say something is true", m_ko:"주장하다", e_en:"He claimed that he was right.", e_ko:"그는 자신이 맞다고 주장했다."},
+      {day:22, w:"evolution",   p:"n",   m_en:"the gradual change of living things over time", m_ko:"진화", e_en:"We learned about evolution in science class.", e_ko:"우리는 과학 시간에 진화를 배웠다."},
+      {day:23, w:"staple",      p:"n",   m_en:"a basic and important item used often", m_ko:"필수품", e_en:"Rice is a staple food in many countries.", e_ko:"쌀은 많은 나라에서 주식이다."},
+      {day:24, w:"dust",        p:"n",   m_en:"very small dry pieces of dirt", m_ko:"먼지", e_en:"There is dust on the shelf.", e_ko:"선반 위에 먼지가 있다."},
+      {day:25, w:"scene",       p:"n",   m_en:"a place or part of a story that you see", m_ko:"장면; 현장", e_en:"That scene in the movie was touching.", e_ko:"그 영화 장면은 감동적이었다."},
+      {day:26, w:"clone",       p:"v",   m_en:"to make an exact copy of a living thing", m_ko:"복제하다", e_en:"Scientists tried to clone an animal.", e_ko:"과학자들은 동물을 복제하려고 했다."},
+      {day:27, w:"commute",     p:"v",   m_en:"to travel regularly between home and work/school", m_ko:"통근하다; 통학하다", e_en:"My father commutes by subway.", e_ko:"아빠는 지하철로 통근한다."},
+      {day:28, w:"unify",       p:"v",   m_en:"to bring together as one", m_ko:"통합하다; 하나로 만들다", e_en:"The leader tried to unify the team.", e_ko:"그 리더는 팀을 하나로 통합하려 했다."},
+      {day:29, w:"fair",        p:"adj", m_en:"treating people equally and correctly", m_ko:"공정한", e_en:"The teacher was fair to everyone.", e_ko:"선생님은 모두에게 공정했다."},
+      {day:30, w:"aware",       p:"adj", m_en:"knowing or realizing something", m_ko:"알고 있는", e_en:"Be aware of your surroundings.", e_ko:"주변을 잘 살펴라."}
+    ];
 
-    // ---------- KST day-of-year seed (로직은 남겨둠: daily shuffle용) ----------
-    function getKSTDate() {
-      const now = new Date();
-      const utc = now.getTime() + now.getTimezoneOffset() * 60000;
-      return new Date(utc + 9 * 3600000);
+    // Game State
+    let state = {
+      score: 0,
+      combo: 0,
+      maxCombo: 0,
+      lives: 3,
+      correct: 0,
+      total: 0,
+      selectedDays: [0], // 0 = all
+      speed: 'slow',
+      currentWord: null,
+      correctIdx: -1,
+      isPlaying: false,
+      fallInterval: null,
+      wordY: 0
+    };
+
+    // Speed configs (pixels per frame at 60fps)
+    const SPEEDS = {
+      slow: { fallSpeed: 1.2, fallDuration: 8000 },
+      normal: { fallSpeed: 2, fallDuration: 5000 },
+      fast: { fallSpeed: 3.5, fallDuration: 3000 }
+    };
+
+    // DOM Elements
+    const $ = id => document.getElementById(id);
+    const scoreEl = $('score');
+    const comboEl = $('combo');
+    const livesEl = $('lives');
+    const gameArea = $('gameArea');
+    const readyText = $('readyText');
+    const answersEl = $('answers');
+    const answerBtns = document.querySelectorAll('.answer-btn');
+    const comboPopup = $('comboPopup');
+    const startModal = $('startModal');
+    const gameOverModal = $('gameOverModal');
+    const settingsModal = $('settingsModal');
+    const daySelector = $('daySelector');
+
+    // Initialize day selector
+    function initDaySelector() {
+      // All days option
+      const allChip = document.createElement('div');
+      allChip.className = 'day-chip selected';
+      allChip.textContent = '전체';
+      allChip.dataset.day = '0';
+      daySelector.appendChild(allChip);
+
+      // Individual days (group by 10)
+      const groups = ['1-10', '11-20', '21-30'];
+      groups.forEach(g => {
+        const chip = document.createElement('div');
+        chip.className = 'day-chip';
+        chip.textContent = `Day ${g}`;
+        chip.dataset.group = g;
+        daySelector.appendChild(chip);
+      });
+
+      // Click handler
+      daySelector.addEventListener('click', e => {
+        const chip = e.target.closest('.day-chip');
+        if (!chip) return;
+
+        document.querySelectorAll('.day-chip').forEach(c => c.classList.remove('selected'));
+        chip.classList.add('selected');
+
+        if (chip.dataset.day === '0') {
+          state.selectedDays = [0];
+        } else {
+          const [start, end] = chip.dataset.group.split('-').map(Number);
+          state.selectedDays = [];
+          for (let i = start; i <= end; i++) state.selectedDays.push(i);
+        }
+      });
     }
-    function dayOfYearKST(d) {
-      const start = new Date(d.getFullYear(), 0, 0);
-      const diff = d - start;
-      const oneDay = 86400000;
-      return Math.floor(diff / oneDay);
+
+    // Difficulty selector
+    document.querySelectorAll('.diff-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        state.speed = btn.dataset.speed;
+      });
+    });
+
+    // Get filtered words
+    function getFilteredWords() {
+      if (state.selectedDays.includes(0)) return [...WORDS];
+      return WORDS.filter(w => state.selectedDays.includes(w.day));
     }
 
-    // ---------- seeded RNG ----------
-    function mulberry32(seed) {
-      let t = seed >>> 0;
-      return function() {
-        t += 0x6D2B79F5;
-        let x = Math.imul(t ^ (t >>> 15), 1 | t);
-        x ^= x + Math.imul(x ^ (x >>> 7), 61 | x);
-        return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
-      };
+    // Get random word
+    function getRandomWord() {
+      const words = getFilteredWords();
+      return words[Math.floor(Math.random() * words.length)];
     }
 
-    // ---------- DOM ----------
-    const scoreEl = document.getElementById("score");
-    const comboEl = document.getElementById("combo");
-    const lifeEl = document.getElementById("life");
-    const stageEl = document.getElementById("stage");
-    const wordCardEl = document.getElementById("wordCard");
-    const wordTextEl = document.getElementById("wordText");
-    const choicesEl = document.getElementById("choices");
-    const startBtn = document.getElementById("startBtn");
-    const restartBtn = document.getElementById("restartBtn");
+    // Get wrong answers
+    function getWrongAnswers(correctWord, count) {
+      const allMeanings = WORDS.map(w => w.m_ko);
+      const wrong = allMeanings.filter(m => m !== correctWord.m_ko);
+      const shuffled = wrong.sort(() => Math.random() - 0.5);
+      return shuffled.slice(0, count);
+    }
 
-    const overlay = document.getElementById("overlay");
-    const modalTitle = document.getElementById("modalTitle");
-    const modalSub = document.getElementById("modalSub");
-    const playAgainBtn = document.getElementById("playAgainBtn");
-    const closeBtn = document.getElementById("closeBtn");
-    const scoreBox = document.getElementById("scoreBox");
-
-    // ---------- Game state ----------
-    const WORDS = (window.WORDS || []).slice();
-    if (!WORDS.length) alert("data.js에 WORDS가 비어있어요.");
-
-    const kst = getKSTDate();
-    const day = dayOfYearKST(kst);
-    const rng = mulberry32((kst.getFullYear() * 1000) + day);
-
-    function shuffleWithRng(arr) {
-      const a = arr.slice();
+    // Shuffle array
+    function shuffle(arr) {
+      const a = [...arr];
       for (let i = a.length - 1; i > 0; i--) {
-        const j = Math.floor(rng() * (i + 1));
+        const j = Math.floor(Math.random() * (i + 1));
         [a[i], a[j]] = [a[j], a[i]];
       }
       return a;
     }
-    const dailyList = shuffleWithRng(WORDS);
 
-    let idx = 0;
-    let running = false;
-    let score = 0;
-    let combo = 0;
-    let life = 3;
-
-    // physics
-    let y = -90;
-    let v = 0.02;     // px/ms
-    let lastTs = null;
-
-    // current question
-    let current = null;
-    let currentCorrect = null;
-    let choiceButtons = [];
-
-    function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
-
-    function speedForScore(s) {
-      const base = 0.02;
-      const add  = Math.min(0.03, Math.floor(s / 120) * 0.004);
-      return base + add;
+    // Update UI
+    function updateUI() {
+      scoreEl.textContent = state.score;
+      comboEl.textContent = state.combo;
+      livesEl.textContent = '♥'.repeat(state.lives) + '♡'.repeat(3 - state.lives);
     }
 
-    function setHUD() {
-      scoreEl.textContent = String(score);
-      comboEl.textContent = String(combo);
-      lifeEl.textContent = String(life);
+    // Show combo popup
+    function showComboPopup(combo) {
+      if (combo >= 3) {
+        comboPopup.textContent = `${combo} COMBO!`;
+        comboPopup.classList.remove('show');
+        void comboPopup.offsetWidth;
+        comboPopup.classList.add('show');
+      }
     }
 
-    function lockChoices(lock=true) {
-      choiceButtons.forEach(b => b.disabled = lock);
+    // Vibrate
+    function vibrate(pattern) {
+      if ($('vibration')?.checked && navigator.vibrate) {
+        navigator.vibrate(pattern);
+      }
     }
 
-    function renderChoices(options) {
-      const palette = ["#A7F3D0", "#FDE68A", "#FCA5A5", "#93C5FD"];
+    // Create falling word element
+    function createFallingWord(word) {
+      const el = document.createElement('div');
+      el.className = 'falling-word';
+      el.innerHTML = `
+        <div class="word-text">${word.w}</div>
+        <div class="word-pos">${word.p}</div>
+      `;
+      el.style.top = '-100px';
+      return el;
+    }
 
-      choicesEl.innerHTML = "";
-      choiceButtons = options.map((meaning, i) => {
-        const b = document.createElement("button");
-        b.className = "choice";
-        b.type = "button";
-        b.dataset.answer = meaning;
+    // Start new round
+    function startRound() {
+      // Clear previous
+      const prev = gameArea.querySelector('.falling-word');
+      if (prev) prev.remove();
 
-        // ✅ 이모지/삐뚤 제거: 고정 색만
-        b.style.background = palette[i % palette.length];
-        b.textContent = meaning;
+      // Get new word
+      state.currentWord = getRandomWord();
+      const wrongAnswers = getWrongAnswers(state.currentWord, 3);
+      const allAnswers = shuffle([state.currentWord.m_ko, ...wrongAnswers]);
+      state.correctIdx = allAnswers.indexOf(state.currentWord.m_ko);
 
-        b.addEventListener("click", () => choose(meaning, b));
-        choicesEl.appendChild(b);
-        return b;
+      // Update answer buttons
+      answerBtns.forEach((btn, i) => {
+        btn.querySelector('.answer-text').textContent = allAnswers[i];
+        btn.classList.remove('correct', 'wrong');
+        btn.disabled = false;
       });
-    }
 
-    function pickNextWord() {
-      current = dailyList[idx % dailyList.length];
-      idx++;
+      // Create falling word
+      const wordEl = createFallingWord(state.currentWord);
+      gameArea.appendChild(wordEl);
+      readyText.style.display = 'none';
 
-      const correct = current[1];
-      const seen = new Set([correct]);
-      const options = [correct];
+      // Start falling animation
+      state.wordY = -100;
+      const gameHeight = gameArea.offsetHeight;
+      const { fallSpeed } = SPEEDS[state.speed];
 
-      while (options.length < 4 && seen.size < WORDS.length) {
-        const r = WORDS[Math.floor(rng() * WORDS.length)][1];
-        if (!seen.has(r)) { seen.add(r); options.push(r); }
+      if (state.fallInterval) cancelAnimationFrame(state.fallInterval);
+
+      function fall() {
+        if (!state.isPlaying) return;
+
+        state.wordY += fallSpeed;
+        wordEl.style.top = state.wordY + 'px';
+
+        if (state.wordY >= gameHeight - 50) {
+          // Hit floor - wrong answer
+          handleAnswer(-1);
+          return;
+        }
+
+        state.fallInterval = requestAnimationFrame(fall);
       }
 
-      for (let i = options.length - 1; i > 0; i--) {
-        const j = Math.floor(rng() * (i + 1));
-        [options[i], options[j]] = [options[j], options[i]];
-      }
-
-      currentCorrect = correct;
-
-      wordTextEl.textContent = String(current[0]).toLowerCase();
-
-      // ✅ 삐뚤 제거 (회전 없음)
-      wordCardEl.style.transform = `translateX(-50%)`;
-
-      y = -90;
-      v = speedForScore(score);
-      wordCardEl.classList.remove("good","bad");
-
-      renderChoices(options);
-      lockChoices(false);
+      state.fallInterval = requestAnimationFrame(fall);
     }
 
-    function choose(meaning, btn) {
-      if (!running) return;
-      lockChoices(true);
+    // Handle answer
+    function handleAnswer(idx) {
+      if (!state.isPlaying) return;
+      if (state.fallInterval) cancelAnimationFrame(state.fallInterval);
 
-      const ok = (meaning === currentCorrect);
-      if (ok) {
-        combo += 1;
-        const bonus = clamp(combo - 1, 0, 20);
-        score += 10 + bonus;
-        wordCardEl.classList.add("good");
-        btn.classList.add("correct");
+      state.total++;
+      const isCorrect = idx === state.correctIdx;
+
+      // Visual feedback
+      answerBtns.forEach((btn, i) => {
+        btn.disabled = true;
+        if (i === state.correctIdx) btn.classList.add('correct');
+        else if (i === idx) btn.classList.add('wrong');
+      });
+
+      if (isCorrect) {
+        state.correct++;
+        state.combo++;
+        if (state.combo > state.maxCombo) state.maxCombo = state.combo;
+        state.score += 10 * (1 + Math.floor(state.combo / 5));
+        showComboPopup(state.combo);
+        vibrate(50);
       } else {
-        combo = 0;
-        life -= 1;
-        wordCardEl.classList.add("bad");
-        btn.classList.add("wrong");
-        choiceButtons.forEach(b => {
-          if (b.dataset.answer === currentCorrect) b.classList.add("correct");
-        });
+        state.combo = 0;
+        state.lives--;
+        vibrate([100, 50, 100]);
       }
 
-      setHUD();
+      updateUI();
 
-      if (life <= 0) {
+      if (state.lives <= 0) {
         endGame();
         return;
       }
 
+      // Next round after delay
       setTimeout(() => {
-        if (!running) return;
-        pickNextWord();
-        setHUD();
-      }, 520);
+        if (state.isPlaying) startRound();
+      }, 800);
     }
 
-    function endGame() {
-      running = false;
-      lockChoices(true);
-      showModal("Game Over", `Your score: ${score}`);
-      saveScore(score);
-      renderTopScores();
-    }
-
-    function showModal(title, sub) {
-      modalTitle.textContent = title;
-      modalSub.textContent = sub;
-      overlay.style.display = "flex";
-    }
-
-    function hideModal() {
-      overlay.style.display = "none";
-    }
-
-    // Top5 local scores
-    const SCORE_KEY = "vareM_wordfall_top5_v1";
-    function loadScores() {
-      try { return JSON.parse(localStorage.getItem(SCORE_KEY) || "[]"); }
-      catch { return []; }
-    }
-    function saveScore(s) {
-      const arr = loadScores();
-      arr.push({ score: s, at: new Date().toISOString() });
-      arr.sort((a,b)=>b.score-a.score);
-      localStorage.setItem(SCORE_KEY, JSON.stringify(arr.slice(0,5)));
-    }
-    function renderTopScores() {
-      const arr = loadScores();
-      if (!arr.length) {
-        scoreBox.innerHTML = "<b>Top 5</b><div style='margin-top:6px;opacity:.75'>No records yet.</div>";
-        return;
-      }
-      const items = arr.map(x => `<li><b>${x.score}</b> <span style="opacity:.7">(${x.at.slice(0,10)})</span></li>`).join("");
-      scoreBox.innerHTML = `<b>Top 5</b><ol>${items}</ol>`;
-    }
-
-    // animation loop
-    function tick(ts) {
-      if (!running) { lastTs = ts; requestAnimationFrame(tick); return; }
-      if (lastTs == null) lastTs = ts;
-      const dt = ts - lastTs;
-      lastTs = ts;
-
-      y += v * dt;
-      wordCardEl.style.top = y + "px";
-
-      const stageH = stageEl.clientHeight;
-      const cardH = wordCardEl.offsetHeight;
-      const floorY = stageH - 14;
-
-      if (y + cardH >= floorY) {
-        combo = 0;
-        life -= 1;
-        setHUD();
-
-        wordCardEl.classList.add("bad");
-        lockChoices(true);
-
-        if (life <= 0) {
-          endGame();
-        } else {
-          setTimeout(() => {
-            if (!running) return;
-            pickNextWord();
-            setHUD();
-          }, 520);
-        }
-      }
-
-      requestAnimationFrame(tick);
-    }
-
+    // Start game
     function startGame() {
-      score = 0; combo = 0; life = 3;
-      idx = 0;
-      running = true;
-      setHUD();
-      pickNextWord();
+      state = {
+        ...state,
+        score: 0,
+        combo: 0,
+        maxCombo: 0,
+        lives: 3,
+        correct: 0,
+        total: 0,
+        isPlaying: true,
+        wordY: 0
+      };
+
+      updateUI();
+      startModal.classList.remove('active');
+      gameOverModal.classList.remove('active');
+
+      setTimeout(startRound, 500);
     }
 
-    function restartGame() {
-      hideModal();
-      startGame();
+    // End game
+    function endGame() {
+      state.isPlaying = false;
+      if (state.fallInterval) cancelAnimationFrame(state.fallInterval);
+
+      $('finalScore').textContent = state.score;
+      $('correctCount').textContent = state.correct;
+      $('maxCombo').textContent = state.maxCombo;
+      $('accuracy').textContent = state.total > 0 
+        ? Math.round((state.correct / state.total) * 100) + '%' 
+        : '0%';
+
+      setTimeout(() => {
+        gameOverModal.classList.add('active');
+      }, 500);
     }
 
-    // keyboard shortcuts 1~4
-    window.addEventListener("keydown", (e) => {
-      if (!running) return;
-      const k = e.key;
-      if (k >= "1" && k <= "4") {
-        const i = Number(k) - 1;
-        const b = choiceButtons[i];
-        if (b && !b.disabled) b.click();
+    // Event listeners
+    $('startBtn').addEventListener('click', startGame);
+    $('restartBtn').addEventListener('click', startGame);
+
+    answerBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (!state.isPlaying) return;
+        handleAnswer(parseInt(btn.dataset.idx));
+      });
+    });
+
+    // Keyboard controls
+    document.addEventListener('keydown', e => {
+      if (!state.isPlaying) return;
+      const key = e.key;
+      if (key >= '1' && key <= '4') {
+        handleAnswer(parseInt(key) - 1);
       }
     });
 
-    startBtn.addEventListener("click", () => { hideModal(); startGame(); });
-    restartBtn.addEventListener("click", restartGame);
-    playAgainBtn.addEventListener("click", restartGame);
-    closeBtn.addEventListener("click", hideModal);
-    overlay.addEventListener("click", (e) => { if (e.target === overlay) hideModal(); });
+    // Settings
+    $('settingsBtn').addEventListener('click', () => {
+      settingsModal.classList.add('active');
+    });
 
-    // init
-    setHUD();
-    renderTopScores();
-    lockChoices(true);
-    requestAnimationFrame(tick);
+    $('closeSettings').addEventListener('click', () => {
+      settingsModal.classList.remove('active');
+    });
+
+    // Show/hide key hints
+    $('showKeyHints')?.addEventListener('change', e => {
+      document.querySelectorAll('.key-hint').forEach(h => {
+        h.style.display = e.target.checked ? 'block' : 'none';
+      });
+    });
+
+    // Close modals on overlay click
+    [startModal, gameOverModal, settingsModal].forEach(modal => {
+      modal.addEventListener('click', e => {
+        if (e.target === modal && modal !== startModal) {
+          modal.classList.remove('active');
+        }
+      });
+    });
+
+    // Init
+    initDaySelector();
   </script>
+
 </body>
 </html>
