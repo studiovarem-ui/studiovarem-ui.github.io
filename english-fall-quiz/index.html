@@ -696,7 +696,9 @@ body::before {
       correctIdx: -1,
       isPlaying: false,
       fallInterval: null,
-      wordY: 0
+      wordY: 0,
+      usedWords: [], // 이미 나온 단어 추적
+      wordPool: []   // 남은 단어 풀
     };
 
     // Speed configs (pixels per frame at 60fps)
@@ -773,10 +775,18 @@ body::before {
       return WORDS.filter(w => state.selectedDays.includes(w.day));
     }
 
-    // Get random word
+    // Get random word (no duplicates until all words used)
     function getRandomWord() {
-      const words = getFilteredWords();
-      return words[Math.floor(Math.random() * words.length)];
+      // 풀이 비어있으면 새로 채우기
+      if (state.wordPool.length === 0) {
+        state.wordPool = shuffle(getFilteredWords());
+        state.usedWords = [];
+      }
+      
+      // 풀에서 하나 꺼내기
+      const word = state.wordPool.pop();
+      state.usedWords.push(word);
+      return word;
     }
 
     // Get wrong answers
@@ -925,6 +935,10 @@ body::before {
 
     // Start game
     function startGame() {
+      // 단어 풀 초기화
+      state.wordPool = shuffle(getFilteredWords());
+      state.usedWords = [];
+      
       state = {
         ...state,
         score: 0,
