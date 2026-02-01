@@ -1,4 +1,3 @@
-<!-- archive.html -->
 <!doctype html>
 <html lang="ko">
 <head>
@@ -8,102 +7,108 @@
 
 <style>
 body{
-  margin:0; min-height:100vh; background:#0f0f10; color:#fff;
+  margin:0; min-height:100vh;
+  background:#0f0f10; color:#fff;
   font-family: system-ui,-apple-system,Apple SD Gothic Neo,Noto Sans KR,sans-serif;
-  display:flex; justify-content:center;
 }
-.wrap{ width:min(560px,92vw); padding:32px 0; }
-
+.wrap{
+  width:min(720px,94vw);
+  margin:0 auto;
+  padding:36px 0 80px;
+}
 .brand{
-  text-align:center; letter-spacing:.28em; font-weight:700; font-size:14px;
-  opacity:.7; margin-bottom:14px;
+  text-align:center;
+  letter-spacing:.28em;
+  font-weight:700;
+  font-size:14px;
+  opacity:.7;
+  margin-bottom:18px;
 }
-
 .header{
-  display:flex; justify-content:space-between; align-items:flex-end;
-  margin-bottom:12px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:18px;
 }
-.title{ font-size:14px; opacity:.75; }
+.title{
+  font-size:20px;
+  font-weight:700;
+}
 .back{
-  font-size:12px; border:1px solid rgba(255,255,255,.18);
-  padding:6px 10px; border-radius:999px; cursor:pointer; opacity:.75; user-select:none;
+  font-size:12px;
+  opacity:.6;
+  text-decoration:none;
+  color:#fff;
 }
+.back:hover{opacity:1}
 
-.panel{
-  border:1px solid rgba(255,255,255,.12);
-  border-radius:18px; overflow:hidden;
-  background:rgba(255,255,255,.02);
-}
-
-/* 목록 5개 높이 + 스크롤 */
 .list{
-  max-height: 270px;
-  overflow:auto;
-  -webkit-overflow-scrolling: touch;
+  display:grid;
+  grid-template-columns: repeat(auto-fill,minmax(160px,1fr));
+  gap:12px;
 }
 
-.row{
-  display:flex; justify-content:space-between; align-items:center;
-  padding:14px 16px;
-  border-top:1px solid rgba(255,255,255,.08);
+.card{
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:14px;
+  padding:14px;
+  background:rgba(255,255,255,.02);
   cursor:pointer;
+  transition:all .15s ease;
 }
-.row:first-child{ border-top:none; }
-.row:hover{ background:rgba(255,255,255,.03); }
+.card:hover{
+  border-color:rgba(255,255,255,.4);
+}
+.day{
+  font-size:11px;
+  opacity:.5;
+}
+.word{
+  margin-top:8px;
+  font-size:18px;
+  font-weight:700;
+}
+.meaning{
+  margin-top:6px;
+  font-size:13px;
+  opacity:.75;
+  line-height:1.4;
+}
 
-.day{ font-size:12px; opacity:.6; }
-.word{ font-size:16px; font-weight:700; }
-
-/* 상세 */
-.detail{
-  border-top:1px solid rgba(255,255,255,.10);
-  padding:18px 16px 18px;
-  display:none;
+/* 하단 Tap & Play */
+.bottomBar{
+  position:fixed;
+  left:50%;
+  transform:translateX(-50%);
+  bottom:16px;
+  width:min(720px,94vw);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
 }
-.detailTop{
-  display:flex; justify-content:space-between; align-items:flex-start; gap:10px;
+.hint{
+  font-size:12px;
+  opacity:.35;
 }
-.detailTitle{ font-size:14px; opacity:.75; }
-.detailDay{
-  font-size:12px; border:1px solid rgba(255,255,255,.18);
-  border-radius:999px; padding:6px 10px; opacity:.75; white-space:nowrap;
-}
-.bigWord{ margin-top:10px; font-size:38px; font-weight:800; }
-
-.meta{ margin-top:12px; display:flex; gap:8px; flex-wrap:wrap; }
-.pill{
+.playMini{
+  font-size:12px;
   border:1px solid rgba(255,255,255,.18);
-  border-radius:999px; padding:6px 10px; font-size:12px; opacity:.75;
+  border-radius:999px;
+  padding:6px 12px;
+  color:#fff;
+  text-decoration:none;
+  letter-spacing:.12em;
+  opacity:.6;
+  transition:all .2s ease;
+  white-space:nowrap;
 }
-.lang{
-  border:1px solid rgba(255,255,255,.18);
-  background:none; color:#fff; padding:6px 10px; border-radius:999px;
-  font-size:12px; opacity:.45; cursor:pointer;
-}
-.lang.active{ opacity:1; border-color:rgba(255,255,255,.6); }
-
-.voiceBtn{
-  border:1px solid rgba(255,255,255,.18);
-  background:none; color:#fff;
-  padding:6px 10px; border-radius:999px;
-  font-size:12px; letter-spacing:.08em;
-  opacity:.45; cursor:pointer;
-  transition: all .2s ease;
-}
-.voiceBtn:hover{ opacity:.75; }
-.voiceBtn:active{ transform:scale(.96); }
-.voiceBtn.playing{
+.playMini:hover{
   opacity:1;
-  border-color:rgba(255,255,255,.55);
-  box-shadow:0 0 0 3px rgba(255,255,255,.06);
+  border-color:rgba(255,255,255,.5);
 }
-
-.meaning{ margin-top:16px; font-size:18px; line-height:1.6; }
-.example{ margin-top:10px; font-size:16px; opacity:.88; line-height:1.6; }
-.hint{ margin-top:10px; font-size:12px; opacity:.35; }
 </style>
 
-<!-- ✅ data 로더 -->
 <script src="data/data.js"></script>
 </head>
 
@@ -112,160 +117,45 @@ body{
   <div class="brand">VAREM</div>
 
   <div class="header">
-    <div class="title">Archive · Day 1 ~ 어제</div>
-    <div class="back" onclick="location.href='./'">← Today</div>
+    <div class="title">Archive</div>
+    <a class="back" href="index.html">← Today</a>
   </div>
 
-  <div class="panel">
-    <div class="list" id="list"></div>
+  <div class="list" id="list"></div>
+</div>
 
-    <div class="detail" id="detail">
-      <div class="detailTop">
-        <div class="detailTitle">아카이브</div>
-        <div class="detailDay" id="dDay">Day -</div>
-      </div>
-
-      <div class="bigWord" id="dWord">word</div>
-
-      <div class="meta">
-        <div class="pill" id="dPos">POS</div>
-
-        <button class="lang active" id="btnEN" type="button">English</button>
-
-        <button class="voiceBtn" id="btnSpeak" type="button" aria-label="voice">voice</button>
-
-        <button class="lang" id="btnKO" type="button">Korean</button>
-      </div>
-
-      <div class="meaning" id="dMeaning"></div>
-      <div class="example" id="dExample"></div>
-      <div class="hint">목록에서 다른 Day를 눌러 바꿀 수 있어요.</div>
-    </div>
-  </div>
+<!-- 하단 고정 -->
+<div class="bottomBar">
+  <div class="hint">키링을 터치하면 오늘의 단어로 돌아갑니다.</div>
+  <a class="playMini"
+     href="https://studiovarem-ui.github.io/english-fall-quiz/"
+     target="_blank"
+     rel="noopener">
+    Tap &amp; Play
+  </a>
 </div>
 
 <script>
-function kst(){
-  const n=new Date();
-  return new Date(n.getTime()+n.getTimezoneOffset()*60000+9*3600000);
-}
-function dayOfYear(d){
-  return Math.floor((d-new Date(d.getFullYear(),0,1))/86400000);
-}
-
-let LIST = [];
-let todayIndex = 0; // 0-based (오늘)
-
-const listEl = document.getElementById("list");
-const detailEl = document.getElementById("detail");
-
-let currentIndex = null; // 0-based day index
-let mode = "EN";
-
-function itemForDayIndex(i){
-  return LIST.length ? LIST[i % LIST.length] : null;
-}
-
-function renderList(){
-  listEl.innerHTML = "";
-
-  if(todayIndex <= 0 || !LIST.length){
-    const row = document.createElement("div");
-    row.className = "row";
-    row.style.cursor = "default";
-    row.innerHTML = `<div class="day">No archive yet</div><div class="word"></div>`;
-    listEl.appendChild(row);
-    return;
-  }
-
-  for(let i = todayIndex - 1; i >= 0; i--){
-    const dayNum = i + 1;
-    const it = itemForDayIndex(i);
-    const w = (it?.word || it?.w || "").toLowerCase();
-
-    const row = document.createElement("div");
-    row.className = "row";
-    row.innerHTML = `<div class="day">Day ${dayNum}</div><div class="word">${w}</div>`;
-    row.onclick = () => showDetail(i);
-    listEl.appendChild(row);
-  }
-}
-
-function renderDetail(){
-  if(currentIndex === null) return;
-  const it = itemForDayIndex(currentIndex);
-  if(!it) return;
-
-  const w = (it.word || it.w || "").toLowerCase();
-  const p = (it.pos || it.p || "");
-
-  dDay.innerText = "Day " + (currentIndex + 1);
-  dWord.innerText = w;
-  dPos.innerText = p;
-
-  if(mode === "EN"){
-    dMeaning.innerText = "Meaning: " + (it.meaning_en ?? it.m_en ?? it.meaning_ko ?? it.m_ko ?? "");
-    dExample.innerText = "Example: " + (it.example_en ?? it.e_en ?? it.example_ko ?? it.e_ko ?? "");
-  }else{
-    dMeaning.innerText = "뜻: " + (it.meaning_ko ?? it.m_ko ?? it.meaning_en ?? it.m_en ?? "");
-    dExample.innerText = "예문: " + (it.example_ko ?? it.e_ko ?? it.example_en ?? it.e_en ?? "");
-  }
-
-  btnEN.classList.toggle("active", mode==="EN");
-  btnKO.classList.toggle("active", mode==="KO");
-}
-
-function showDetail(dayIndex){
-  currentIndex = dayIndex;
-  mode = "EN";
-  detailEl.style.display = "block";
-  renderDetail();
-  detailEl.scrollIntoView({behavior:"smooth", block:"start"});
-}
-
-btnEN.onclick = () => { mode="EN"; renderDetail(); };
-btnKO.onclick = () => { mode="KO"; renderDetail(); };
-
-// ✅ voice(TTS)
-function speakWord(text){
-  try{
-    if(!("speechSynthesis" in window)) return;
-
-    window.speechSynthesis.cancel();
-
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = "en-US";
-    u.rate = 0.95;
-
-    u.onstart = () => btnSpeak.classList.add("playing");
-    u.onend   = () => btnSpeak.classList.remove("playing");
-    u.onerror = () => btnSpeak.classList.remove("playing");
-
-    const voices = window.speechSynthesis.getVoices?.() || [];
-    const v = voices.find(v=>/en-US/i.test(v.lang)) || voices.find(v=>/^en/i.test(v.lang));
-    if(v) u.voice = v;
-
-    window.speechSynthesis.speak(u);
-  }catch(e){
-    btnSpeak.classList.remove("playing");
-  }
-}
-if("speechSynthesis" in window){
-  window.speechSynthesis.onvoiceschanged = ()=>{};
-}
-btnSpeak.onclick = () => {
-  if(currentIndex !== null){
-    const it = itemForDayIndex(currentIndex);
-    const w = (it?.word || it?.w || "");
-    if(w) speakWord(w);
-  }
-};
-
-// ✅ data 로드 완료 후 렌더
 window.VAREM_onReady(function(){
-  LIST = window.VAREM_LIST || [];
-  todayIndex = dayOfYear(kst());
-  renderList();
+  const listEl = document.getElementById("list");
+  const data = window.VAREM_LIST || [];
+
+  data.forEach((item, i) => {
+    const c = document.createElement("div");
+    c.className = "card";
+    c.innerHTML = `
+      <div class="day">Day ${i+1}</div>
+      <div class="word">${(item.word || item.w || "").toLowerCase()}</div>
+      <div class="meaning">${item.meaning_en || item.m_en || item.meaning_ko || ""}</div>
+    `;
+
+    c.onclick = () => {
+      // index로 돌아가면 자동으로 오늘 날짜 기준 단어 표시
+      location.href = "index.html";
+    };
+
+    listEl.appendChild(c);
+  });
 });
 </script>
 </body>
