@@ -1,9 +1,10 @@
+<!-- index.html -->
 <!doctype html>
 <html lang="ko">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>VAREM · 중3 영어</title>
+<title>VAREM · M3</title>
 
 <style>
 body{
@@ -20,8 +21,8 @@ body{
   border:1px solid rgba(255,255,255,.12);
   border-radius:18px; padding:22px; background:rgba(255,255,255,.02);
 }
-.top{ display:flex; justify-content:flex-end; align-items:flex-start; gap:10px; }
-
+.top{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+.subtitle{ font-size:16px; opacity:.8; }
 .day{
   font-size:12px; border:1px solid rgba(255,255,255,.18); border-radius:999px;
   padding:6px 10px; opacity:.75; cursor:pointer; user-select:none;
@@ -38,6 +39,23 @@ body{
   font-size:12px; opacity:.45; cursor:pointer;
 }
 .lang.active{ opacity:1; border-color:rgba(255,255,255,.6); }
+
+.voiceBtn{
+  border:1px solid rgba(255,255,255,.18);
+  background:none; color:#fff;
+  padding:6px 10px; border-radius:999px;
+  font-size:12px; letter-spacing:.08em;
+  opacity:.45; cursor:pointer;
+  transition: all .2s ease;
+}
+.voiceBtn:hover{ opacity:.75; }
+.voiceBtn:active{ transform:scale(.96); }
+.voiceBtn.playing{
+  opacity:1;
+  border-color:rgba(255,255,255,.55);
+  box-shadow:0 0 0 3px rgba(255,255,255,.06);
+}
+
 .meaning{ margin-top:18px; font-size:18px; line-height:1.6; }
 .example{ margin-top:10px; font-size:16px; opacity:.88; line-height:1.6; }
 .hint{
@@ -47,6 +65,9 @@ body{
 @keyframes pulse{0%{opacity:.4}50%{opacity:1}100%{opacity:.4}}
 .hintPulse{ animation:pulse .6s ease-in-out 0s 2; }
 </style>
+
+<!-- ✅ data 로더 -->
+<script src="data/data.js"></script>
 </head>
 
 <body>
@@ -55,6 +76,7 @@ body{
 
   <div class="card">
     <div class="top">
+      <div class="subtitle"></div>
       <div class="day" onclick="location.href='archive.html'">Day <span id="dayNum"></span></div>
     </div>
 
@@ -62,7 +84,11 @@ body{
 
     <div class="meta">
       <div class="pill" id="pos"></div>
+
       <button class="lang active" id="btnEN" type="button">English</button>
+
+      <button class="voiceBtn" id="btnSpeak" type="button" aria-label="voice">voice</button>
+
       <button class="lang" id="btnKO" type="button">Korean</button>
     </div>
 
@@ -72,9 +98,6 @@ body{
 
   <div class="hint">내일 다시 키링을 터치하세요.</div>
 </div>
-
-<!-- ✅ data/data.js 로드 -->
-<script src="data/data.js"></script>
 
 <script>
 function kst(){
@@ -86,40 +109,74 @@ function dayOfYear(d){
 }
 
 let mode="EN";
-let _lastItem=null, _lastDayIndex=0;
+let item=null;
 
-function render(item, dayIndex){
-  dayNum.innerText = dayIndex + 1;
-  word.innerText = item.w.toLowerCase();
-  pos.innerText = item.p;
+function render(){
+  if(!item) return;
+
+  dayNum.innerText = (dayOfYear(kst()) + 1);
+  word.innerText = (item.word || item.w || "").toLowerCase();
+  pos.innerText  = item.pos || item.p || "";
 
   if(mode==="EN"){
-    meaning.innerText="Meaning: " + (item.m_en ?? item.m_ko ?? "");
-    example.innerText="Example: " + (item.e_en ?? item.e_ko ?? "");
+    meaning.innerText="Meaning: " + (item.meaning_en ?? item.m_en ?? item.meaning_ko ?? item.m_ko ?? "");
+    example.innerText="Example: " + (item.example_en ?? item.e_en ?? item.example_ko ?? item.e_ko ?? "");
   }else{
-    meaning.innerText="뜻: " + (item.m_ko ?? item.m_en ?? "");
-    example.innerText="예문: " + (item.e_ko ?? item.e_en ?? "");
+    meaning.innerText="뜻: " + (item.meaning_ko ?? item.m_ko ?? item.meaning_en ?? item.m_en ?? "");
+    example.innerText="예문: " + (item.example_ko ?? item.e_ko ?? item.example_en ?? item.e_en ?? "");
   }
 
   btnEN.classList.toggle("active", mode==="EN");
   btnKO.classList.toggle("active", mode==="KO");
 }
 
-btnEN.onclick=()=>{ mode="EN"; if(_lastItem) render(_lastItem,_lastDayIndex); };
-btnKO.onclick=()=>{ mode="KO"; if(_lastItem) render(_lastItem,_lastDayIndex); };
+btnEN.onclick=()=>{mode="EN";render();}
+btnKO.onclick=()=>{mode="KO";render();}
 
+// ✅ voice(TTS)
+function speakWord(text){
+  try{
+    if(!("speechSynthesis" in window)) return;
+
+    window.speechSynthesis.cancel();
+
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "en-US";
+    u.rate = 0.95;
+
+    u.onstart = () => btnSpeak.classList.add("playing");
+    u.onend   = () => btnSpeak.classList.remove("playing");
+    u.onerror = () => btnSpeak.classList.remove("playing");
+
+    const voices = window.speechSynthesis.getVoices?.() || [];
+    const v = voices.find(v=>/en-US/i.test(v.lang)) || voices.find(v=>/^en/i.test(v.lang));
+    if(v) u.voice = v;
+
+    window.speechSynthesis.speak(u);
+  }catch(e){
+    btnSpeak.classList.remove("playing");
+  }
+}
+if("speechSynthesis" in window){
+  window.speechSynthesis.onvoiceschanged = ()=>{};
+}
+btnSpeak.onclick = () => {
+  if(item){
+    const w = (item.word || item.w || "");
+    if(w) speakWord(w);
+  }
+};
+
+// ✅ data 로드 완료 후 오늘 단어 선택
 window.VAREM_onReady(function(){
-  const dayIndex = dayOfYear(kst()); // 0-based
-  const item = window.VAREM_LIST[dayIndex % window.VAREM_LIST.length];
-
-  _lastItem = item;
-  _lastDayIndex = dayIndex;
-
-  render(item, dayIndex);
-
-  // 토글 힌트(2회)
-  btnKO.classList.add("hintPulse");
+  const LIST = window.VAREM_LIST || [];
+  const idx = dayOfYear(kst()); // 0-based
+  item = LIST.length ? LIST[idx % LIST.length] : null;
+  render();
 });
+
+// 토글 힌트(2회): Korean 버튼 강조
+btnKO.classList.add("hintPulse");
 </script>
 </body>
 </html>
