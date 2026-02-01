@@ -58,10 +58,32 @@ body{
 
 .meaning{ margin-top:18px; font-size:18px; line-height:1.6; }
 .example{ margin-top:10px; font-size:16px; opacity:.88; line-height:1.6; }
+
+/* ✅ 카드 하단 라인(좌:힌트 / 우:Tap&Play) */
+.bottomBar{
+  position:absolute; left:0; right:0; bottom:0;
+  transform:translateY(120%);
+  display:flex; align-items:center; justify-content:space-between;
+  gap:12px;
+}
 .hint{
-  position:absolute; left:0; bottom:0; transform:translateY(120%);
   font-size:12px; opacity:.35;
 }
+.playMini{
+  font-size:12px;
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:999px;
+  padding:6px 10px;
+  color:#fff;
+  text-decoration:none;
+  letter-spacing:.12em;
+  opacity:.6;
+  transition:all .2s ease;
+  white-space:nowrap;
+}
+.playMini:hover{ opacity:1; border-color:rgba(255,255,255,.5); }
+.playMini:active{ transform:scale(.98); }
+
 @keyframes pulse{0%{opacity:.4}50%{opacity:1}100%{opacity:.4}}
 .hintPulse{ animation:pulse .6s ease-in-out 0s 2; }
 </style>
@@ -86,9 +108,7 @@ body{
       <div class="pill" id="pos"></div>
 
       <button class="lang active" id="btnEN" type="button">English</button>
-
       <button class="voiceBtn" id="btnSpeak" type="button" aria-label="voice">voice</button>
-
       <button class="lang" id="btnKO" type="button">Korean</button>
     </div>
 
@@ -96,7 +116,13 @@ body{
     <div class="example" id="example"></div>
   </div>
 
-  <div class="hint">내일 다시 키링을 터치하세요.</div>
+  <!-- ✅ 여기(아까 Today/카운트 넣으려던 위치) 오른쪽에 Tap&Play -->
+  <div class="bottomBar">
+    <div class="hint">내일 다시 키링을 터치하세요.</div>
+    <a class="playMini" id="playLink" href="https://studiovarem-ui.github.io/english-fall-quiz/" target="_blank" rel="noopener">
+      Tap &amp; Play
+    </a>
+  </div>
 </div>
 
 <script>
@@ -110,6 +136,13 @@ function dayOfYear(d){
 
 let mode="EN";
 let item=null;
+
+function updatePlayLink(){
+  if(!item) return;
+  const w = encodeURIComponent(item.word || item.w || "");
+  // 단어 전달(게임 쪽에서 ?word= 처리하면 자동 연동됨)
+  playLink.href = "https://studiovarem-ui.github.io/english-fall-quiz/?word=" + w;
+}
 
 function render(){
   if(!item) return;
@@ -128,6 +161,8 @@ function render(){
 
   btnEN.classList.toggle("active", mode==="EN");
   btnKO.classList.toggle("active", mode==="KO");
+
+  updatePlayLink();
 }
 
 btnEN.onclick=()=>{mode="EN";render();}
@@ -175,7 +210,7 @@ window.VAREM_onReady(function(){
   render();
 });
 
-// 토글 힌트(2회): Korean 버튼 강조
+// 토글 힌트(2회)
 btnKO.classList.add("hintPulse");
 </script>
 </body>
