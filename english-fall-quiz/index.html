@@ -7,19 +7,14 @@
   <title>VAREM • Word Fall Quiz</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-dark: #0a0a0f;
-      --bg-card: #12121a;
-      --accent: #00f5d4;
-      --accent-dim: #00f5d433;
-      --danger: #ff6b6b;
-      --warning: #ffd93d;
-      --text: #e8e8e8;
+      --bg: #000;
+      --card: #1a1a1a;
+      --card-border: #2a2a2a;
+      --text: #fff;
       --text-dim: #888;
-      --glass: rgba(255,255,255,0.03);
-      --glass-border: rgba(255,255,255,0.08);
     }
 
 ```
@@ -31,30 +26,11 @@
 }
 
 body {
-  font-family: 'Noto Sans KR', sans-serif;
-  background: var(--bg-dark);
+  font-family: 'Noto Sans KR', -apple-system, sans-serif;
+  background: var(--bg);
   color: var(--text);
   min-height: 100dvh;
   overflow: hidden;
-  position: relative;
-}
-
-/* Animated background grid */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image: 
-    linear-gradient(var(--glass-border) 1px, transparent 1px),
-    linear-gradient(90deg, var(--glass-border) 1px, transparent 1px);
-  background-size: 50px 50px;
-  opacity: 0.3;
-  animation: gridMove 20s linear infinite;
-}
-
-@keyframes gridMove {
-  0% { transform: translate(0, 0); }
-  100% { transform: translate(50px, 50px); }
 }
 
 /* Header */
@@ -63,28 +39,19 @@ body::before {
   top: 0;
   left: 0;
   right: 0;
-  padding: 12px 20px;
+  padding: 16px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: linear-gradient(to bottom, var(--bg-dark), transparent);
   z-index: 100;
 }
 
-.logo {
-  font-family: 'Space Mono', monospace;
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--accent);
-  letter-spacing: 2px;
-}
-
-.settings-btn {
-  width: 36px;
-  height: 36px;
-  border: 1px solid var(--glass-border);
-  border-radius: 8px;
-  background: var(--glass);
+.back-btn {
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--card-border);
+  border-radius: 50%;
+  background: transparent;
   color: var(--text);
   cursor: pointer;
   display: flex;
@@ -93,57 +60,65 @@ body::before {
   transition: all 0.2s;
 }
 
-.settings-btn:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+.back-btn:hover {
+  border-color: #555;
+}
+
+.header-spacer {
+  width: 40px;
+}
+
+.logo {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 4px;
+  color: var(--text);
 }
 
 /* Stats bar */
 .stats {
   position: fixed;
-  top: 60px;
-  left: 20px;
-  right: 20px;
+  top: 56px;
+  left: 16px;
+  right: 16px;
   display: flex;
-  gap: 12px;
+  gap: 8px;
   z-index: 90;
 }
 
 .stat-item {
   flex: 1;
-  background: var(--glass);
-  border: 1px solid var(--glass-border);
+  background: var(--card);
+  border: 1px solid var(--card-border);
   border-radius: 12px;
-  padding: 10px 14px;
+  padding: 12px 8px;
   text-align: center;
 }
 
 .stat-label {
   font-size: 10px;
   color: var(--text-dim);
-  text-transform: uppercase;
-  letter-spacing: 1px;
   margin-bottom: 4px;
 }
 
 .stat-value {
-  font-family: 'Space Mono', monospace;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
 }
 
-.stat-value.score { color: var(--accent); }
-.stat-value.combo { color: var(--warning); }
-.stat-value.lives { color: var(--danger); }
-.stat-value.remaining { color: #a78bfa; }
+.stat-value.lives {
+  color: #c45c5c;
+  font-size: 16px;
+  letter-spacing: 2px;
+}
 
 /* Game area */
 .game-area {
   position: fixed;
-  top: 130px;
+  top: 140px;
   left: 0;
   right: 0;
-  bottom: 200px;
+  bottom: 220px;
   overflow: hidden;
 }
 
@@ -152,35 +127,50 @@ body::before {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  background: linear-gradient(135deg, var(--bg-card), #1a1a2e);
-  border: 2px solid var(--accent);
+  background: var(--card);
+  border: 1px solid var(--card-border);
   border-radius: 16px;
-  padding: 16px 28px;
+  padding: 20px 32px;
   text-align: center;
-  box-shadow: 
-    0 0 30px var(--accent-dim),
-    0 10px 40px rgba(0,0,0,0.5);
-  animation: glow 2s ease-in-out infinite alternate;
+  min-width: 200px;
 }
 
-@keyframes glow {
-  from { box-shadow: 0 0 20px var(--accent-dim), 0 10px 40px rgba(0,0,0,0.5); }
-  to { box-shadow: 0 0 40px var(--accent-dim), 0 10px 40px rgba(0,0,0,0.5); }
+.word-day {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  font-size: 12px;
+  color: var(--text-dim);
+  background: var(--bg);
+  padding: 4px 10px;
+  border-radius: 20px;
 }
 
 .word-text {
-  font-family: 'Space Mono', monospace;
-  font-size: 24px;
+  font-size: 32px;
   font-weight: 700;
-  color: #fff;
-  margin-bottom: 6px;
+  color: var(--text);
+  margin-bottom: 8px;
+  margin-top: 8px;
 }
 
 .word-pos {
-  font-size: 11px;
-  color: var(--accent);
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  display: inline-block;
+  font-size: 12px;
+  color: var(--text-dim);
+  border: 1px solid var(--card-border);
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+/* Floor indicator */
+.floor-line {
+  position: fixed;
+  bottom: 220px;
+  left: 20px;
+  right: 20px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #333, transparent);
 }
 
 /* Answer buttons */
@@ -190,77 +180,46 @@ body::before {
   left: 0;
   right: 0;
   padding: 16px;
-  padding-bottom: max(16px, env(safe-area-inset-bottom));
+  padding-bottom: max(20px, env(safe-area-inset-bottom));
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
-  background: linear-gradient(to top, var(--bg-dark) 80%, transparent);
 }
 
 .answer-btn {
-  background: var(--bg-card);
-  border: 1px solid var(--glass-border);
-  border-radius: 14px;
-  padding: 16px 12px;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 18px 12px;
   color: var(--text);
   font-size: 15px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.15s;
   position: relative;
-  overflow: hidden;
-}
-
-.answer-btn::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, var(--accent), #00a896);
-  opacity: 0;
-  transition: opacity 0.15s;
-}
-
-.answer-btn span {
-  position: relative;
-  z-index: 1;
 }
 
 .answer-btn:active {
   transform: scale(0.97);
-}
-
-.answer-btn.correct::before {
-  opacity: 1;
+  background: #222;
 }
 
 .answer-btn.correct {
-  border-color: var(--accent);
-  color: #fff;
+  background: var(--text);
+  color: var(--bg);
+  border-color: var(--text);
 }
 
 .answer-btn.wrong {
-  border-color: var(--danger);
-  background: rgba(255,107,107,0.2);
-}
-
-.key-hint {
-  position: absolute;
-  top: 6px;
-  right: 8px;
-  font-family: 'Space Mono', monospace;
-  font-size: 10px;
-  color: var(--text-dim);
-  background: var(--glass);
-  padding: 2px 6px;
-  border-radius: 4px;
+  background: #331111;
+  border-color: #552222;
 }
 
 /* Modals */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.85);
-  backdrop-filter: blur(10px);
+  background: #000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -276,135 +235,166 @@ body::before {
 }
 
 .modal {
-  background: var(--bg-card);
-  border: 1px solid var(--glass-border);
-  border-radius: 24px;
-  padding: 32px 28px;
-  width: 90%;
-  max-width: 360px;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 20px;
+  padding: 36px 28px;
+  width: 100%;
   text-align: center;
-  transform: scale(0.9) translateY(20px);
+  transform: scale(0.95);
   transition: transform 0.3s;
 }
 
-.modal-overlay.active .modal {
-  transform: scale(1) translateY(0);
+.modal-overlay.active .modal-wrapper .modal {
+  transform: scale(1);
 }
 
 .modal-title {
-  font-family: 'Space Mono', monospace;
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 700;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .modal-subtitle {
   color: var(--text-dim);
-  margin-bottom: 24px;
+  font-size: 14px;
+  margin-bottom: 28px;
 }
 
-/* Start modal specific */
+/* Day selector */
 .day-selector {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   justify-content: center;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .day-chip {
-  padding: 8px 14px;
-  background: var(--glass);
-  border: 1px solid var(--glass-border);
-  border-radius: 20px;
-  font-size: 13px;
+  padding: 10px 18px;
+  background: transparent;
+  border: 1px solid var(--card-border);
+  border-radius: 24px;
+  font-size: 14px;
+  color: var(--text);
   cursor: pointer;
   transition: all 0.15s;
 }
 
 .day-chip:hover {
-  border-color: var(--accent);
+  border-color: #555;
 }
 
 .day-chip.selected {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--bg-dark);
-  font-weight: 700;
+  background: var(--text);
+  border-color: var(--text);
+  color: var(--bg);
+  font-weight: 600;
 }
 
+/* Difficulty selector */
 .difficulty-selector {
   display: flex;
-  gap: 10px;
-  margin-bottom: 24px;
+  gap: 8px;
+  margin-bottom: 28px;
 }
 
 .diff-btn {
   flex: 1;
-  padding: 12px;
-  background: var(--glass);
-  border: 1px solid var(--glass-border);
+  padding: 14px 8px;
+  background: transparent;
+  border: 1px solid var(--card-border);
   border-radius: 12px;
   color: var(--text);
-  font-size: 13px;
   cursor: pointer;
   transition: all 0.15s;
 }
 
 .diff-btn:hover {
-  border-color: var(--accent);
+  border-color: #555;
 }
 
 .diff-btn.selected {
-  border-color: var(--accent);
-  background: var(--accent-dim);
+  background: var(--text);
+  border-color: var(--text);
+  color: var(--bg);
 }
 
 .diff-label {
   display: block;
-  font-weight: 700;
-  margin-bottom: 2px;
+  font-size: 14px;
+  font-weight: 600;
 }
 
-.diff-desc {
-  font-size: 10px;
-  color: var(--text-dim);
-}
-
+/* Play button - mint color */
 .play-btn {
   width: 100%;
   padding: 16px;
-  background: linear-gradient(135deg, var(--accent), #00a896);
+  background: #00f5d4;
   border: none;
-  border-radius: 14px;
-  color: var(--bg-dark);
-  font-size: 16px;
+  border-radius: 12px;
+  color: #000;
+  font-size: 15px;
   font-weight: 700;
   cursor: pointer;
-  transition: transform 0.15s, box-shadow 0.15s;
+  transition: opacity 0.15s;
 }
 
 .play-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 30px var(--accent-dim);
+  opacity: 0.9;
+}
+
+/* Vocab link - outside box, bottom */
+.vocab-link {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 10px 20px;
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 13px;
+  letter-spacing: 1px;
+  border: 1px solid var(--card-border);
+  border-radius: 24px;
+  transition: all 0.15s;
+  align-self: flex-end;
+}
+
+.vocab-link:hover {
+  border-color: #555;
+  color: var(--text);
+}
+
+/* Modal brand - outside box */
+.modal-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 90%;
+  max-width: 340px;
+}
+
+.modal-brand {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 4px;
+  color: var(--text);
+  margin-bottom: 24px;
 }
 
 /* Game over modal */
 .final-score {
-  font-family: 'Space Mono', monospace;
   font-size: 56px;
   font-weight: 700;
-  color: var(--accent);
   margin: 16px 0;
 }
 
 .score-breakdown {
   display: flex;
   justify-content: center;
-  gap: 24px;
-  margin-bottom: 24px;
+  gap: 20px;
+  margin-bottom: 28px;
   padding: 16px;
-  background: var(--glass);
+  background: var(--bg);
   border-radius: 12px;
 }
 
@@ -413,7 +403,6 @@ body::before {
 }
 
 .breakdown-value {
-  font-family: 'Space Mono', monospace;
   font-size: 20px;
   font-weight: 700;
 }
@@ -421,23 +410,7 @@ body::before {
 .breakdown-label {
   font-size: 11px;
   color: var(--text-dim);
-}
-
-/* Settings modal */
-.setting-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px 0;
-  border-bottom: 1px solid var(--glass-border);
-}
-
-.setting-row:last-child {
-  border-bottom: none;
-}
-
-.setting-label {
-  font-size: 14px;
+  margin-top: 2px;
 }
 
 /* Ready state */
@@ -446,11 +419,9 @@ body::before {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-family: 'Space Mono', monospace;
-  font-size: 32px;
+  font-size: 20px;
   color: var(--text-dim);
-  text-transform: uppercase;
-  letter-spacing: 4px;
+  letter-spacing: 2px;
 }
 
 /* Combo popup */
@@ -459,47 +430,40 @@ body::before {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-family: 'Space Mono', monospace;
-  font-size: 48px;
+  font-size: 36px;
   font-weight: 700;
-  color: var(--warning);
-  text-shadow: 0 0 30px var(--warning);
+  color: var(--text);
   pointer-events: none;
   opacity: 0;
   z-index: 200;
 }
 
 .combo-popup.show {
-  animation: comboPop 0.6s ease-out forwards;
+  animation: comboPop 0.5s ease-out forwards;
 }
 
 @keyframes comboPop {
   0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
-  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
   100% { opacity: 0; transform: translate(-50%, -60%) scale(1); }
 }
 
-/* Floor line */
-.floor-line {
-  position: fixed;
-  bottom: 200px;
-  left: 20px;
-  right: 20px;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--danger), transparent);
-  opacity: 0.5;
-}
-
-/* Hide on desktop */
+/* Desktop */
 @media (min-width: 768px) {
   .answers {
-    max-width: 500px;
+    max-width: 480px;
     left: 50%;
     transform: translateX(-50%);
   }
   
   .game-area {
-    max-width: 600px;
+    max-width: 500px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .stats {
+    max-width: 500px;
     left: 50%;
     transform: translateX(-50%);
   }
@@ -511,8 +475,13 @@ body::before {
 <body>
   <!-- Header -->
   <header class="header">
+    <button class="back-btn" id="backBtn">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path d="M12 15L7 10L12 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
     <div class="logo">VAREM</div>
-    <button class="settings-btn" id="settingsBtn">⚙</button>
+    <div class="header-spacer"></div>
   </header>
 
   <!-- Stats -->
@@ -520,15 +489,15 @@ body::before {
   <div class="stats">
     <div class="stat-item">
       <div class="stat-label">Score</div>
-      <div class="stat-value score" id="score">0</div>
+      <div class="stat-value" id="score">0</div>
     </div>
     <div class="stat-item">
-      <div class="stat-label">남은 단어</div>
-      <div class="stat-value remaining" id="remaining">30</div>
+      <div class="stat-label">Left</div>
+      <div class="stat-value" id="remaining">30</div>
     </div>
     <div class="stat-item">
       <div class="stat-label">Combo</div>
-      <div class="stat-value combo" id="combo">0</div>
+      <div class="stat-value" id="combo">0</div>
     </div>
     <div class="stat-item">
       <div class="stat-label">Lives</div>
@@ -548,19 +517,15 @@ body::before {
 
   <div class="answers" id="answers">
     <button class="answer-btn" data-idx="0">
-      <span class="key-hint">1</span>
       <span class="answer-text">-</span>
     </button>
     <button class="answer-btn" data-idx="1">
-      <span class="key-hint">2</span>
       <span class="answer-text">-</span>
     </button>
     <button class="answer-btn" data-idx="2">
-      <span class="key-hint">3</span>
       <span class="answer-text">-</span>
     </button>
     <button class="answer-btn" data-idx="3">
-      <span class="key-hint">4</span>
       <span class="answer-text">-</span>
     </button>
   </div>
@@ -572,29 +537,32 @@ body::before {
   <!-- Start Modal -->
 
   <div class="modal-overlay active" id="startModal">
-    <div class="modal">
-      <div class="modal-title">Word Fall</div>
-      <div class="modal-subtitle">중3 영어 단어 퀴즈</div>
+    <div class="modal-wrapper">
+      <div class="modal-brand">VAREM</div>
+      <div class="modal">
+        <div class="modal-title">Word Fall Game</div>
 
 ```
   <div class="day-selector" id="daySelector"></div>
   
   <div class="difficulty-selector">
     <button class="diff-btn selected" data-speed="slow">
-      <span class="diff-label">🐢 Easy</span>
-      <span class="diff-desc">느린 속도</span>
+      <span class="diff-label">Easy</span>
     </button>
     <button class="diff-btn" data-speed="normal">
-      <span class="diff-label">🚀 Normal</span>
-      <span class="diff-desc">보통 속도</span>
+      <span class="diff-label">Normal</span>
     </button>
     <button class="diff-btn" data-speed="fast">
-      <span class="diff-label">⚡ Hard</span>
-      <span class="diff-desc">빠른 속도</span>
+      <span class="diff-label">Hard</span>
     </button>
   </div>
   
   <button class="play-btn" id="startBtn">START</button>
+  </div>
+  
+  <a href="https://studiovarem-ui.github.io/english-m3/" class="vocab-link">
+    Tap & Study
+  </a>
 </div>
 ```
 
@@ -604,7 +572,7 @@ body::before {
 
   <div class="modal-overlay" id="gameOverModal">
     <div class="modal">
-      <div class="modal-title">GAME OVER</div>
+      <div class="modal-title" id="endTitle">GAME OVER</div>
       <div class="final-score" id="finalScore">0</div>
 
 ```
@@ -629,62 +597,39 @@ body::before {
 
   </div>
 
-  <!-- Settings Modal -->
-
-  <div class="modal-overlay" id="settingsModal">
-    <div class="modal">
-      <div class="modal-title">설정</div>
-
-```
-  <div class="setting-row">
-    <span class="setting-label">키보드 힌트 표시</span>
-    <input type="checkbox" id="showKeyHints" checked>
-  </div>
-  
-  <div class="setting-row">
-    <span class="setting-label">진동 피드백</span>
-    <input type="checkbox" id="vibration" checked>
-  </div>
-  
-  <button class="play-btn" id="closeSettings" style="margin-top: 20px;">닫기</button>
-</div>
-```
-
-  </div>
-
   <script>
-    // Word Data - 중3 영어 30일 단어
+    // Word Data
     const WORDS = [
-      {day:1,  w:"copyright",   p:"n",   m_en:"the legal right to control the use of a book, song, or work", m_ko:"저작권", e_en:"This photo is protected by copyright.", e_ko:"이 사진은 저작권으로 보호된다."},
-      {day:2,  w:"supporter",   p:"n",   m_en:"a person who supports a team, idea, or person", m_ko:"지지자; 응원하는 사람", e_en:"The team thanked its supporters.", e_ko:"그 팀은 지지자들에게 감사를 전했다."},
-      {day:3,  w:"identical",   p:"adj", m_en:"exactly the same", m_ko:"똑같은, 동일한", e_en:"Their answers were identical.", e_ko:"그들의 답은 똑같았다."},
-      {day:4,  w:"tray",        p:"n",   m_en:"a flat object used to carry things", m_ko:"쟁반, 트레이", e_en:"She carried cups on a tray.", e_ko:"그녀는 쟁반에 컵을 올려 옮겼다."},
-      {day:5,  w:"assign",      p:"v",   m_en:"to give someone a task or duty", m_ko:"(일을) 맡기다", e_en:"The teacher assigned homework.", e_ko:"선생님이 숙제를 내주셨다."},
-      {day:6,  w:"propose",     p:"v",   m_en:"to suggest a plan or idea", m_ko:"제안하다", e_en:"He proposed a new idea in class.", e_ko:"그는 수업에서 새로운 아이디어를 제안했다."},
-      {day:7,  w:"total",       p:"adj", m_en:"complete; the whole amount", m_ko:"전체의, 총", e_en:"The total cost was 10,000 won.", e_ko:"총비용은 1만 원이었다."},
-      {day:8,  w:"obedient",    p:"adj", m_en:"doing what you are told to do", m_ko:"순종적인, 말을 잘 듣는", e_en:"The dog is obedient and calm.", e_ko:"그 강아지는 말을 잘 듣고 차분하다."},
-      {day:9,  w:"stationery",  p:"n",   m_en:"things like pens, pencils, and paper", m_ko:"문구류", e_en:"I bought stationery for school.", e_ko:"나는 학교에 쓸 문구류를 샀다."},
-      {day:10, w:"roast",       p:"v",   m_en:"to cook food in an oven or over heat", m_ko:"굽다(로스트하다)", e_en:"We roasted chicken for dinner.", e_ko:"우리는 저녁으로 치킨을 구웠다."},
-      {day:11, w:"volunteer",   p:"v",   m_en:"to offer to help without being paid", m_ko:"자원봉사하다", e_en:"She volunteered at a community center.", e_ko:"그녀는 지역 센터에서 자원봉사를 했다."},
-      {day:12, w:"long for",    p:"phr", m_en:"to want something very much", m_ko:"간절히 바라다", e_en:"He longed for a chance to travel.", e_ko:"그는 여행할 기회를 간절히 바랐다."},
-      {day:13, w:"destructive", p:"adj", m_en:"causing a lot of damage", m_ko:"파괴적인", e_en:"The storm was destructive.", e_ko:"그 폭풍은 파괴적이었다."},
-      {day:14, w:"stereotype",  p:"n",   m_en:"a fixed idea about a group of people", m_ko:"고정관념", e_en:"We should not judge people by stereotypes.", e_ko:"우리는 고정관념으로 사람을 판단하면 안 된다."},
-      {day:15, w:"debate",      p:"n",   m_en:"a formal discussion with different opinions", m_ko:"토론", e_en:"Our class had a debate about school rules.", e_ko:"우리 반은 학교 규칙에 대해 토론했다."},
-      {day:16, w:"put off",     p:"phr", m_en:"to delay doing something", m_ko:"미루다", e_en:"Don't put off your homework.", e_ko:"숙제를 미루지 마."},
-      {day:17, w:"merchandise", p:"n",   m_en:"goods that are for sale", m_ko:"상품, 판매 물품", e_en:"The store sells sports merchandise.", e_ko:"그 가게는 스포츠 상품을 판다."},
-      {day:18, w:"wash away",   p:"phr", m_en:"to remove or carry away with water", m_ko:"씻겨 나가다; 쓸려가다", e_en:"Heavy rain washed away the dirt.", e_ko:"폭우가 흙을 씻겨 내려보냈다."},
-      {day:19, w:"custom",      p:"n",   m_en:"a traditional way of doing things", m_ko:"관습, 풍습", e_en:"It's a custom to bow in Korea.", e_ko:"한국에서는 인사로 절하는 것이 풍습이다."},
-      {day:20, w:"requirement", p:"n",   m_en:"something you must have or do", m_ko:"필수 조건", e_en:"Meeting the requirement is important.", e_ko:"조건을 충족하는 것이 중요하다."},
-      {day:21, w:"claim",       p:"v",   m_en:"to say something is true", m_ko:"주장하다", e_en:"He claimed that he was right.", e_ko:"그는 자신이 맞다고 주장했다."},
-      {day:22, w:"evolution",   p:"n",   m_en:"the gradual change of living things over time", m_ko:"진화", e_en:"We learned about evolution in science class.", e_ko:"우리는 과학 시간에 진화를 배웠다."},
-      {day:23, w:"staple",      p:"n",   m_en:"a basic and important item used often", m_ko:"필수품", e_en:"Rice is a staple food in many countries.", e_ko:"쌀은 많은 나라에서 주식이다."},
-      {day:24, w:"dust",        p:"n",   m_en:"very small dry pieces of dirt", m_ko:"먼지", e_en:"There is dust on the shelf.", e_ko:"선반 위에 먼지가 있다."},
-      {day:25, w:"scene",       p:"n",   m_en:"a place or part of a story that you see", m_ko:"장면; 현장", e_en:"That scene in the movie was touching.", e_ko:"그 영화 장면은 감동적이었다."},
-      {day:26, w:"clone",       p:"v",   m_en:"to make an exact copy of a living thing", m_ko:"복제하다", e_en:"Scientists tried to clone an animal.", e_ko:"과학자들은 동물을 복제하려고 했다."},
-      {day:27, w:"commute",     p:"v",   m_en:"to travel regularly between home and work/school", m_ko:"통근하다; 통학하다", e_en:"My father commutes by subway.", e_ko:"아빠는 지하철로 통근한다."},
-      {day:28, w:"unify",       p:"v",   m_en:"to bring together as one", m_ko:"통합하다; 하나로 만들다", e_en:"The leader tried to unify the team.", e_ko:"그 리더는 팀을 하나로 통합하려 했다."},
-      {day:29, w:"fair",        p:"adj", m_en:"treating people equally and correctly", m_ko:"공정한", e_en:"The teacher was fair to everyone.", e_ko:"선생님은 모두에게 공정했다."},
-      {day:30, w:"aware",       p:"adj", m_en:"knowing or realizing something", m_ko:"알고 있는", e_en:"Be aware of your surroundings.", e_ko:"주변을 잘 살펴라."}
+      {day:1,  w:"copyright",   p:"n",   m_ko:"저작권"},
+      {day:2,  w:"supporter",   p:"n",   m_ko:"지지자; 응원하는 사람"},
+      {day:3,  w:"identical",   p:"adj", m_ko:"똑같은, 동일한"},
+      {day:4,  w:"tray",        p:"n",   m_ko:"쟁반, 트레이"},
+      {day:5,  w:"assign",      p:"v",   m_ko:"(일을) 맡기다"},
+      {day:6,  w:"propose",     p:"v",   m_ko:"제안하다"},
+      {day:7,  w:"total",       p:"adj", m_ko:"전체의, 총"},
+      {day:8,  w:"obedient",    p:"adj", m_ko:"순종적인, 말을 잘 듣는"},
+      {day:9,  w:"stationery",  p:"n",   m_ko:"문구류"},
+      {day:10, w:"roast",       p:"v",   m_ko:"굽다(로스트하다)"},
+      {day:11, w:"volunteer",   p:"v",   m_ko:"자원봉사하다"},
+      {day:12, w:"long for",    p:"phr", m_ko:"간절히 바라다"},
+      {day:13, w:"destructive", p:"adj", m_ko:"파괴적인"},
+      {day:14, w:"stereotype",  p:"n",   m_ko:"고정관념"},
+      {day:15, w:"debate",      p:"n",   m_ko:"토론"},
+      {day:16, w:"put off",     p:"phr", m_ko:"미루다"},
+      {day:17, w:"merchandise", p:"n",   m_ko:"상품, 판매 물품"},
+      {day:18, w:"wash away",   p:"phr", m_ko:"씻겨 나가다; 쓸려가다"},
+      {day:19, w:"custom",      p:"n",   m_ko:"관습, 풍습"},
+      {day:20, w:"requirement", p:"n",   m_ko:"필수 조건"},
+      {day:21, w:"claim",       p:"v",   m_ko:"주장하다"},
+      {day:22, w:"evolution",   p:"n",   m_ko:"진화"},
+      {day:23, w:"staple",      p:"n",   m_ko:"필수품"},
+      {day:24, w:"dust",        p:"n",   m_ko:"먼지"},
+      {day:25, w:"scene",       p:"n",   m_ko:"장면; 현장"},
+      {day:26, w:"clone",       p:"v",   m_ko:"복제하다"},
+      {day:27, w:"commute",     p:"v",   m_ko:"통근하다; 통학하다"},
+      {day:28, w:"unify",       p:"v",   m_ko:"통합하다; 하나로 만들다"},
+      {day:29, w:"fair",        p:"adj", m_ko:"공정한"},
+      {day:30, w:"aware",       p:"adj", m_ko:"알고 있는"}
     ];
 
     // Game State
@@ -695,25 +640,24 @@ body::before {
       lives: 3,
       correct: 0,
       total: 0,
-      selectedDays: [0], // 0 = all
+      selectedDays: [0],
       speed: 'slow',
       currentWord: null,
       correctIdx: -1,
       isPlaying: false,
       fallInterval: null,
       wordY: 0,
-      usedWords: [], // 이미 나온 단어 추적
-      wordPool: []   // 남은 단어 풀
+      usedWords: [],
+      wordPool: []
     };
 
-    // Speed configs (pixels per frame at 60fps)
     const SPEEDS = {
-      slow: { fallSpeed: 1.2, fallDuration: 8000 },
-      normal: { fallSpeed: 2, fallDuration: 5000 },
-      fast: { fallSpeed: 3.5, fallDuration: 3000 }
+      slow: { fallSpeed: 1.2 },
+      normal: { fallSpeed: 2 },
+      fast: { fallSpeed: 3.5 }
     };
 
-    // DOM Elements
+    // DOM
     const $ = id => document.getElementById(id);
     const scoreEl = $('score');
     const comboEl = $('combo');
@@ -721,26 +665,21 @@ body::before {
     const remainingEl = $('remaining');
     const gameArea = $('gameArea');
     const readyText = $('readyText');
-    const answersEl = $('answers');
     const answerBtns = document.querySelectorAll('.answer-btn');
     const comboPopup = $('comboPopup');
     const startModal = $('startModal');
     const gameOverModal = $('gameOverModal');
-    const settingsModal = $('settingsModal');
     const daySelector = $('daySelector');
 
-    // Initialize day selector
+    // Init day selector
     function initDaySelector() {
-      // All days option
       const allChip = document.createElement('div');
       allChip.className = 'day-chip selected';
       allChip.textContent = '전체';
       allChip.dataset.day = '0';
       daySelector.appendChild(allChip);
 
-      // Individual days (group by 10)
-      const groups = ['1-10', '11-20', '21-30'];
-      groups.forEach(g => {
+      ['1-10', '11-20', '21-30'].forEach(g => {
         const chip = document.createElement('div');
         chip.className = 'day-chip';
         chip.textContent = `Day ${g}`;
@@ -748,14 +687,11 @@ body::before {
         daySelector.appendChild(chip);
       });
 
-      // Click handler
       daySelector.addEventListener('click', e => {
         const chip = e.target.closest('.day-chip');
         if (!chip) return;
-
         document.querySelectorAll('.day-chip').forEach(c => c.classList.remove('selected'));
         chip.classList.add('selected');
-
         if (chip.dataset.day === '0') {
           state.selectedDays = [0];
         } else {
@@ -775,35 +711,27 @@ body::before {
       });
     });
 
-    // Get filtered words
     function getFilteredWords() {
       if (state.selectedDays.includes(0)) return [...WORDS];
       return WORDS.filter(w => state.selectedDays.includes(w.day));
     }
 
-    // Get random word (no duplicates until all words used)
     function getRandomWord() {
-      // 풀이 비어있으면 새로 채우기
       if (state.wordPool.length === 0) {
         state.wordPool = shuffle(getFilteredWords());
         state.usedWords = [];
       }
-      
-      // 풀에서 하나 꺼내기
       const word = state.wordPool.pop();
       state.usedWords.push(word);
       return word;
     }
 
-    // Get wrong answers
     function getWrongAnswers(correctWord, count) {
       const allMeanings = WORDS.map(w => w.m_ko);
       const wrong = allMeanings.filter(m => m !== correctWord.m_ko);
-      const shuffled = wrong.sort(() => Math.random() - 0.5);
-      return shuffled.slice(0, count);
+      return shuffle(wrong).slice(0, count);
     }
 
-    // Shuffle array
     function shuffle(arr) {
       const a = [...arr];
       for (let i = a.length - 1; i > 0; i--) {
@@ -813,7 +741,6 @@ body::before {
       return a;
     }
 
-    // Update UI
     function updateUI() {
       scoreEl.textContent = state.score;
       comboEl.textContent = state.combo;
@@ -821,24 +748,19 @@ body::before {
       remainingEl.textContent = state.wordPool.length;
     }
 
-    // Show combo popup
     function showComboPopup(combo) {
       if (combo >= 3) {
-        comboPopup.textContent = `${combo} COMBO!`;
+        comboPopup.textContent = `${combo} COMBO`;
         comboPopup.classList.remove('show');
         void comboPopup.offsetWidth;
         comboPopup.classList.add('show');
       }
     }
 
-    // Vibrate
     function vibrate(pattern) {
-      if ($('vibration')?.checked && navigator.vibrate) {
-        navigator.vibrate(pattern);
-      }
+      if (navigator.vibrate) navigator.vibrate(pattern);
     }
 
-    // Create falling word element
     function createFallingWord(word) {
       const el = document.createElement('div');
       el.className = 'falling-word';
@@ -846,36 +768,30 @@ body::before {
         <div class="word-text">${word.w}</div>
         <div class="word-pos">${word.p}</div>
       `;
-      el.style.top = '-100px';
+      el.style.top = '-120px';
       return el;
     }
 
-    // Start new round
     function startRound() {
-      // Clear previous
       const prev = gameArea.querySelector('.falling-word');
       if (prev) prev.remove();
 
-      // Get new word
       state.currentWord = getRandomWord();
       const wrongAnswers = getWrongAnswers(state.currentWord, 3);
       const allAnswers = shuffle([state.currentWord.m_ko, ...wrongAnswers]);
       state.correctIdx = allAnswers.indexOf(state.currentWord.m_ko);
 
-      // Update answer buttons
       answerBtns.forEach((btn, i) => {
         btn.querySelector('.answer-text').textContent = allAnswers[i];
         btn.classList.remove('correct', 'wrong');
         btn.disabled = false;
       });
 
-      // Create falling word
       const wordEl = createFallingWord(state.currentWord);
       gameArea.appendChild(wordEl);
       readyText.style.display = 'none';
 
-      // Start falling animation
-      state.wordY = -100;
+      state.wordY = -120;
       const gameHeight = gameArea.offsetHeight;
       const { fallSpeed } = SPEEDS[state.speed];
 
@@ -883,23 +799,18 @@ body::before {
 
       function fall() {
         if (!state.isPlaying) return;
-
         state.wordY += fallSpeed;
         wordEl.style.top = state.wordY + 'px';
-
-        if (state.wordY >= gameHeight - 50) {
-          // Hit floor - wrong answer
+        if (state.wordY >= gameHeight - 60) {
           handleAnswer(-1);
           return;
         }
-
         state.fallInterval = requestAnimationFrame(fall);
       }
 
       state.fallInterval = requestAnimationFrame(fall);
     }
 
-    // Handle answer
     function handleAnswer(idx) {
       if (!state.isPlaying) return;
       if (state.fallInterval) cancelAnimationFrame(state.fallInterval);
@@ -907,7 +818,6 @@ body::before {
       state.total++;
       const isCorrect = idx === state.correctIdx;
 
-      // Visual feedback
       answerBtns.forEach((btn, i) => {
         btn.disabled = true;
         if (i === state.correctIdx) btn.classList.add('correct');
@@ -930,25 +840,21 @@ body::before {
       updateUI();
 
       if (state.lives <= 0) {
-        endGame(false); // 실패
+        endGame(false);
         return;
       }
 
-      // 모든 단어 클리어 체크
       if (state.wordPool.length === 0) {
-        endGame(true); // 성공
+        endGame(true);
         return;
       }
 
-      // Next round after delay
       setTimeout(() => {
         if (state.isPlaying) startRound();
-      }, 800);
+      }, 700);
     }
 
-    // Start game
     function startGame() {
-      // 단어 풀 초기화
       state.wordPool = shuffle(getFilteredWords());
       state.usedWords = [];
       
@@ -968,23 +874,15 @@ body::before {
       startModal.classList.remove('active');
       gameOverModal.classList.remove('active');
 
-      setTimeout(startRound, 500);
+      setTimeout(startRound, 400);
     }
 
-    // End game
     function endGame(isCleared = false) {
       state.isPlaying = false;
       if (state.fallInterval) cancelAnimationFrame(state.fallInterval);
 
-      // 모달 타이틀 변경
-      const titleEl = gameOverModal.querySelector('.modal-title');
-      if (isCleared) {
-        titleEl.textContent = '🎉 CLEAR!';
-        titleEl.style.color = 'var(--accent)';
-      } else {
-        titleEl.textContent = 'GAME OVER';
-        titleEl.style.color = 'var(--danger)';
-      }
+      const titleEl = $('endTitle');
+      titleEl.textContent = isCleared ? 'CLEAR' : 'GAME OVER';
 
       $('finalScore').textContent = state.score;
       $('correctCount').textContent = state.correct;
@@ -995,12 +893,21 @@ body::before {
 
       setTimeout(() => {
         gameOverModal.classList.add('active');
-      }, 500);
+      }, 400);
     }
 
-    // Event listeners
+    // Events
     $('startBtn').addEventListener('click', startGame);
     $('restartBtn').addEventListener('click', startGame);
+    
+    // Back button - return to start modal
+    $('backBtn').addEventListener('click', () => {
+      if (state.isPlaying) {
+        state.isPlaying = false;
+        if (state.fallInterval) cancelAnimationFrame(state.fallInterval);
+      }
+      startModal.classList.add('active');
+    });
 
     answerBtns.forEach(btn => {
       btn.addEventListener('click', () => {
@@ -1009,38 +916,11 @@ body::before {
       });
     });
 
-    // Keyboard controls
     document.addEventListener('keydown', e => {
       if (!state.isPlaying) return;
-      const key = e.key;
-      if (key >= '1' && key <= '4') {
-        handleAnswer(parseInt(key) - 1);
+      if (e.key >= '1' && e.key <= '4') {
+        handleAnswer(parseInt(e.key) - 1);
       }
-    });
-
-    // Settings
-    $('settingsBtn').addEventListener('click', () => {
-      settingsModal.classList.add('active');
-    });
-
-    $('closeSettings').addEventListener('click', () => {
-      settingsModal.classList.remove('active');
-    });
-
-    // Show/hide key hints
-    $('showKeyHints')?.addEventListener('change', e => {
-      document.querySelectorAll('.key-hint').forEach(h => {
-        h.style.display = e.target.checked ? 'block' : 'none';
-      });
-    });
-
-    // Close modals on overlay click
-    [startModal, gameOverModal, settingsModal].forEach(modal => {
-      modal.addEventListener('click', e => {
-        if (e.target === modal && modal !== startModal) {
-          modal.classList.remove('active');
-        }
-      });
     });
 
     // Init
