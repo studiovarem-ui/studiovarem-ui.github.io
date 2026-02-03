@@ -74,16 +74,19 @@
     .menu-btn:active { background: linear-gradient(180deg, #FFD93D 0%, #F4A623 100%); transform: scale(0.95); }
     .menu-btn.secondary { background: linear-gradient(180deg, #666 0%, #444 100%); color: #fff; }
     
-    .shop-header { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(0,0,0,0.7); border-bottom: 3px solid #FFD93D; width: 100%; }
+    /* SHOP OVERLAY - Fixed layout so close button is always visible */
+    #shopOverlay { overflow: hidden; }
+    .shop-header { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(0,0,0,0.7); border-bottom: 3px solid #FFD93D; width: 100%; flex-shrink: 0; position: relative; z-index: 2; }
     .shop-title { font-size: 14px; color: #FFD93D; text-shadow: 1px 1px 0 #000; }
     .shop-currency { display: flex; gap: 8px; font-size: 9px; }
     .currency-item { background: rgba(255,255,255,0.9); padding: 4px 8px; border-radius: 6px; color: #333; border: 2px solid #333; }
     
-    .shop-tabs { display: flex; width: 100%; }
-    .shop-tab { flex: 1; padding: 10px; background: rgba(0,0,0,0.5); color: #aaa; font-size: 9px; text-align: center; border: none; cursor: pointer; }
+    .shop-tabs { display: flex; width: 100%; flex-shrink: 0; position: relative; z-index: 2; }
+    .shop-tab { flex: 1; padding: 10px; background: rgba(0,0,0,0.5); color: #aaa; font-size: 9px; text-align: center; border: none; cursor: pointer; font-family: 'Press Start 2P', monospace; }
     .shop-tab.active { background: rgba(255,255,255,0.2); color: #FFD93D; border-bottom: 2px solid #FFD93D; }
     
-    .shop-items { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 12px; width: 100%; max-width: 360px; }
+    .shop-scroll-area { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; position: relative; z-index: 1; }
+    .shop-items { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 12px; width: 100%; max-width: 360px; margin: 0 auto; }
     .shop-item { background: rgba(255,255,255,0.9); border: 2px solid #333; border-radius: 10px; padding: 10px 6px; display: flex; flex-direction: column; align-items: center; cursor: pointer; }
     .shop-item:active { border-color: #FFD93D; background: #FFF8DC; }
     .shop-item.owned { opacity: 0.5; }
@@ -92,7 +95,7 @@
     .shop-item-name { font-size: 6px; color: #333; text-align: center; }
     .shop-item-price { font-size: 7px; color: #8B6914; margin-top: 3px; }
     
-    .shop-footer { padding: 12px; border-top: 3px solid rgba(255,255,255,0.2); width: 100%; display: flex; justify-content: center; background: rgba(0,0,0,0.5); }
+    .shop-footer { padding: 12px; border-top: 3px solid rgba(255,255,255,0.2); width: 100%; display: flex; justify-content: center; background: rgba(0,0,0,0.7); flex-shrink: 0; position: relative; z-index: 2; }
     
     .stage-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 15px; max-width: 320px; }
     .stage-btn { background: rgba(255,255,255,0.9); border: 3px solid #333; border-radius: 12px; padding: 12px 8px; display: flex; flex-direction: column; align-items: center; cursor: pointer; }
@@ -189,6 +192,7 @@
       </div>
     </div>
     
+    <!-- FIXED: Shop uses fixed header/footer with scrollable middle area -->
     <div id="shopOverlay" class="overlay">
       <canvas id="shopBg" class="overlay-bg"></canvas>
       <div class="shop-header">
@@ -204,7 +208,7 @@
         <button class="shop-tab" onclick="switchShopTab(this,'upgrades')">업그레이드</button>
         <button class="shop-tab" onclick="switchShopTab(this,'evolution')">진화</button>
       </div>
-      <div class="overlay-content" style="justify-content:flex-start;padding-top:8px">
+      <div class="shop-scroll-area">
         <div class="shop-items" id="shopItems"></div>
       </div>
       <div class="shop-footer">
