@@ -15,7 +15,7 @@ body{
 .wrap{
   width:min(720px,94vw);
   margin:0 auto;
-  padding:36px 0 80px;
+  padding:36px 0 40px;
 }
 .brand{
   text-align:center;
@@ -43,70 +43,101 @@ body{
 }
 .back:hover{opacity:1}
 
+/* 리스트 */
 .list{
-  display:grid;
-  grid-template-columns: repeat(auto-fill,minmax(160px,1fr));
-  gap:12px;
+  display:flex;
+  flex-direction:column;
+  gap:1px;
 }
 
-.card{
-  border:1px solid rgba(255,255,255,.12);
-  border-radius:14px;
-  padding:14px;
-  background:rgba(255,255,255,.02);
+.row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:16px 16px;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:12px;
   cursor:pointer;
   transition:all .15s ease;
 }
-.card:hover{
-  border-color:rgba(255,255,255,.4);
+.row:hover{
+  border-color:rgba(255,255,255,.25);
 }
-.day{
+.row.active{
+  border-color:rgba(255,255,255,.3);
+  background:rgba(255,255,255,.04);
+  border-radius:12px 12px 0 0;
+}
+.row-left{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+.row-day{
   font-size:11px;
-  opacity:.5;
+  opacity:.4;
+  min-width:46px;
 }
-.word{
-  margin-top:8px;
-  font-size:18px;
+.row-word{
+  font-size:16px;
   font-weight:700;
 }
-.meaning{
-  margin-top:6px;
-  font-size:13px;
-  opacity:.75;
-  line-height:1.4;
-}
-
-/* 하단 Tap & Play */
-.bottomBar{
-  position:fixed;
-  left:50%;
-  transform:translateX(-50%);
-  bottom:16px;
-  width:min(720px,94vw);
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:12px;
-}
-.hint{
-  font-size:12px;
+.row-pos{
+  font-size:11px;
   opacity:.35;
 }
-.playMini{
-  font-size:12px;
-  border:1px solid rgba(255,255,255,.18);
-  border-radius:999px;
-  padding:6px 12px;
-  color:#fff;
-  text-decoration:none;
-  letter-spacing:.12em;
-  opacity:.6;
-  transition:all .2s ease;
-  white-space:nowrap;
+
+/* 상세 패널 */
+.detail{
+  overflow:hidden;
+  max-height:0;
+  transition:max-height .3s ease;
 }
-.playMini:hover{
-  opacity:1;
-  border-color:rgba(255,255,255,.5);
+.detail.open{
+  max-height:400px;
+}
+.detail-inner{
+  padding:20px 16px 24px;
+  border:1px solid rgba(255,255,255,.08);
+  border-top:none;
+  border-radius:0 0 12px 12px;
+  background:rgba(255,255,255,.02);
+  margin-top:-1px;
+}
+.detail-word{
+  font-size:28px;
+  font-weight:700;
+  margin-bottom:6px;
+}
+.detail-pos{
+  display:inline-block;
+  font-size:11px;
+  opacity:.5;
+  border:1px solid rgba(255,255,255,.15);
+  padding:3px 10px;
+  border-radius:20px;
+  margin-bottom:16px;
+}
+.detail-section{
+  margin-bottom:14px;
+}
+.detail-label{
+  font-size:10px;
+  opacity:.35;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  margin-bottom:4px;
+}
+.detail-text{
+  font-size:14px;
+  line-height:1.5;
+  opacity:.85;
+}
+.detail-example{
+  font-size:13px;
+  line-height:1.5;
+  opacity:.55;
+  font-style:italic;
 }
 </style>
 
@@ -126,45 +157,76 @@ body{
   <div class="list" id="list"></div>
 </div>
 
-<!-- 하단 고정 -->
-
-<div class="bottomBar">
-  <div class="hint">키링을 터치하면 오늘의 단어로 돌아갑니다.</div>
-  <a class="playMini"
-     href="https://studiovarem-ui.github.io/english-fall-quiz/"
-     target="_blank"
-     rel="noopener">
-    Tap &amp; Play
-  </a>
-</div>
-
 <script>
 window.VAREM_onReady(function(){
   const listEl = document.getElementById("list");
   const data = window.VAREM_LIST || [];
 
-  // 오늘이 1월 1일부터 며칠째인지 계산
+  // 오늘 Day 계산
   const now = new Date();
   const jan1 = new Date(now.getFullYear(), 0, 1);
   const today = Math.floor((now - jan1) / 86400000) + 1;
 
-  // 오늘까지만 필터
+  // 오늘까지 필터 + 최신순
   const filtered = data.filter(item => (item.day || 0) <= today);
+  filtered.sort((a, b) => b.day - a.day);
+
+  let openRow = null;
+  let openRowEl = null;
 
   filtered.forEach((item) => {
-    const c = document.createElement("div");
-    c.className = "card";
-    c.innerHTML = `
-      <div class="day">Day ${item.day}</div>
-      <div class="word">${(item.word || item.w || "").toLowerCase()}</div>
-      <div class="meaning">${item.meaning_en || item.m_en || item.meaning_ko || ""}</div>
+    const w = item.word || item.w || "";
+    const pos = item.p || "";
+    const mEn = item.meaning_en || item.m_en || "";
+    const mKo = item.meaning_ko || item.m_ko || "";
+    const eEn = item.example_en || item.e_en || "";
+    const eKo = item.example_ko || item.e_ko || "";
+
+    // 행
+    const row = document.createElement("div");
+    row.className = "row";
+    row.innerHTML = `
+      <div class="row-left">
+        <div class="row-day">Day ${item.day}</div>
+        <div class="row-word">${w.toLowerCase()}</div>
+      </div>
+      <div class="row-pos">${pos}</div>
     `;
 
-    c.onclick = () => {
-      location.href = "index.html";
-    };
+    // 상세 패널
+    const detail = document.createElement("div");
+    detail.className = "detail";
+    detail.innerHTML = `
+      <div class="detail-inner">
+        <div class="detail-word">${w.toLowerCase()}</div>
+        <div class="detail-pos">${pos}</div>
+        <div class="detail-section">
+          <div class="detail-label">meaning</div>
+          <div class="detail-text">${mEn}</div>
+          <div class="detail-text" style="opacity:.55">${mKo}</div>
+        </div>
+        ${eEn ? `<div class="detail-section">
+          <div class="detail-label">example</div>
+          <div class="detail-example">${eEn}</div>
+          <div class="detail-example">${eKo}</div>
+        </div>` : ""}
+      </div>
+    `;
 
-    listEl.appendChild(c);
+    row.addEventListener("click", () => {
+      // 이전 열린 거 닫기
+      if (openRow && openRow !== detail) {
+        openRow.classList.remove("open");
+        openRowEl.classList.remove("active");
+      }
+      const isOpen = detail.classList.toggle("open");
+      row.classList.toggle("active", isOpen);
+      openRow = isOpen ? detail : null;
+      openRowEl = isOpen ? row : null;
+    });
+
+    listEl.appendChild(row);
+    listEl.appendChild(detail);
   });
 });
 </script>
