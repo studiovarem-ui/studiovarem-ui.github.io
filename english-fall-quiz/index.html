@@ -299,6 +299,50 @@ body {
   font-weight: 600;
 }
 
+/* Day range input */
+.day-range-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border: 1px solid var(--card-border);
+  border-radius: 24px;
+  transition: all 0.15s;
+}
+.day-range-wrap.selected {
+  background: var(--text);
+  border-color: var(--text);
+}
+.day-range-wrap.selected .range-label {
+  color: var(--bg);
+}
+.day-range-wrap.selected .range-input {
+  color: var(--bg);
+  border-color: rgba(0,0,0,.25);
+}
+.range-label {
+  font-size: 14px;
+  color: var(--text);
+}
+.range-input {
+  width: 40px;
+  background: transparent;
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  padding: 4px 2px;
+  outline: none;
+  -moz-appearance: textfield;
+}
+.range-input::-webkit-outer-spin-button,
+.range-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 /* Difficulty selector */
 .difficulty-selector {
   display: flex;
@@ -543,7 +587,7 @@ body {
 
   <!-- Start Modal -->
 
-  <div class="modal-overlay active" id="startModal">
+  <div class="modal-overlay" id="startModal">
     <div class="modal-wrapper">
       <div class="modal-brand">VAREM</div>
       <div class="modal" style="position:relative;">
@@ -707,27 +751,44 @@ body {
       allChip.dataset.day = '0';
       daySelector.appendChild(allChip);
 
-      // Day range chip
-      const rangeChip = document.createElement('div');
-      rangeChip.className = 'day-chip';
-      const rangeStart = Math.floor((maxDay - 1) / 10) * 10 + 1;
-      rangeChip.textContent = `Day ${rangeStart} ~ ${maxDay}`;
-      rangeChip.dataset.group = `${rangeStart}-${maxDay}`;
-      daySelector.appendChild(rangeChip);
+      // Custom range chip with inputs
+      const rangeWrap = document.createElement('div');
+      rangeWrap.className = 'day-range-wrap';
+      rangeWrap.innerHTML = `
+        <span class="range-label">Day</span>
+        <input type="number" class="range-input" id="rangeFrom" min="1" max="${maxDay}" value="1">
+        <span class="range-label">~</span>
+        <input type="number" class="range-input" id="rangeTo" min="1" max="${maxDay}" value="${maxDay}">
+      `;
+      daySelector.appendChild(rangeWrap);
 
-      daySelector.addEventListener('click', e => {
-        const chip = e.target.closest('.day-chip');
-        if (!chip) return;
-        document.querySelectorAll('.day-chip').forEach(c => c.classList.remove('selected'));
-        chip.classList.add('selected');
-        if (chip.dataset.day === '0') {
-          state.selectedDays = [0];
-        } else {
-          const [start, end] = chip.dataset.group.split('-').map(Number);
-          state.selectedDays = [];
-          for (let i = start; i <= end; i++) state.selectedDays.push(i);
-        }
+      // All chip click
+      allChip.addEventListener('click', () => {
+        allChip.classList.add('selected');
+        rangeWrap.classList.remove('selected');
+        state.selectedDays = [0];
       });
+
+      // Range inputs: 클릭하면 All 해제, 범위 활성화
+      const fromInput = rangeWrap.querySelector('#rangeFrom');
+      const toInput = rangeWrap.querySelector('#rangeTo');
+
+      function activateRange() {
+        allChip.classList.remove('selected');
+        rangeWrap.classList.add('selected');
+        const from = parseInt(fromInput.value) || 1;
+        const to = parseInt(toInput.value) || maxDay;
+        state.selectedDays = [];
+        for (let i = from; i <= to; i++) state.selectedDays.push(i);
+      }
+
+      fromInput.addEventListener('focus', activateRange);
+      toInput.addEventListener('focus', activateRange);
+      fromInput.addEventListener('input', activateRange);
+      toInput.addEventListener('input', activateRange);
+
+      // 모달 표시
+      startModal.classList.add('active');
     }
 
     // Difficulty selector
