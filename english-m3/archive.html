@@ -1,4 +1,5 @@
 <!doctype html>
+
 <html lang="ko">
 <head>
 <meta charset="utf-8" />
@@ -110,6 +111,7 @@ body{
 </style>
 
 <script src="data/data.js"></script>
+
 </head>
 
 <body>
@@ -125,6 +127,7 @@ body{
 </div>
 
 <!-- 하단 고정 -->
+
 <div class="bottomBar">
   <div class="hint">키링을 터치하면 오늘의 단어로 돌아갑니다.</div>
   <a class="playMini"
@@ -140,17 +143,24 @@ window.VAREM_onReady(function(){
   const listEl = document.getElementById("list");
   const data = window.VAREM_LIST || [];
 
-  data.forEach((item, i) => {
+  // 오늘이 1월 1일부터 며칠째인지 계산
+  const now = new Date();
+  const jan1 = new Date(now.getFullYear(), 0, 1);
+  const today = Math.floor((now - jan1) / 86400000) + 1;
+
+  // 오늘까지만 필터
+  const filtered = data.filter(item => (item.day || 0) <= today);
+
+  filtered.forEach((item) => {
     const c = document.createElement("div");
     c.className = "card";
     c.innerHTML = `
-      <div class="day">Day ${i+1}</div>
+      <div class="day">Day ${item.day}</div>
       <div class="word">${(item.word || item.w || "").toLowerCase()}</div>
       <div class="meaning">${item.meaning_en || item.m_en || item.meaning_ko || ""}</div>
     `;
 
     c.onclick = () => {
-      // index로 돌아가면 자동으로 오늘 날짜 기준 단어 표시
       location.href = "index.html";
     };
 
@@ -158,5 +168,6 @@ window.VAREM_onReady(function(){
   });
 });
 </script>
+
 </body>
 </html>
