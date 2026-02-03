@@ -12,302 +12,45 @@ resizeCanvas();
 
 // ============ PIXEL ART SPRITES ============
 const SPRITES = {
-  sparrow: [
-    '....yyyy....',
-    '...yYYYYy...',
-    '..yYYYYYYy..',
-    '..yYFFYYyw..',
-    '.yYYYYYYYYy.',
-    '.yOYYYYYYy..',
-    '..yYYYYYYy..',
-    '...yYYYYy...',
-    '....oBBo....',
-    '....o..o....'
-  ],
-  pigeon: [
-    '....gggg....',
-    '...gGGGGg...',
-    '..gGGGGGGg..',
-    '..gGFFGGgw..',
-    '.gPPPPPPPPg.',
-    '.gOGGGGGGg..',
-    '..gGGGGGGg..',
-    '...gGGGGg...',
-    '....rrrr....',
-    '....r..r....'
-  ],
-  crow: [
-    '....kkkk....',
-    '...kKKKKk...',
-    '..kKKKKKKk..',
-    '..kKFFKKkw..',
-    '.kKKKKKKKKk.',
-    '.kOKKKKKKk..',
-    '..kKKKKKKk..',
-    '...kKKKKk...',
-    '....kkkk....',
-    '....k..k....'
-  ],
-  eagle: [
-    '...dddddd...',
-    '..dDDDDDDd..',
-    '.dDDFFDDDdw.',
-    '.dDDFFDDDDd.',
-    'dDDDDDDDDDDd',
-    'dODDDDDDDd..',
-    '.dDDDDDDDDd.',
-    '..dDDDDDDd..',
-    '...oYYYoo...',
-    '...o....o...'
-  ],
-  archaeopteryx: [
-    '..tttttttt..',
-    '.tTTTTTTTTt.',
-    '.tTFFTTTwwt.',
-    '.tTFFTTTTTt.',
-    'tTTTTTTTTTTt',
-    'tOTTTTTTTt..',
-    '.tTTTTTTTTt.',
-    '..tTggggTt..',
-    '...gggggg...',
-    '...g....g...'
-  ],
-  phoenix: [
-    '..rrOOrrOO..',
-    '.rROOOOOORr.',
-    '.rOFFOOOwwR.',
-    '.rOFFOOOYYr.',
-    'rOOOOOOOOOOr',
-    'YOYYYYYYYY..',
-    '.YYYYYYYYYY.',
-    '..YYYYYYYY..',
-    '...rrrrrr...',
-    '...r....r...'
-  ],
-  
-  human_normal: [
-    '...pppp...',
-    '..pPPPPp..',
-    '..p.pp.p..',
-    '..pPPPPp..',
-    '...pppp...',
-    '..bbbbbb..',
-    '.bBBBBBBb.',
-    '..bBBBBb..',
-    '...b..b...',
-    '...s..s...'
-  ],
-  human_child: [
-    '...yyyy...',
-    '..yYYYYy..',
-    '..y.yy.y..',
-    '..yYYYYy..',
-    '...yyyy...',
-    '..cccccc..',
-    '..cMMMc...',
-    '...cMc....',
-    '...c..c...',
-    '...s..s...'
-  ],
-  human_runner: [
-    '...gggg...',
-    '..gGGGGg..',
-    '..g.gg.g..',
-    '..gGGGGg..',
-    '...gggg...',
-    '..mmmmmm..',
-    '.mMMMMMMm.',
-    '..mMMMMm..',
-    '..m....m..',
-    '..s....s..'
-  ],
-  human_oldman: [
-    '...wwww...',
-    '..wWWWWw..',
-    '..w.ww.w..',
-    '..wWWWWw..',
-    '...wwww...',
-    '..bbbbbb..',
-    '.bBBBBBBb.',
-    '..bBBBBb..',
-    '...b..b...',
-    '...s..s...'
-  ],
-  human_lady: [
-    '...rrrr...',
-    '..rRRRRr..',
-    '..r.rr.r..',
-    '..rRRRRr..',
-    '...rrrr...',
-    '..pppppp..',
-    '.pPPPPPPp.',
-    '..pPPPPp..',
-    '...p..p...',
-    '...s..s...'
-  ],
-  human_athlete: [
-    '...oooo...',
-    '..oOOOOo..',
-    '..o.oo.o..',
-    '..oOOOOo..',
-    '...oooo...',
-    '..wwwwww..',
-    '.wWWWWWWw.',
-    '..wWWWWw..',
-    '..w....w..',
-    '..s....s..'
-  ],
-  human_student: [
-    '...kkkk...',
-    '..kKKKKk..',
-    '..k.kk.k..',
-    '..kKKKKk..',
-    '...kkkk...',
-    '..wwwwww..',
-    '.wWWWWWWw.',
-    '..wWWWWw..',
-    '...w..w...',
-    '...s..s...'
-  ],
-  human_tourist: [
-    '...yyyy...',
-    '..yYYYYy..',
-    '..y.yy.y..',
-    '..yYYYYy..',
-    '...yyyy...',
-    '..rrrrrr..',
-    '.rRRRRRRr.',
-    '..rRRRRr..',
-    '...r..r...',
-    '...s..s...'
-  ],
-  
-  boss_cleaner: [
-    '....bbbb....',
-    '...bBBBBb...',
-    '..bB.BB.Bb..',
-    '..bBBBBBBb..',
-    '...bBBBBb...',
-    '..gggggggg..',
-    '.gGGGGGGGGg.',
-    '.gGGGGGGGGg.',
-    '..gG....Gg..',
-    '..ss....ss..'
-  ],
-  boss_dog: [
-    '..oo....oo..',
-    '.oOOo..oOOo.',
-    '.oOOOooOOOo.',
-    '..oOOFFOOo..',
-    '..oOOFFOOo..',
-    '.oOOOOOOOOo.',
-    '.oOkOOOOkOo.',
-    '..oOOOOOOo..',
-    '...oooooo...',
-    '..o......o..'
-  ],
-  boss_cat: [
-    '.oo......oo.',
-    'oGGo....oGGo',
-    'oGGGooooGGGo',
-    '.oGGFFFFGGo.',
-    '.oGGFFFFGGo.',
-    '.oGGGGGGGGo.',
-    '.oGkGGGGkGo.',
-    '..oGGGGGGo..',
-    '..oGGooGGo..',
-    '...oo..oo...'
-  ],
-  boss_security: [
-    '....kkkk....',
-    '...kKKKKk...',
-    '..kK.KK.Kk..',
-    '..kKKKKKKk..',
-    '...kKKKKk...',
-    '..kkkkkkkk..',
-    '.kKKKKKKKKk.',
-    '.kKKKKKKKKk.',
-    '..kK....Kk..',
-    '..ss....ss..'
-  ],
-  boss_witch: [
-    '....pppp....',
-    '...pPPPPp...',
-    '..pPPPPPPp..',
-    '..pP.PP.Pp..',
-    '..pPPPPPPp..',
-    '...pPPPPp...',
-    '..kkkkkkkk..',
-    '.kKKKKKKKKk.',
-    '..kKKKKKKk..',
-    '...kk..kk...'
-  ],
-  boss_dragon: [
-    '..rr....rr..',
-    '.rRRr..rRRr.',
-    '.rRRRrrRRRr.',
-    '..rRRFFRRr..',
-    '..rROFFORr..',
-    '.rRRRRRRRRr.',
-    '.rRYRRRRYRr.',
-    '..rRRRRRRr..',
-    '...rrrrrr...',
-    '..rr....rr..'
-  ],
-  
-  poop: [
-    '..cc..',
-    '.cCCc.',
-    '.cBCc.',
-    'cCCCCc',
-    'cCCCCc',
-    '.cCCc.'
-  ],
-  projectile: [
-    '.rr.',
-    'rRRr',
-    'rRRr',
-    '.rr.'
-  ]
+  sparrow: ['....yyyy....','...yYYYYy...','..yYYYYYYy..','..yYFFYYyw..','.yYYYYYYYYy.','.yOYYYYYYy..','..yYYYYYYy..','...yYYYYy...','....oBBo....','....o..o....'],
+  pigeon: ['....gggg....','...gGGGGg...','..gGGGGGGg..','..gGFFGGgw..','.gPPPPPPPPg.','.gOGGGGGGg..','..gGGGGGGg..','...gGGGGg...','....rrrr....','....r..r....'],
+  crow: ['....kkkk....','...kKKKKk...','..kKKKKKKk..','..kKFFKKkw..','.kKKKKKKKKk.','.kOKKKKKKk..','..kKKKKKKk..','...kKKKKk...','....kkkk....','....k..k....'],
+  eagle: ['...dddddd...','..dDDDDDDd..','.dDDFFDDDdw.','.dDDFFDDDDd.','dDDDDDDDDDDd','dODDDDDDDd..','.dDDDDDDDDd.','..dDDDDDDd..','...oYYYoo...','...o....o...'],
+  archaeopteryx: ['..tttttttt..','.tTTTTTTTTt.','.tTFFTTTwwt.','.tTFFTTTTTt.','tTTTTTTTTTTt','tOTTTTTTTt..','.tTTTTTTTTt.','..tTggggTt..','...gggggg...','...g....g...'],
+  phoenix: ['..rrOOrrOO..','.rROOOOOORr.','.rOFFOOOwwR.','.rOFFOOOYYr.','rOOOOOOOOOOr','YOYYYYYYYY..','.YYYYYYYYYY.','..YYYYYYYY..','...rrrrrr...','...r....r...'],
+  human_normal: ['...pppp...','..pPPPPp..','..p.pp.p..','..pPPPPp..','...pppp...','..bbbbbb..','.bBBBBBBb.','..bBBBBb..','...b..b...','...s..s...'],
+  human_child: ['...yyyy...','..yYYYYy..','..y.yy.y..','..yYYYYy..','...yyyy...','..cccccc..','..cMMMc...','...cMc....','...c..c...','...s..s...'],
+  human_runner: ['...gggg...','..gGGGGg..','..g.gg.g..','..gGGGGg..','...gggg...','..mmmmmm..','.mMMMMMMm.','..mMMMMm..','..m....m..','..s....s..'],
+  human_oldman: ['...wwww...','..wWWWWw..','..w.ww.w..','..wWWWWw..','...wwww...','..bbbbbb..','.bBBBBBBb.','..bBBBBb..','...b..b...','...s..s...'],
+  human_lady: ['...rrrr...','..rRRRRr..','..r.rr.r..','..rRRRRr..','...rrrr...','..pppppp..','.pPPPPPPp.','..pPPPPp..','...p..p...','...s..s...'],
+  human_athlete: ['...oooo...','..oOOOOo..','..o.oo.o..','..oOOOOo..','...oooo...','..wwwwww..','.wWWWWWWw.','..wWWWWw..','..w....w..','..s....s..'],
+  human_student: ['...kkkk...','..kKKKKk..','..k.kk.k..','..kKKKKk..','...kkkk...','..wwwwww..','.wWWWWWWw.','..wWWWWw..','...w..w...','...s..s...'],
+  human_tourist: ['...yyyy...','..yYYYYy..','..y.yy.y..','..yYYYYy..','...yyyy...','..rrrrrr..','.rRRRRRRr.','..rRRRRr..','...r..r...','...s..s...'],
+  boss_cleaner: ['....bbbb....','...bBBBBb...','..bB.BB.Bb..','..bBBBBBBb..','...bBBBBb...','..gggggggg..','.gGGGGGGGGg.','.gGGGGGGGGg.','..gG....Gg..','..ss....ss..'],
+  boss_dog: ['..oo....oo..','.oOOo..oOOo.','.oOOOooOOOo.','..oOOFFOOo..','..oOOFFOOo..','.oOOOOOOOOo.','.oOkOOOOkOo.','..oOOOOOOo..','...oooooo...','..o......o..'],
+  boss_cat: ['.oo......oo.','oGGo....oGGo','oGGGooooGGGo','.oGGFFFFGGo.','.oGGFFFFGGo.','.oGGGGGGGGo.','.oGkGGGGkGo.','..oGGGGGGo..','..oGGooGGo..','...oo..oo...'],
+  boss_security: ['....kkkk....','...kKKKKk...','..kK.KK.Kk..','..kKKKKKKk..','...kKKKKk...','..kkkkkkkk..','.kKKKKKKKKk.','.kKKKKKKKKk.','..kK....Kk..','..ss....ss..'],
+  boss_witch: ['....pppp....','...pPPPPp...','..pPPPPPPp..','..pP.PP.Pp..','..pPPPPPPp..','...pPPPPp...','..kkkkkkkk..','.kKKKKKKKKk.','..kKKKKKKk..','...kk..kk...'],
+  boss_dragon: ['..rr....rr..','.rRRr..rRRr.','.rRRRrrRRRr.','..rRRFFRRr..','..rROFFORr..','.rRRRRRRRRr.','.rRYRRRRYRr.','..rRRRRRRr..','...rrrrrr...','..rr....rr..'],
+  poop: ['..cc..','.cCCc.','.cBCc.','cCCCCc','cCCCCc','.cCCc.'],
+  projectile: ['.rr.','rRRr','rRRr','.rr.']
 };
 
-const COLORS = {
-  'y': '#D4A574', 'Y': '#FFE4B5',
-  'g': '#228B22', 'G': '#90EE90',
-  'b': '#4A4A4A', 'B': '#8B4513',
-  'p': '#DDA0DD', 'P': '#FFB6C1',
-  'r': '#DC143C', 'R': '#FF6B6B',
-  'o': '#FF8C00', 'O': '#FFA500',
-  'k': '#2F2F2F', 'K': '#4A4A4A',
-  'w': '#C0C0C0', 'W': '#FFFFFF',
-  'c': '#8B7355', 'C': '#C9A86C',
-  'm': '#20B2AA', 'M': '#98D4BB',
-  't': '#008B8B', 'T': '#20B2AA',
-  's': '#2F2F2F',
-  'd': '#8B4513', 'D': '#CD853F',
-  'F': '#1a1a1a',
-  '.': null
-};
+const COLORS = {'y':'#D4A574','Y':'#FFE4B5','g':'#228B22','G':'#90EE90','b':'#4A4A4A','B':'#8B4513','p':'#DDA0DD','P':'#FFB6C1','r':'#DC143C','R':'#FF6B6B','o':'#FF8C00','O':'#FFA500','k':'#2F2F2F','K':'#4A4A4A','w':'#C0C0C0','W':'#FFFFFF','c':'#8B7355','C':'#C9A86C','m':'#20B2AA','M':'#98D4BB','t':'#008B8B','T':'#20B2AA','s':'#2F2F2F','d':'#8B4513','D':'#CD853F','F':'#1a1a1a','.':null};
 
 const spriteCache = {};
 function createSprite(data, scale = 3) {
   if (!data) return null;
   const key = data.join('') + scale;
   if (spriteCache[key]) return spriteCache[key];
-  
   const h = data.length, w = data[0].length;
   const c = document.createElement('canvas');
-  c.width = w * scale;
-  c.height = h * scale;
+  c.width = w * scale; c.height = h * scale;
   const x = c.getContext('2d');
-  
   for (let y = 0; y < h; y++) {
     for (let i = 0; i < w; i++) {
       const ch = data[y][i];
-      if (COLORS[ch]) {
-        x.fillStyle = COLORS[ch];
-        x.fillRect(i * scale, y * scale, scale, scale);
-      }
+      if (COLORS[ch]) { x.fillStyle = COLORS[ch]; x.fillRect(i * scale, y * scale, scale, scale); }
     }
   }
   spriteCache[key] = c;
@@ -316,24 +59,12 @@ function createSprite(data, scale = 3) {
 
 // ============ STAGE DATA ============
 const STAGES = [
-  { id: 1, name: '공원', icon: '🌳', duration: 90, spawnRate: 2200,
-    bgColors: ['#87CEEB', '#B0E0E6', '#98FB98'], groundColor: '#7CB342', pathColor: '#D7CCC8',
-    humanTypes: ['normal', 'child', 'oldman'], boss: 'cleaner', bossName: '환경미화원' },
-  { id: 2, name: '도시', icon: '🏙️', duration: 100, spawnRate: 2000,
-    bgColors: ['#B0C4DE', '#87CEEB', '#C0C0C0'], groundColor: '#808080', pathColor: '#A9A9A9',
-    humanTypes: ['normal', 'runner', 'lady', 'student'], boss: 'dog', bossName: '맹견' },
-  { id: 3, name: '해변', icon: '🏖️', duration: 100, spawnRate: 1900,
-    bgColors: ['#00BFFF', '#87CEEB', '#F0E68C'], groundColor: '#F4A460', pathColor: '#FFECD2',
-    humanTypes: ['normal', 'child', 'tourist', 'athlete'], boss: 'cat', bossName: '도둑고양이' },
-  { id: 4, name: '운동장', icon: '🏟️', duration: 110, spawnRate: 1800,
-    bgColors: ['#87CEEB', '#98FB98', '#90EE90'], groundColor: '#228B22', pathColor: '#CD853F',
-    humanTypes: ['runner', 'athlete', 'student', 'normal'], boss: 'security', bossName: '경비원' },
-  { id: 5, name: '성', icon: '🏰', duration: 120, spawnRate: 1700,
-    bgColors: ['#9370DB', '#DDA0DD', '#E6E6FA'], groundColor: '#696969', pathColor: '#A9A9A9',
-    humanTypes: ['lady', 'oldman', 'normal', 'tourist'], boss: 'witch', bossName: '마녀' },
-  { id: 6, name: '화산', icon: '🌋', duration: 130, spawnRate: 1500,
-    bgColors: ['#FF6347', '#FF4500', '#8B0000'], groundColor: '#2F2F2F', pathColor: '#8B0000',
-    humanTypes: ['runner', 'athlete', 'tourist', 'normal', 'lady'], boss: 'dragon', bossName: '드래곤' }
+  { id: 1, name: '공원', icon: '🌳', duration: 90, spawnRate: 2200, bgColors: ['#87CEEB', '#B0E0E6', '#98FB98'], groundColor: '#7CB342', pathColor: '#D7CCC8', humanTypes: ['normal', 'child', 'oldman'], boss: 'cleaner', bossName: '환경미화원' },
+  { id: 2, name: '도시', icon: '🏙️', duration: 100, spawnRate: 2000, bgColors: ['#B0C4DE', '#87CEEB', '#C0C0C0'], groundColor: '#808080', pathColor: '#A9A9A9', humanTypes: ['normal', 'runner', 'lady', 'student'], boss: 'dog', bossName: '맹견' },
+  { id: 3, name: '해변', icon: '🏖️', duration: 100, spawnRate: 1900, bgColors: ['#00BFFF', '#87CEEB', '#F0E68C'], groundColor: '#F4A460', pathColor: '#FFECD2', humanTypes: ['normal', 'child', 'tourist', 'athlete'], boss: 'cat', bossName: '도둑고양이' },
+  { id: 4, name: '운동장', icon: '🏟️', duration: 110, spawnRate: 1800, bgColors: ['#87CEEB', '#98FB98', '#90EE90'], groundColor: '#228B22', pathColor: '#CD853F', humanTypes: ['runner', 'athlete', 'student', 'normal'], boss: 'security', bossName: '경비원' },
+  { id: 5, name: '성', icon: '🏰', duration: 120, spawnRate: 1700, bgColors: ['#9370DB', '#DDA0DD', '#E6E6FA'], groundColor: '#696969', pathColor: '#A9A9A9', humanTypes: ['lady', 'oldman', 'normal', 'tourist'], boss: 'witch', bossName: '마녀' },
+  { id: 6, name: '화산', icon: '🌋', duration: 130, spawnRate: 1500, bgColors: ['#FF6347', '#FF4500', '#8B0000'], groundColor: '#2F2F2F', pathColor: '#8B0000', humanTypes: ['runner', 'athlete', 'tourist', 'normal', 'lady'], boss: 'dragon', bossName: '드래곤' }
 ];
 
 const BIRDS = {
@@ -381,36 +112,17 @@ const UPGRADES = {
 
 // ============ GAME STATE ============
 let gameState = {
-  screen: 'menu',
-  difficulty: 'normal',
-  currentStage: 1,
-  score: 0,
-  feathers: 150,
-  gold: 15,
-  stones: 5,
-  health: 3,
-  maxHealth: 3,
-  energy: 100,
-  maxEnergy: 100,
-  combo: 0,
-  maxCombo: 0,
-  hits: 0,
-  shots: 0,
-  stageFeathers: 0,
-  stageGold: 0,
-  
+  screen: 'menu', difficulty: 'normal', currentStage: 1,
+  score: 0, feathers: 150, gold: 15, stones: 5,
+  health: 3, maxHealth: 3, energy: 100, maxEnergy: 100,
+  combo: 0, maxCombo: 0, hits: 0, shots: 0,
+  stageFeathers: 0, stageGold: 0,
   inventory: { bread: 3, chili: 2, shield: 2 },
   quickSlots: ['bread', 'chili', 'shield'],
   effects: { unlimited: 0, shield: false, invincible: 0 },
   upgrades: { energy: 0, speed: 0, poopSpeed: 0, damage: 0, luck: 0 },
-  
-  currentBird: 'sparrow',
-  unlockedBirds: ['sparrow'],
-  stageStars: {},
-  
-  bossSpawned: false,
-  bossDefeated: false,
-  bossWarningShown: false
+  currentBird: 'sparrow', unlockedBirds: ['sparrow'], stageStars: {},
+  bossSpawned: false, bossDefeated: false, bossWarningShown: false
 };
 
 // Load saved data
@@ -419,9 +131,9 @@ function loadGame() {
     const saved = localStorage.getItem('birdDropSave');
     if (saved) {
       const data = JSON.parse(saved);
-      gameState.feathers = data.feathers || 150;
-      gameState.gold = data.gold || 15;
-      gameState.stones = data.stones || 5;
+      gameState.feathers = data.feathers ?? 150;
+      gameState.gold = data.gold ?? 15;
+      gameState.stones = data.stones ?? 5;
       gameState.inventory = data.inventory || { bread: 3, chili: 2, shield: 2 };
       gameState.upgrades = data.upgrades || { energy: 0, speed: 0, poopSpeed: 0, damage: 0, luck: 0 };
       gameState.currentBird = data.currentBird || 'sparrow';
@@ -435,13 +147,9 @@ function loadGame() {
 function saveGame() {
   try {
     localStorage.setItem('birdDropSave', JSON.stringify({
-      feathers: gameState.feathers,
-      gold: gameState.gold,
-      stones: gameState.stones,
-      inventory: gameState.inventory,
-      upgrades: gameState.upgrades,
-      currentBird: gameState.currentBird,
-      unlockedBirds: gameState.unlockedBirds,
+      feathers: gameState.feathers, gold: gameState.gold, stones: gameState.stones,
+      inventory: gameState.inventory, upgrades: gameState.upgrades,
+      currentBird: gameState.currentBird, unlockedBirds: gameState.unlockedBirds,
       stageStars: gameState.stageStars
     }));
   } catch(e) { console.log('Save failed'); }
@@ -509,7 +217,7 @@ poopButton.addEventListener('mouseleave', () => poopPressed = false);
 // Keyboard support
 document.addEventListener('keydown', e => {
   keys[e.code] = true;
-  if (e.code === 'Space') poopPressed = true;
+  if (e.code === 'Space') { e.preventDefault(); poopPressed = true; }
   if (e.code === 'Digit1') useQuickSlot(0);
   if (e.code === 'Digit2') useQuickSlot(1);
   if (e.code === 'Digit3') useQuickSlot(2);
@@ -556,30 +264,21 @@ function updateUI() {
 function updateProgressMap() {
   const map = document.getElementById('progressMap');
   map.innerHTML = '';
-  
   const stage = STAGES.find(s => s.id === gameState.currentStage);
   if (!stage || gameState.screen !== 'playing') return;
-  
   const elapsed = (Date.now() - gameStartTime) / 1000;
   const progress = Math.min(10, Math.floor((elapsed / stage.duration) * 10));
-  
   for (let i = 0; i < 10; i++) {
     if (i > 0) {
       const line = document.createElement('div');
       line.className = 'progress-line' + (i <= progress ? ' passed' : '');
       map.appendChild(line);
     }
-    
     const dot = document.createElement('div');
-    if (i === 8) {
-      dot.className = 'progress-dot boss';
-    } else if (i === progress) {
-      dot.className = 'progress-dot current';
-    } else if (i < progress) {
-      dot.className = 'progress-dot passed';
-    } else {
-      dot.className = 'progress-dot';
-    }
+    if (i === 8) dot.className = 'progress-dot boss';
+    else if (i === progress) dot.className = 'progress-dot current';
+    else if (i < progress) dot.className = 'progress-dot passed';
+    else dot.className = 'progress-dot';
     map.appendChild(dot);
   }
 }
@@ -639,14 +338,11 @@ function updateDifficultyButtons() {
 function renderStageGrid() {
   const grid = document.getElementById('stageGrid');
   grid.innerHTML = '';
-  
   STAGES.forEach((stage, i) => {
-    // FIX: Use stage.id for previous stage check
     const prevStageId = i > 0 ? STAGES[i-1].id : 0;
     const prevStars = i === 0 ? 1 : (gameState.stageStars[prevStageId] || 0);
     const unlocked = i === 0 || prevStars > 0;
     const stars = gameState.stageStars[stage.id] || 0;
-    
     const btn = document.createElement('div');
     btn.className = 'stage-btn' + (unlocked ? '' : ' locked');
     btn.innerHTML = `
@@ -683,6 +379,7 @@ function quitToMenu() {
 }
 
 // ============ SHOP ============
+// FIX: Save previousScreen BEFORE changing gameState.screen
 function openShop() {
   previousScreen = gameState.screen;
   gameState.screen = 'shop';
@@ -695,15 +392,25 @@ function openShop() {
 function openShopFromPause() {
   previousScreen = 'paused';
   document.getElementById('pauseOverlay').classList.remove('active');
-  openShop();
+  gameState.screen = 'shop';
+  hideAllOverlays();
+  document.getElementById('shopOverlay').classList.add('active');
+  updateShopDisplay();
+  switchShopTab(document.querySelector('.shop-tab'), 'items');
 }
 
+// FIX: closeShop now correctly returns to the screen you came from
 function closeShop() {
   document.getElementById('shopOverlay').classList.remove('active');
   if (previousScreen === 'paused') {
     gameState.screen = 'paused';
     document.getElementById('pauseOverlay').classList.add('active');
+  } else if (previousScreen === 'menu') {
+    showMainMenu();
+  } else if (previousScreen === 'stageSelect') {
+    showStageSelect();
   } else {
+    // Default fallback: go to stage select
     showStageSelect();
   }
 }
@@ -773,7 +480,6 @@ function switchShopTab(el, tab) {
         }
       };
       container.appendChild(div);
-      
       setTimeout(() => {
         const canv = div.querySelector('.bird-canvas');
         if (canv && SPRITES[b.sprite]) {
@@ -834,10 +540,8 @@ function useQuickSlot(i) {
   if (gameState.screen !== 'playing') return;
   const k = gameState.quickSlots[i];
   if (!k || !gameState.inventory[k]) return;
-  
   gameState.inventory[k]--;
   updateItemButtons();
-  
   switch (ITEMS[k].effect) {
     case 'heal':
       gameState.health = Math.min(gameState.health + 1, gameState.maxHealth);
@@ -859,7 +563,6 @@ function useQuickSlot(i) {
 function startStage(num) {
   const stage = STAGES.find(s => s.id === num);
   if (!stage) return;
-  
   gameState.currentStage = num;
   gameState.screen = 'playing';
   gameState.score = 0;
@@ -875,18 +578,12 @@ function startStage(num) {
   gameState.bossDefeated = false;
   gameState.bossWarningShown = false;
   gameState.effects = { unlimited: 0, shield: false, invincible: 0 };
-  
   bird.x = canvas.width / 2;
   bird.y = canvas.height * 0.15;
-  poops = [];
-  humans = [];
-  projectiles = [];
-  particles = [];
+  poops = []; humans = []; projectiles = []; particles = [];
   boss = null;
-  
   gameStartTime = Date.now();
   lastSpawnTime = 0;
-  
   hideAllOverlays();
   document.getElementById('bossWarning').style.display = 'none';
   updateUI();
@@ -908,7 +605,6 @@ function spawnHuman() {
   const side = Math.random() < 0.5 ? 'left' : 'right';
   const humanData = HUMAN_TYPES[type];
   const speedMult = gameState.difficulty === 'hell' ? 1.5 : 1;
-  
   humans.push({
     x: side === 'left' ? -30 : canvas.width + 30,
     y: canvas.height * 0.65 + Math.random() * (canvas.height * 0.2),
@@ -922,7 +618,6 @@ function spawnBoss() {
   const stage = STAGES.find(s => s.id === gameState.currentStage);
   const bossData = BOSSES[stage.boss];
   const healthMult = gameState.difficulty === 'hell' ? 1.8 : 1;
-  
   boss = {
     x: canvas.width / 2, y: canvas.height * 0.7,
     width: 60, height: 70,
@@ -938,7 +633,6 @@ function shootPoop() {
   gameState.shots++;
   const birdData = BIRDS[gameState.currentBird];
   const speedBonus = 1 + gameState.upgrades.poopSpeed * 0.15;
-  
   poops.push({
     x: bird.x, y: bird.y + 20,
     width: 18, height: 18,
@@ -950,19 +644,16 @@ function shootPoop() {
 
 function bossAttack() {
   if (!boss || boss.defeated) return;
-  
   const dx = bird.x - boss.x;
   const dy = bird.y - boss.y;
   const dist = Math.sqrt(dx*dx + dy*dy);
   const speed = gameState.difficulty === 'hell' ? 6 : 4;
-  
   projectiles.push({
     x: boss.x, y: boss.y - 20,
     vx: (dx / dist) * speed + (Math.random() - 0.5) * 2,
     vy: (dy / dist) * speed,
     width: 12, height: 12
   });
-  
   if (gameState.difficulty === 'hell') {
     setTimeout(() => {
       if (boss && !boss.defeated) {
@@ -978,18 +669,15 @@ function bossAttack() {
 
 function update() {
   if (gameState.screen !== 'playing') return;
-  
   const birdData = BIRDS[gameState.currentBird];
   const speedBonus = 1 + gameState.upgrades.speed * 0.1;
   const speed = birdData.speed * speedBonus;
   
-  // Keyboard movement
   if (keys['ArrowLeft'] || keys['KeyA']) bird.x -= speed;
   if (keys['ArrowRight'] || keys['KeyD']) bird.x += speed;
   if (keys['ArrowUp'] || keys['KeyW']) bird.y -= speed;
   if (keys['ArrowDown'] || keys['KeyS']) bird.y += speed;
   
-  // Joystick movement
   if (joystick.active) {
     bird.x += joystick.moveX * speed;
     bird.y += joystick.moveY * speed;
@@ -1044,13 +732,11 @@ function update() {
   if (boss && !boss.defeated) {
     boss.x += boss.speed * boss.direction;
     if (boss.x < 60 || boss.x > canvas.width - 60) boss.direction *= -1;
-    
     boss.attackTimer++;
     if (boss.attackTimer > boss.attackRate) {
       bossAttack();
       boss.attackTimer = 0;
     }
-    
     if (boss.health <= 0) {
       boss.defeated = true;
       gameState.bossDefeated = true;
@@ -1081,7 +767,6 @@ function update() {
         createParticles(h.x, h.y, '#C9A86C', 8);
       }
     });
-    
     if (boss && !boss.defeated && collision(poop, boss)) {
       boss.health -= poop.damage;
       poop.hit = true;
@@ -1131,7 +816,6 @@ function createParticles(x, y, color, count) {
 // ============ RENDER ============
 function render() {
   const stage = STAGES.find(s => s.id === gameState.currentStage);
-  
   const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
   gradient.addColorStop(0, stage.bgColors[0]);
   gradient.addColorStop(0.5, stage.bgColors[1]);
@@ -1152,7 +836,6 @@ function render() {
   
   ctx.fillStyle = stage.groundColor;
   ctx.fillRect(0, canvas.height * 0.82, canvas.width, canvas.height * 0.18);
-  
   ctx.fillStyle = stage.pathColor;
   ctx.fillRect(0, canvas.height * 0.7, canvas.width, canvas.height * 0.12);
   
@@ -1175,7 +858,6 @@ function render() {
   if (boss && !boss.defeated) {
     const sprite = createSprite(SPRITES[boss.sprite], 4);
     if (sprite) ctx.drawImage(sprite, boss.x - boss.width/2, boss.y - boss.height/2);
-    
     const barWidth = 80;
     ctx.fillStyle = '#333';
     ctx.fillRect(boss.x - barWidth/2 - 2, boss.y - boss.height/2 - 18, barWidth + 4, 12);
@@ -1227,21 +909,16 @@ function render() {
 function stageClear() {
   gameState.screen = 'stageClear';
   if (animationId) cancelAnimationFrame(animationId);
-  
   const stage = STAGES.find(s => s.id === gameState.currentStage);
   let stars = 1;
   if (gameState.score >= 100 * stage.id) stars = 2;
   if (gameState.score >= 100 * stage.id && gameState.health === gameState.maxHealth) stars = 3;
-  
   gameState.stageStars[gameState.currentStage] = Math.max(gameState.stageStars[gameState.currentStage] || 0, stars);
   if (stars === 3) gameState.stageGold += 3;
   if (Math.random() < 0.2 * stars) gameState.stones++;
-  
   gameState.feathers += gameState.stageFeathers;
   gameState.gold += gameState.stageGold;
-  
   saveGame();
-  
   hideAllOverlays();
   document.getElementById('clearOverlay').classList.add('active');
   document.getElementById('clearStars').textContent = '⭐'.repeat(stars) + '☆'.repeat(3 - stars);
@@ -1255,10 +932,8 @@ function stageClear() {
 function gameOver() {
   gameState.screen = 'gameover';
   if (animationId) cancelAnimationFrame(animationId);
-  
   gameState.feathers += Math.floor(gameState.stageFeathers * 0.3);
   saveGame();
-  
   hideAllOverlays();
   document.getElementById('gameoverOverlay').classList.add('active');
   document.getElementById('goScore').textContent = Math.floor(gameState.score);
@@ -1296,7 +971,6 @@ function drawMenuBackground() {
   bgCanvas.width = window.innerWidth;
   bgCanvas.height = window.innerHeight;
   const bgCtx = bgCanvas.getContext('2d');
-  
   const gradient = bgCtx.createLinearGradient(0, 0, 0, bgCanvas.height);
   gradient.addColorStop(0, '#87CEEB');
   gradient.addColorStop(0.5, '#B0E0E6');
