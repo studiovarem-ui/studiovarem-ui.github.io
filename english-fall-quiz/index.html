@@ -252,13 +252,7 @@ body {
 .modal-title {
   font-size: 24px;
   font-weight: 700;
-  margin-bottom: 6px;
-}
-
-.modal-subtitle {
-  color: var(--text-dim);
-  font-size: 14px;
-  margin-bottom: 28px;
+  margin-bottom: 24px;
 }
 
 /* Day selector */
@@ -543,21 +537,21 @@ body {
         <div class="modal-title">Word Fall Game</div>
 
 ```
-  <div class="day-selector" id="daySelector"></div>
+    <div class="day-selector" id="daySelector"></div>
   
-  <div class="difficulty-selector">
-    <button class="diff-btn selected" data-speed="slow">
-      <span class="diff-label">Easy</span>
-    </button>
-    <button class="diff-btn" data-speed="normal">
-      <span class="diff-label">Normal</span>
-    </button>
-    <button class="diff-btn" data-speed="fast">
-      <span class="diff-label">Hard</span>
-    </button>
-  </div>
+    <div class="difficulty-selector">
+      <button class="diff-btn selected" data-speed="slow">
+        <span class="diff-label">Easy</span>
+      </button>
+      <button class="diff-btn" data-speed="normal">
+        <span class="diff-label">Normal</span>
+      </button>
+      <button class="diff-btn" data-speed="fast">
+        <span class="diff-label">Hard</span>
+      </button>
+    </div>
   
-  <button class="play-btn" id="startBtn">START</button>
+    <button class="play-btn" id="startBtn">START</button>
   </div>
   
   <a href="https://studiovarem-ui.github.io/english-m3/" class="vocab-link">
@@ -571,27 +565,29 @@ body {
   <!-- Game Over Modal -->
 
   <div class="modal-overlay" id="gameOverModal">
-    <div class="modal">
-      <div class="modal-title" id="endTitle">GAME OVER</div>
-      <div class="final-score" id="finalScore">0</div>
+    <div class="modal-wrapper">
+      <div class="modal">
+        <div class="modal-title" id="endTitle">GAME OVER</div>
+        <div class="final-score" id="finalScore">0</div>
 
 ```
-  <div class="score-breakdown">
-    <div class="breakdown-item">
-      <div class="breakdown-value" id="correctCount">0</div>
-      <div class="breakdown-label">정답</div>
+    <div class="score-breakdown">
+      <div class="breakdown-item">
+        <div class="breakdown-value" id="correctCount">0</div>
+        <div class="breakdown-label">정답</div>
+      </div>
+      <div class="breakdown-item">
+        <div class="breakdown-value" id="maxCombo">0</div>
+        <div class="breakdown-label">최대 콤보</div>
+      </div>
+      <div class="breakdown-item">
+        <div class="breakdown-value" id="accuracy">0%</div>
+        <div class="breakdown-label">정확도</div>
+      </div>
     </div>
-    <div class="breakdown-item">
-      <div class="breakdown-value" id="maxCombo">0</div>
-      <div class="breakdown-label">최대 콤보</div>
-    </div>
-    <div class="breakdown-item">
-      <div class="breakdown-value" id="accuracy">0%</div>
-      <div class="breakdown-label">정확도</div>
-    </div>
-  </div>
   
-  <button class="play-btn" id="restartBtn">PLAY AGAIN</button>
+    <button class="play-btn" id="restartBtn">PLAY AGAIN</button>
+  </div>
 </div>
 ```
 
