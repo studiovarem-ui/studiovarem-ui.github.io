@@ -139,6 +139,28 @@ body{
   opacity:.55;
   font-style:italic;
 }
+.detail-top{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:6px;
+}
+.voiceBtn{
+  border:1px solid rgba(255,255,255,.18);
+  background:none; color:#fff;
+  padding:5px 10px; border-radius:999px;
+  font-size:11px; letter-spacing:.08em;
+  opacity:.45; cursor:pointer;
+  transition:all .2s ease;
+  flex-shrink:0;
+}
+.voiceBtn:hover{ opacity:.75; }
+.voiceBtn:active{ transform:scale(.96); }
+.voiceBtn.playing{
+  opacity:1;
+  border-color:rgba(255,255,255,.55);
+  box-shadow:0 0 0 3px rgba(255,255,255,.06);
+}
 </style>
 
 <script src="data/data.js"></script>
@@ -158,6 +180,31 @@ body{
 </div>
 
 <script>
+// TTS
+function speakWord(text, btn){
+  try{
+    if(!("speechSynthesis" in window)) return;
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "en-US";
+    u.rate = 0.95;
+    if(btn){
+      u.onstart = () => btn.classList.add("playing");
+      u.onend   = () => btn.classList.remove("playing");
+      u.onerror = () => btn.classList.remove("playing");
+    }
+    const voices = window.speechSynthesis.getVoices?.() || [];
+    const v = voices.find(v=>/en-US/i.test(v.lang)) || voices.find(v=>/^en/i.test(v.lang));
+    if(v) u.voice = v;
+    window.speechSynthesis.speak(u);
+  }catch(e){
+    if(btn) btn.classList.remove("playing");
+  }
+}
+if("speechSynthesis" in window){
+  window.speechSynthesis.onvoiceschanged = ()=>{};
+}
+
 window.VAREM_onReady(function(){
   const listEl = document.getElementById("list");
   const data = window.VAREM_LIST || [];
@@ -198,7 +245,10 @@ window.VAREM_onReady(function(){
     detail.className = "detail";
     detail.innerHTML = `
       <div class="detail-inner">
-        <div class="detail-word">${w.toLowerCase()}</div>
+        <div class="detail-top">
+          <div class="detail-word">${w.toLowerCase()}</div>
+          <button class="voiceBtn" type="button" data-word="${w}" aria-label="voice">voice</button>
+        </div>
         <div class="detail-pos">${pos}</div>
         <div class="detail-section">
           <div class="detail-label">meaning</div>
@@ -212,6 +262,15 @@ window.VAREM_onReady(function(){
         </div>` : ""}
       </div>
     `;
+
+    // voice 버튼 클릭 (이벤트 버블링 막기)
+    const vBtn = detail.querySelector(".voiceBtn");
+    if (vBtn) {
+      vBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        speakWord(vBtn.dataset.word, vBtn);
+      });
+    }
 
     row.addEventListener("click", () => {
       // 이전 열린 거 닫기
