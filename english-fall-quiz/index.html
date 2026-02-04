@@ -2,1019 +2,348 @@
 
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>VAREM • Word Fall Quiz</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: #000;
-      --card: #1a1a1a;
-      --card-border: #2a2a2a;
-      --text: #fff;
-      --text-dim: #888;
-    }
-
-```
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
-}
-
-body {
-  font-family: 'Noto Sans KR', -apple-system, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100dvh;
-  overflow: hidden;
-}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>VAREM · Word Fall Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#000;--card:#1a1a1a;--card-border:#2a2a2a;--text:#fff;--text-dim:#888}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:'Noto Sans KR',-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100dvh;overflow:hidden}
 
 /* Header */
-.header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  padding: 16px 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  z-index: 100;
-}
+.header{position:fixed;top:0;left:0;right:0;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;z-index:100}
+.back-btn{width:40px;height:40px;border:1px solid var(–card-border);border-radius:50%;background:transparent;color:var(–text);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.back-btn:hover{border-color:#555}
+.header-spacer{width:40px}
+.logo{font-size:13px;font-weight:500;letter-spacing:4px;color:var(–text)}
 
-.back-btn {
-  width: 40px;
-  height: 40px;
-  border: 1px solid var(--card-border);
-  border-radius: 50%;
-  background: transparent;
-  color: var(--text);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-}
-
-.back-btn:hover {
-  border-color: #555;
-}
-
-.header-spacer {
-  width: 40px;
-}
-
-.logo {
-  font-size: 13px;
-  font-weight: 500;
-  letter-spacing: 4px;
-  color: var(--text);
-}
-
-/* Stats bar */
-.stats {
-  position: fixed;
-  top: 56px;
-  left: 16px;
-  right: 16px;
-  display: flex;
-  gap: 8px;
-  z-index: 90;
-}
-
-.stat-item {
-  flex: 1;
-  background: var(--card);
-  border: 1px solid var(--card-border);
-  border-radius: 12px;
-  padding: 12px 8px;
-  text-align: center;
-}
-
-.stat-label {
-  font-size: 10px;
-  color: var(--text-dim);
-  margin-bottom: 4px;
-}
-
-.stat-value {
-  font-size: 18px;
-  font-weight: 700;
-}
-
-.stat-value.lives {
-  color: #c45c5c;
-  font-size: 16px;
-  letter-spacing: 2px;
-}
+/* Stats */
+.stats{position:fixed;top:56px;left:16px;right:16px;display:flex;gap:8px;z-index:90}
+.stat-item{flex:1;background:var(–card);border:1px solid var(–card-border);border-radius:12px;padding:12px 8px;text-align:center}
+.stat-label{font-size:10px;color:var(–text-dim);margin-bottom:4px}
+.stat-value{font-size:18px;font-weight:700}
+.stat-value.lives{color:#c45c5c;font-size:16px;letter-spacing:2px}
 
 /* Game area */
-.game-area {
-  position: fixed;
-  top: 140px;
-  left: 0;
-  right: 0;
-  bottom: 220px;
-  overflow: hidden;
-}
+.game-area{position:fixed;top:140px;left:0;right:0;bottom:220px;overflow:hidden}
+.ready-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:20px;color:var(–text-dim);display:none}
 
 /* Falling word */
-.falling-word {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--card);
-  border: 1px solid var(--card-border);
-  border-radius: 16px;
-  padding: 20px 32px;
-  text-align: center;
-  min-width: 200px;
-}
+.falling-word{position:absolute;left:50%;transform:translateX(-50%);background:var(–card);border:1px solid var(–card-border);border-radius:16px;padding:20px 32px;text-align:center;min-width:200px}
+.word-text{font-size:32px;font-weight:700;color:var(–text);margin-bottom:8px;margin-top:8px}
+.word-pos{display:inline-block;font-size:12px;color:var(–text-dim);border:1px solid var(–card-border);padding:4px 12px;border-radius:20px}
+.floor-line{position:fixed;bottom:220px;left:20px;right:20px;height:1px;background:linear-gradient(90deg,transparent,#333,transparent)}
 
-.word-day {
-  position: absolute;
-  top: 12px;
-  right: 16px;
-  font-size: 12px;
-  color: var(--text-dim);
-  background: var(--bg);
-  padding: 4px 10px;
-  border-radius: 20px;
-}
-
-.word-text {
-  font-size: 32px;
-  font-weight: 700;
-  color: var(--text);
-  margin-bottom: 8px;
-  margin-top: 8px;
-}
-
-.word-pos {
-  display: inline-block;
-  font-size: 12px;
-  color: var(--text-dim);
-  border: 1px solid var(--card-border);
-  padding: 4px 12px;
-  border-radius: 20px;
-}
-
-/* Floor indicator */
-.floor-line {
-  position: fixed;
-  bottom: 220px;
-  left: 20px;
-  right: 20px;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, #333, transparent);
-}
-
-/* Answer buttons */
-.answers {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 16px;
-  padding-bottom: max(20px, env(safe-area-inset-bottom));
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
-.answer-btn {
-  background: var(--card);
-  border: 1px solid var(--card-border);
-  border-radius: 12px;
-  padding: 18px 12px;
-  color: var(--text);
-  font-size: 15px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.15s;
-  position: relative;
-}
-
-.answer-btn:active {
-  transform: scale(0.97);
-  background: #222;
-}
-
-.answer-btn.correct {
-  background: var(--text);
-  color: var(--bg);
-  border-color: var(--text);
-}
-
-.answer-btn.wrong {
-  background: #331111;
-  border-color: #552222;
-}
-
-/* Modals */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: #000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.3s;
-}
-
-.modal-overlay.active {
-  opacity: 1;
-  visibility: visible;
-}
-
-.modal {
-  background: var(--card);
-  border: 1px solid var(--card-border);
-  border-radius: 20px;
-  padding: 48px 28px 40px;
-  width: 100%;
-  text-align: center;
-  transform: scale(0.95);
-  transition: transform 0.3s;
-}
-
-.modal-overlay.active .modal-wrapper .modal {
-  transform: scale(1);
-}
-
-.modal-title {
-  font-size: 24px;
-  font-weight: 700;
-  margin-bottom: 32px;
-}
-
-/* Day badge */
-.day-badge {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  font-size: 13px;
-  color: var(--text-dim);
-  background: var(--bg);
-  border: 1px solid var(--card-border);
-  padding: 6px 14px;
-  border-radius: 20px;
-}
-
-/* Day selector */
-.day-selector {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: center;
-  margin-bottom: 32px;
-}
-
-.day-chip {
-  padding: 10px 18px;
-  background: transparent;
-  border: 1px solid var(--card-border);
-  border-radius: 24px;
-  font-size: 14px;
-  color: var(--text);
-  cursor: pointer;
-  transition: all 0.15s;
-}
-
-.day-chip:hover {
-  border-color: #555;
-}
-
-.day-chip.selected {
-  background: var(--text);
-  border-color: var(--text);
-  color: var(--bg);
-  font-weight: 600;
-}
-
-/* Day range input */
-.day-range-wrap {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 14px;
-  border: 1px solid var(--card-border);
-  border-radius: 24px;
-  transition: all 0.15s;
-}
-.day-range-wrap.selected {
-  background: var(--text);
-  border-color: var(--text);
-}
-.day-range-wrap.selected .range-label {
-  color: var(--bg);
-}
-.day-range-wrap.selected .range-input {
-  color: var(--bg);
-  border-color: rgba(0,0,0,.25);
-}
-.range-label {
-  font-size: 14px;
-  color: var(--text);
-}
-.range-input {
-  width: 40px;
-  background: transparent;
-  border: 1px solid var(--card-border);
-  border-radius: 8px;
-  color: var(--text);
-  font-size: 14px;
-  font-weight: 600;
-  text-align: center;
-  padding: 4px 2px;
-  outline: none;
-  -moz-appearance: textfield;
-}
-.range-input::-webkit-outer-spin-button,
-.range-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-/* Difficulty selector */
-.difficulty-selector {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 36px;
-}
-
-.diff-btn {
-  flex: 1;
-  padding: 14px 8px;
-  background: transparent;
-  border: 1px solid var(--card-border);
-  border-radius: 12px;
-  color: var(--text);
-  cursor: pointer;
-  transition: all 0.15s;
-}
-
-.diff-btn:hover {
-  border-color: #555;
-}
-
-.diff-btn.selected {
-  background: var(--text);
-  border-color: var(--text);
-  color: var(--bg);
-}
-
-.diff-label {
-  display: block;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-/* Play button - mint color */
-.play-btn {
-  width: 100%;
-  padding: 18px;
-  background: #00f5d4;
-  border: none;
-  border-radius: 12px;
-  color: #000;
-  font-size: 15px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: opacity 0.15s;
-}
-
-.play-btn:hover {
-  opacity: 0.9;
-}
-
-/* Vocab link - outside box, bottom */
-.vocab-link {
-  display: inline-block;
-  margin-top: 20px;
-  padding: 10px 20px;
-  color: var(--text-dim);
-  text-decoration: none;
-  font-size: 13px;
-  letter-spacing: 1px;
-  border: 1px solid var(--card-border);
-  border-radius: 24px;
-  transition: all 0.15s;
-  align-self: flex-end;
-}
-
-.vocab-link:hover {
-  border-color: #555;
-  color: var(--text);
-}
-
-/* Modal brand - outside box */
-.modal-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 90%;
-  max-width: 340px;
-}
-
-.modal-brand {
-  font-size: 13px;
-  font-weight: 500;
-  letter-spacing: 4px;
-  color: var(--text);
-  margin-bottom: 24px;
-}
-
-/* Game over modal */
-.final-score {
-  font-size: 56px;
-  font-weight: 700;
-  margin: 16px 0;
-}
-
-.score-breakdown {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  margin-bottom: 28px;
-  padding: 16px;
-  background: var(--bg);
-  border-radius: 12px;
-}
-
-.breakdown-item {
-  text-align: center;
-}
-
-.breakdown-value {
-  font-size: 20px;
-  font-weight: 700;
-}
-
-.breakdown-label {
-  font-size: 11px;
-  color: var(--text-dim);
-  margin-top: 2px;
-}
-
-/* Ready state */
-.ready-text {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 20px;
-  color: var(--text-dim);
-  letter-spacing: 2px;
-}
+/* Answers */
+.answers{position:fixed;bottom:0;left:0;right:0;padding:16px;padding-bottom:max(20px,env(safe-area-inset-bottom));display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.answer-btn{background:var(–card);border:1px solid var(–card-border);border-radius:12px;padding:18px 12px;color:var(–text);font-size:15px;font-weight:500;cursor:pointer;transition:all .15s}
+.answer-btn:active{transform:scale(.97);background:#222}
+.answer-btn.correct{background:var(–text);color:var(–bg);border-color:var(–text)}
+.answer-btn.wrong{background:#331111;border-color:#552222}
 
 /* Combo popup */
-.combo-popup {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 36px;
-  font-weight: 700;
-  color: var(--text);
-  pointer-events: none;
-  opacity: 0;
-  z-index: 200;
-}
+.combo-popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:28px;font-weight:700;color:var(–text);opacity:0;pointer-events:none;transition:all .3s}
+.combo-popup.show{opacity:1;animation:comboPop .6s ease-out forwards}
+@keyframes comboPop{0%{transform:translate(-50%,-50%) scale(.5);opacity:0}30%{transform:translate(-50%,-50%) scale(1.2);opacity:1}100%{transform:translate(-50%,-70%) scale(1);opacity:0}}
 
-.combo-popup.show {
-  animation: comboPop 0.5s ease-out forwards;
-}
+/* Modal overlay */
+.modal-overlay{position:fixed;inset:0;background:#000;display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;visibility:hidden;transition:all .3s}
+.modal-overlay.active{opacity:1;visibility:visible}
+.modal{background:var(–card);border:1px solid var(–card-border);border-radius:20px;padding:48px 28px 40px;width:100%;text-align:center;position:relative;transform:scale(.95);transition:transform .3s}
+.modal-overlay.active .modal-wrapper .modal{transform:scale(1)}
+.modal-title{font-size:24px;font-weight:700;margin-bottom:32px}
+.modal-wrapper{display:flex;flex-direction:column;align-items:center;width:90%;max-width:340px}
+.modal-brand{font-size:13px;font-weight:500;letter-spacing:4px;color:var(–text);margin-bottom:24px}
 
-@keyframes comboPop {
-  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
-  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
-  100% { opacity: 0; transform: translate(-50%, -60%) scale(1); }
-}
+/* Day badge */
+.day-badge{position:absolute;top:16px;right:16px;font-size:13px;color:var(–text-dim);background:var(–bg);border:1px solid var(–card-border);padding:6px 14px;border-radius:20px}
 
-/* Desktop */
-@media (min-width: 768px) {
-  .answers {
-    max-width: 480px;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-  
-  .game-area {
-    max-width: 500px;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-  
-  .stats {
-    max-width: 500px;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-}
-```
+/* Day selector - horizontal scroll */
+.day-selector{display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -28px 32px;padding:0 28px;scrollbar-width:none}
+.day-selector::-webkit-scrollbar{display:none}
+.day-chip{padding:10px 18px;background:transparent;border:1px solid var(–card-border);border-radius:24px;font-size:14px;color:var(–text);cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0}
+.day-chip:hover{border-color:#555}
+.day-chip.selected{background:var(–text);border-color:var(–text);color:var(–bg);font-weight:600}
 
-  </style>
+/* Difficulty */
+.difficulty-selector{display:flex;gap:8px;margin-bottom:36px}
+.diff-btn{flex:1;padding:14px 8px;background:transparent;border:1px solid var(–card-border);border-radius:12px;color:var(–text);cursor:pointer;transition:all .15s}
+.diff-btn:hover{border-color:#555}
+.diff-btn.selected{background:var(–text);border-color:var(–text);color:var(–bg)}
+.diff-label{display:block;font-size:14px;font-weight:600}
+
+/* Play button */
+.play-btn{width:100%;padding:18px;background:#00f5d4;border:none;border-radius:12px;color:#000;font-size:15px;font-weight:700;cursor:pointer;transition:opacity .15s}
+.play-btn:hover{opacity:.9}
+
+/* Vocab link */
+.vocab-link{display:inline-block;margin-top:20px;padding:8px 20px;border:1px solid var(–card-border);border-radius:24px;color:var(–text-dim);text-decoration:none;font-size:13px;transition:all .2s}
+.vocab-link:hover{border-color:#555;color:var(–text)}
+
+/* Game over */
+.final-score{font-size:56px;font-weight:700;margin:16px 0}
+.score-breakdown{display:flex;justify-content:center;gap:20px;margin-bottom:28px}
+.breakdown-item{text-align:center}
+.breakdown-value{font-size:24px;font-weight:700}
+.breakdown-label{font-size:11px;color:var(–text-dim);margin-top:4px}
+</style>
+
 </head>
 <body>
-  <!-- Header -->
-  <header class="header">
-    <button class="back-btn" id="backBtn">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-        <path d="M12 15L7 10L12 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </button>
-    <div class="logo">VAREM</div>
-    <div class="header-spacer"></div>
-  </header>
 
-  <!-- Stats -->
+<!-- Header -->
 
-  <div class="stats">
-    <div class="stat-item">
-      <div class="stat-label">Score</div>
-      <div class="stat-value" id="score">0</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-label">Left</div>
-      <div class="stat-value" id="remaining">30</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-label">Combo</div>
-      <div class="stat-value" id="combo">0</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-label">Lives</div>
-      <div class="stat-value lives" id="lives">♥♥♥</div>
-    </div>
-  </div>
-
-  <!-- Game Area -->
-
-  <div class="game-area" id="gameArea">
-    <div class="ready-text" id="readyText">READY</div>
-  </div>
-
-  <div class="floor-line"></div>
-
-  <!-- Answers -->
-
-  <div class="answers" id="answers">
-    <button class="answer-btn" data-idx="0">
-      <span class="answer-text">-</span>
-    </button>
-    <button class="answer-btn" data-idx="1">
-      <span class="answer-text">-</span>
-    </button>
-    <button class="answer-btn" data-idx="2">
-      <span class="answer-text">-</span>
-    </button>
-    <button class="answer-btn" data-idx="3">
-      <span class="answer-text">-</span>
-    </button>
-  </div>
-
-  <!-- Combo Popup -->
-
-  <div class="combo-popup" id="comboPopup"></div>
-
-  <!-- Start Modal -->
-
-  <div class="modal-overlay" id="startModal">
-    <div class="modal-wrapper">
-      <div class="modal-brand">VAREM</div>
-      <div class="modal" style="position:relative;">
-        <div class="day-badge" id="dayBadge">Day 0</div>
-        <div class="modal-title">Word Fall Game</div>
-
-```
-    <div class="day-selector" id="daySelector"></div>
-  
-    <div class="difficulty-selector">
-      <button class="diff-btn selected" data-speed="slow">
-        <span class="diff-label">Easy</span>
-      </button>
-      <button class="diff-btn" data-speed="normal">
-        <span class="diff-label">Normal</span>
-      </button>
-      <button class="diff-btn" data-speed="fast">
-        <span class="diff-label">Hard</span>
-      </button>
-    </div>
-  
-    <button class="play-btn" id="startBtn">START</button>
-  </div>
-  
-  <a href="https://studiovarem-ui.github.io/english-m3/" class="vocab-link">
-    Tap & Study
-  </a>
+<div class="header">
+  <button class="back-btn" id="backBtn">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+  </button>
+  <div class="logo">VAREM</div>
+  <div class="header-spacer"></div>
 </div>
-```
 
-  </div>
+<!-- Stats -->
 
-  <!-- Game Over Modal -->
+<div class="stats">
+  <div class="stat-item"><div class="stat-label">Score</div><div class="stat-value" id="score">0</div></div>
+  <div class="stat-item"><div class="stat-label">Left</div><div class="stat-value" id="remaining">0</div></div>
+  <div class="stat-item"><div class="stat-label">Combo</div><div class="stat-value" id="combo">0</div></div>
+  <div class="stat-item"><div class="stat-label">Lives</div><div class="stat-value lives" id="lives">♥♥♥</div></div>
+</div>
 
-  <div class="modal-overlay" id="gameOverModal">
-    <div class="modal-wrapper">
-      <div class="modal">
-        <div class="modal-title" id="endTitle">GAME OVER</div>
-        <div class="final-score" id="finalScore">0</div>
+<!-- Game Area -->
 
-```
-    <div class="score-breakdown">
-      <div class="breakdown-item">
-        <div class="breakdown-value" id="correctCount">0</div>
-        <div class="breakdown-label">정답</div>
+<div class="game-area" id="gameArea"><div class="ready-text" id="readyText">READY</div></div>
+<div class="floor-line"></div>
+
+<!-- Answers -->
+
+<div class="answers" id="answers">
+  <button class="answer-btn" data-idx="0"><span class="answer-text">-</span></button>
+  <button class="answer-btn" data-idx="1"><span class="answer-text">-</span></button>
+  <button class="answer-btn" data-idx="2"><span class="answer-text">-</span></button>
+  <button class="answer-btn" data-idx="3"><span class="answer-text">-</span></button>
+</div>
+
+<div class="combo-popup" id="comboPopup"></div>
+
+<!-- Start Modal -->
+
+<div class="modal-overlay" id="startModal">
+  <div class="modal-wrapper">
+    <div class="modal-brand">VAREM</div>
+    <div class="modal">
+      <div class="day-badge" id="dayBadge"></div>
+      <div class="modal-title">Word Fall Game</div>
+      <div class="day-selector" id="daySelector"></div>
+      <div class="difficulty-selector">
+        <button class="diff-btn selected" data-speed="slow"><span class="diff-label">Easy</span></button>
+        <button class="diff-btn" data-speed="normal"><span class="diff-label">Normal</span></button>
+        <button class="diff-btn" data-speed="fast"><span class="diff-label">Hard</span></button>
       </div>
-      <div class="breakdown-item">
-        <div class="breakdown-value" id="maxCombo">0</div>
-        <div class="breakdown-label">최대 콤보</div>
-      </div>
-      <div class="breakdown-item">
-        <div class="breakdown-value" id="accuracy">0%</div>
-        <div class="breakdown-label">정확도</div>
-      </div>
+      <button class="play-btn" id="startBtn">START</button>
     </div>
-  
-    <button class="play-btn" id="restartBtn">PLAY AGAIN</button>
+    <a href="https://studiovarem-ui.github.io/english-m3/" class="vocab-link">Tap &amp; Study</a>
   </div>
 </div>
-```
 
+<!-- Game Over Modal -->
+
+<div class="modal-overlay" id="gameOverModal">
+  <div class="modal-wrapper">
+    <div class="modal">
+      <div class="modal-title" id="endTitle">GAME OVER</div>
+      <div class="final-score" id="finalScore">0</div>
+      <div class="score-breakdown">
+        <div class="breakdown-item"><div class="breakdown-value" id="correctCount">0</div><div class="breakdown-label">정답</div></div>
+        <div class="breakdown-item"><div class="breakdown-value" id="maxCombo">0</div><div class="breakdown-label">최대 콤보</div></div>
+        <div class="breakdown-item"><div class="breakdown-value" id="accuracy">0%</div><div class="breakdown-label">정확도</div></div>
+      </div>
+      <button class="play-btn" id="restartBtn">PLAY AGAIN</button>
+    </div>
   </div>
+</div>
 
-  <script>
-    // Load words from english-m3 data files directly
-    const M3_BASE = 'https://studiovarem-ui.github.io/english-m3/data/';
-    const MAX_FILES = 13;
-    let WORDS = [];
+<script>
+// === Data Loader ===
+const M3_BASE='https://studiovarem-ui.github.io/english-m3/data/';
+const MAX_FILES=13;
+let WORDS=[];
+const _origAdd=window.add;
+window.add=function(arr){if(Array.isArray(arr))WORDS.push(...arr)};
+function loadScript(src){return new Promise((r,j)=>{const s=document.createElement('script');s.src=src;s.onload=r;s.onerror=()=>j();document.head.appendChild(s)})}
+(async function(){
+  for(let i=1;i<=MAX_FILES;i++){try{await loadScript(M3_BASE+String(i).padStart(3,'0')+'.js')}catch(e){break}}
+  if(_origAdd)window.add=_origAdd;else delete window.add;
+  initGame();
+})();
 
-    // Save original add if exists (english-m3 compatibility)
-    const _origAdd = window.add;
+// === Game ===
+function initGame(){
+const $=id=>document.getElementById(id);
+const scoreEl=$('score'),comboEl=$('combo'),livesEl=$('lives'),remainingEl=$('remaining');
+const gameArea=$('gameArea'),readyText=$('readyText'),answerBtns=document.querySelectorAll('.answer-btn');
+const comboPopup=$('comboPopup'),startModal=$('startModal'),gameOverModal=$('gameOverModal'),daySelector=$('daySelector');
 
-    // Temporary add() for loading data files
-    window.add = function(arr) {
-      if (Array.isArray(arr)) WORDS.push(...arr);
-    };
+function getTodayDay(){const n=new Date(),j=new Date(n.getFullYear(),0,1);return Math.floor((n-j)/86400000)+1}
+const TODAY=getTodayDay();
 
-    function loadScript(src) {
-      return new Promise((resolve, reject) => {
-        const s = document.createElement('script');
-        s.src = src;
-        s.onload = resolve;
-        s.onerror = () => reject();
-        document.head.appendChild(s);
-      });
+let state={score:0,combo:0,maxCombo:0,lives:3,correct:0,total:0,selectedDays:[0],speed:'slow',currentWord:null,correctIdx:-1,isPlaying:false,fallInterval:null,wordY:0,usedWords:[],wordPool:[]};
+const SPEEDS={slow:{fallSpeed:1.2},normal:{fallSpeed:2},fast:{fallSpeed:3.5}};
+
+// Day selector - scrollable chips
+function initDaySelector(){
+  const maxDay=Math.min(TODAY,Math.max(...WORDS.map(w=>w.day)));
+  $('dayBadge').textContent='Day '+TODAY;
+
+  // All chip
+  const all=document.createElement('div');
+  all.className='day-chip selected';
+  all.textContent='All';
+  all.dataset.day='0';
+  daySelector.appendChild(all);
+
+  // Day range chips (10개씩)
+  for(let i=1;i<=maxDay;i+=10){
+    const end=Math.min(i+9,maxDay);
+    const chip=document.createElement('div');
+    chip.className='day-chip';
+    chip.textContent='Day '+i+' ~ '+end;
+    chip.dataset.group=i+'-'+end;
+    daySelector.appendChild(chip);
+  }
+
+  daySelector.addEventListener('click',e=>{
+    const chip=e.target.closest('.day-chip');
+    if(!chip)return;
+    document.querySelectorAll('.day-chip').forEach(c=>c.classList.remove('selected'));
+    chip.classList.add('selected');
+    if(chip.dataset.day==='0'){state.selectedDays=[0]}
+    else{
+      const[s,e]=chip.dataset.group.split('-').map(Number);
+      state.selectedDays=[];
+      for(let i=s;i<=e;i++)state.selectedDays.push(i);
     }
+  });
 
-    (async function() {
-      for (let i = 1; i <= MAX_FILES; i++) {
-        const file = String(i).padStart(3, '0') + '.js';
-        try {
-          await loadScript(M3_BASE + file);
-        } catch(e) {
-          break;
-        }
-      }
-      // Restore original add
-      if (_origAdd) window.add = _origAdd;
-      else delete window.add;
-      initGame();
-    })();
+  // Show modal after data loaded
+  startModal.classList.add('active');
+}
 
-    function initGame() {
-    let state = {
-      score: 0,
-      combo: 0,
-      maxCombo: 0,
-      lives: 3,
-      correct: 0,
-      total: 0,
-      selectedDays: [0],
-      speed: 'slow',
-      currentWord: null,
-      correctIdx: -1,
-      isPlaying: false,
-      fallInterval: null,
-      wordY: 0,
-      usedWords: [],
-      wordPool: []
-    };
+// Difficulty
+document.querySelectorAll('.diff-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.diff-btn').forEach(b=>b.classList.remove('selected'));
+    btn.classList.add('selected');
+    state.speed=btn.dataset.speed;
+  });
+});
 
-    const SPEEDS = {
-      slow: { fallSpeed: 1.2 },
-      normal: { fallSpeed: 2 },
-      fast: { fallSpeed: 3.5 }
-    };
+function getFilteredWords(){
+  if(state.selectedDays.includes(0))return WORDS.filter(w=>w.day<=TODAY);
+  return WORDS.filter(w=>state.selectedDays.includes(w.day));
+}
+function getRandomWord(){
+  if(state.wordPool.length===0){state.wordPool=shuffle(getFilteredWords());state.usedWords=[]}
+  const w=state.wordPool.pop();state.usedWords.push(w);return w;
+}
+function getWrongAnswers(cw,count){
+  const all=WORDS.map(w=>w.m_ko);
+  return shuffle(all.filter(m=>m!==cw.m_ko)).slice(0,count);
+}
+function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 
-    // DOM
-    const $ = id => document.getElementById(id);
-    const scoreEl = $('score');
-    const comboEl = $('combo');
-    const livesEl = $('lives');
-    const remainingEl = $('remaining');
-    const gameArea = $('gameArea');
-    const readyText = $('readyText');
-    const answerBtns = document.querySelectorAll('.answer-btn');
-    const comboPopup = $('comboPopup');
-    const startModal = $('startModal');
-    const gameOverModal = $('gameOverModal');
-    const daySelector = $('daySelector');
+function updateUI(){
+  scoreEl.textContent=state.score;
+  comboEl.textContent=state.combo;
+  livesEl.textContent='♥'.repeat(state.lives)+'♡'.repeat(3-state.lives);
+  remainingEl.textContent=state.wordPool.length;
+}
+function showComboPopup(c){
+  if(c>=3){comboPopup.textContent=c+' COMBO';comboPopup.classList.remove('show');void comboPopup.offsetWidth;comboPopup.classList.add('show')}
+}
+function vibrate(p){if(navigator.vibrate)navigator.vibrate(p)}
 
-    // Today = days since Jan 1
-    function getTodayDay() {
-      const now = new Date();
-      const jan1 = new Date(now.getFullYear(), 0, 1);
-      return Math.floor((now - jan1) / 86400000) + 1;
-    }
-    const TODAY = getTodayDay();
+function createFallingWord(w){
+  const el=document.createElement('div');
+  el.className='falling-word';
+  el.innerHTML='<div class="word-text">'+w.w+'</div><div class="word-pos">'+w.p+'</div>';
+  el.style.top='-120px';
+  return el;
+}
 
-    // Init day selector
-    function initDaySelector() {
-      const maxDay = Math.min(TODAY, Math.max(...WORDS.map(w => w.day)));
+function startRound(){
+  const prev=gameArea.querySelector('.falling-word');if(prev)prev.remove();
+  state.currentWord=getRandomWord();
+  const wrong=getWrongAnswers(state.currentWord,3);
+  const answers=shuffle([state.currentWord.m_ko,...wrong]);
+  state.correctIdx=answers.indexOf(state.currentWord.m_ko);
+  answerBtns.forEach((btn,i)=>{btn.querySelector('.answer-text').textContent=answers[i];btn.classList.remove('correct','wrong');btn.disabled=false});
+  const wordEl=createFallingWord(state.currentWord);
+  gameArea.appendChild(wordEl);
+  readyText.style.display='none';
+  state.wordY=-120;
+  const gh=gameArea.offsetHeight;
+  const{fallSpeed}=SPEEDS[state.speed];
+  if(state.fallInterval)cancelAnimationFrame(state.fallInterval);
+  function fall(){
+    if(!state.isPlaying)return;
+    state.wordY+=fallSpeed;
+    wordEl.style.top=state.wordY+'px';
+    if(state.wordY>=gh-60){handleAnswer(-1);return}
+    state.fallInterval=requestAnimationFrame(fall);
+  }
+  state.fallInterval=requestAnimationFrame(fall);
+}
 
-      // Day badge
-      $('dayBadge').textContent = 'Day ' + TODAY;
+function handleAnswer(idx){
+  if(!state.isPlaying)return;
+  if(state.fallInterval)cancelAnimationFrame(state.fallInterval);
+  state.total++;
+  const ok=idx===state.correctIdx;
+  answerBtns.forEach((btn,i)=>{btn.disabled=true;if(i===state.correctIdx)btn.classList.add('correct');else if(i===idx)btn.classList.add('wrong')});
+  if(ok){state.correct++;state.combo++;if(state.combo>state.maxCombo)state.maxCombo=state.combo;state.score+=10*(1+Math.floor(state.combo/5));showComboPopup(state.combo);vibrate(50)}
+  else{state.combo=0;state.lives--;vibrate([100,50,100])}
+  updateUI();
+  if(state.lives<=0){endGame(false);return}
+  if(state.wordPool.length===0){endGame(true);return}
+  setTimeout(()=>{if(state.isPlaying)startRound()},700);
+}
 
-      // All chip
-      const allChip = document.createElement('div');
-      allChip.className = 'day-chip selected';
-      allChip.textContent = 'All';
-      allChip.dataset.day = '0';
-      daySelector.appendChild(allChip);
+function startGame(){
+  state.wordPool=shuffle(getFilteredWords());
+  state.usedWords=[];
+  state={...state,score:0,combo:0,maxCombo:0,lives:3,correct:0,total:0,isPlaying:true,wordY:0};
+  updateUI();
+  startModal.classList.remove('active');
+  gameOverModal.classList.remove('active');
+  setTimeout(startRound,400);
+}
 
-      // Custom range chip with inputs
-      const rangeWrap = document.createElement('div');
-      rangeWrap.className = 'day-range-wrap';
-      rangeWrap.innerHTML = `
-        <span class="range-label">Day</span>
-        <input type="number" class="range-input" id="rangeFrom" min="1" max="${maxDay}" value="1">
-        <span class="range-label">~</span>
-        <input type="number" class="range-input" id="rangeTo" min="1" max="${maxDay}" value="${maxDay}">
-      `;
-      daySelector.appendChild(rangeWrap);
+function endGame(cleared){
+  state.isPlaying=false;
+  if(state.fallInterval)cancelAnimationFrame(state.fallInterval);
+  $('endTitle').textContent=cleared?'CLEAR':'GAME OVER';
+  $('finalScore').textContent=state.score;
+  $('correctCount').textContent=state.correct;
+  $('maxCombo').textContent=state.maxCombo;
+  $('accuracy').textContent=state.total>0?Math.round(state.correct/state.total*100)+'%':'0%';
+  setTimeout(()=>gameOverModal.classList.add('active'),400);
+}
 
-      // All chip click
-      allChip.addEventListener('click', () => {
-        allChip.classList.add('selected');
-        rangeWrap.classList.remove('selected');
-        state.selectedDays = [0];
-      });
+// Events
+$('startBtn').addEventListener('click',startGame);
+$('restartBtn').addEventListener('click',startGame);
+$('backBtn').addEventListener('click',()=>{
+  if(state.isPlaying){state.isPlaying=false;if(state.fallInterval)cancelAnimationFrame(state.fallInterval)}
+  startModal.classList.add('active');
+});
+answerBtns.forEach(btn=>{btn.addEventListener('click',()=>{if(!state.isPlaying)return;handleAnswer(parseInt(btn.dataset.idx))})});
+document.addEventListener('keydown',e=>{if(!state.isPlaying)return;if(e.key>='1'&&e.key<='4')handleAnswer(parseInt(e.key)-1)});
 
-      // Range inputs: 클릭하면 All 해제, 범위 활성화
-      const fromInput = rangeWrap.querySelector('#rangeFrom');
-      const toInput = rangeWrap.querySelector('#rangeTo');
-
-      function activateRange() {
-        allChip.classList.remove('selected');
-        rangeWrap.classList.add('selected');
-        const from = parseInt(fromInput.value) || 1;
-        const to = parseInt(toInput.value) || maxDay;
-        state.selectedDays = [];
-        for (let i = from; i <= to; i++) state.selectedDays.push(i);
-      }
-
-      fromInput.addEventListener('focus', activateRange);
-      toInput.addEventListener('focus', activateRange);
-      fromInput.addEventListener('input', activateRange);
-      toInput.addEventListener('input', activateRange);
-
-      // 모달 표시
-      startModal.classList.add('active');
-    }
-
-    // Difficulty selector
-    document.querySelectorAll('.diff-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-        state.speed = btn.dataset.speed;
-      });
-    });
-
-    function getFilteredWords() {
-      if (state.selectedDays.includes(0)) return WORDS.filter(w => w.day <= TODAY);
-      return WORDS.filter(w => state.selectedDays.includes(w.day));
-    }
-
-    function getRandomWord() {
-      if (state.wordPool.length === 0) {
-        state.wordPool = shuffle(getFilteredWords());
-        state.usedWords = [];
-      }
-      const word = state.wordPool.pop();
-      state.usedWords.push(word);
-      return word;
-    }
-
-    function getWrongAnswers(correctWord, count) {
-      const allMeanings = WORDS.map(w => w.m_ko);
-      const wrong = allMeanings.filter(m => m !== correctWord.m_ko);
-      return shuffle(wrong).slice(0, count);
-    }
-
-    function shuffle(arr) {
-      const a = [...arr];
-      for (let i = a.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
-      }
-      return a;
-    }
-
-    function updateUI() {
-      scoreEl.textContent = state.score;
-      comboEl.textContent = state.combo;
-      livesEl.textContent = '♥'.repeat(state.lives) + '♡'.repeat(3 - state.lives);
-      remainingEl.textContent = state.wordPool.length;
-    }
-
-    function showComboPopup(combo) {
-      if (combo >= 3) {
-        comboPopup.textContent = `${combo} COMBO`;
-        comboPopup.classList.remove('show');
-        void comboPopup.offsetWidth;
-        comboPopup.classList.add('show');
-      }
-    }
-
-    function vibrate(pattern) {
-      if (navigator.vibrate) navigator.vibrate(pattern);
-    }
-
-    function createFallingWord(word) {
-      const el = document.createElement('div');
-      el.className = 'falling-word';
-      el.innerHTML = `
-        <div class="word-text">${word.w}</div>
-        <div class="word-pos">${word.p}</div>
-      `;
-      el.style.top = '-120px';
-      return el;
-    }
-
-    function startRound() {
-      const prev = gameArea.querySelector('.falling-word');
-      if (prev) prev.remove();
-
-      state.currentWord = getRandomWord();
-      const wrongAnswers = getWrongAnswers(state.currentWord, 3);
-      const allAnswers = shuffle([state.currentWord.m_ko, ...wrongAnswers]);
-      state.correctIdx = allAnswers.indexOf(state.currentWord.m_ko);
-
-      answerBtns.forEach((btn, i) => {
-        btn.querySelector('.answer-text').textContent = allAnswers[i];
-        btn.classList.remove('correct', 'wrong');
-        btn.disabled = false;
-      });
-
-      const wordEl = createFallingWord(state.currentWord);
-      gameArea.appendChild(wordEl);
-      readyText.style.display = 'none';
-
-      state.wordY = -120;
-      const gameHeight = gameArea.offsetHeight;
-      const { fallSpeed } = SPEEDS[state.speed];
-
-      if (state.fallInterval) cancelAnimationFrame(state.fallInterval);
-
-      function fall() {
-        if (!state.isPlaying) return;
-        state.wordY += fallSpeed;
-        wordEl.style.top = state.wordY + 'px';
-        if (state.wordY >= gameHeight - 60) {
-          handleAnswer(-1);
-          return;
-        }
-        state.fallInterval = requestAnimationFrame(fall);
-      }
-
-      state.fallInterval = requestAnimationFrame(fall);
-    }
-
-    function handleAnswer(idx) {
-      if (!state.isPlaying) return;
-      if (state.fallInterval) cancelAnimationFrame(state.fallInterval);
-
-      state.total++;
-      const isCorrect = idx === state.correctIdx;
-
-      answerBtns.forEach((btn, i) => {
-        btn.disabled = true;
-        if (i === state.correctIdx) btn.classList.add('correct');
-        else if (i === idx) btn.classList.add('wrong');
-      });
-
-      if (isCorrect) {
-        state.correct++;
-        state.combo++;
-        if (state.combo > state.maxCombo) state.maxCombo = state.combo;
-        state.score += 10 * (1 + Math.floor(state.combo / 5));
-        showComboPopup(state.combo);
-        vibrate(50);
-      } else {
-        state.combo = 0;
-        state.lives--;
-        vibrate([100, 50, 100]);
-      }
-
-      updateUI();
-
-      if (state.lives <= 0) {
-        endGame(false);
-        return;
-      }
-
-      if (state.wordPool.length === 0) {
-        endGame(true);
-        return;
-      }
-
-      setTimeout(() => {
-        if (state.isPlaying) startRound();
-      }, 700);
-    }
-
-    function startGame() {
-      state.wordPool = shuffle(getFilteredWords());
-      state.usedWords = [];
-      
-      state = {
-        ...state,
-        score: 0,
-        combo: 0,
-        maxCombo: 0,
-        lives: 3,
-        correct: 0,
-        total: 0,
-        isPlaying: true,
-        wordY: 0
-      };
-
-      updateUI();
-      startModal.classList.remove('active');
-      gameOverModal.classList.remove('active');
-
-      setTimeout(startRound, 400);
-    }
-
-    function endGame(isCleared = false) {
-      state.isPlaying = false;
-      if (state.fallInterval) cancelAnimationFrame(state.fallInterval);
-
-      const titleEl = $('endTitle');
-      titleEl.textContent = isCleared ? 'CLEAR' : 'GAME OVER';
-
-      $('finalScore').textContent = state.score;
-      $('correctCount').textContent = state.correct;
-      $('maxCombo').textContent = state.maxCombo;
-      $('accuracy').textContent = state.total > 0 
-        ? Math.round((state.correct / state.total) * 100) + '%' 
-        : '0%';
-
-      setTimeout(() => {
-        gameOverModal.classList.add('active');
-      }, 400);
-    }
-
-    // Events
-    $('startBtn').addEventListener('click', startGame);
-    $('restartBtn').addEventListener('click', startGame);
-    
-    // Back button - return to start modal
-    $('backBtn').addEventListener('click', () => {
-      if (state.isPlaying) {
-        state.isPlaying = false;
-        if (state.fallInterval) cancelAnimationFrame(state.fallInterval);
-      }
-      startModal.classList.add('active');
-    });
-
-    answerBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        if (!state.isPlaying) return;
-        handleAnswer(parseInt(btn.dataset.idx));
-      });
-    });
-
-    document.addEventListener('keydown', e => {
-      if (!state.isPlaying) return;
-      if (e.key >= '1' && e.key <= '4') {
-        handleAnswer(parseInt(e.key) - 1);
-      }
-    });
-
-    // Init
-    initDaySelector();
-    } // end initGame
-  </script>
+initDaySelector();
+} // end initGame
+</script>
 
 </body>
+</html>
