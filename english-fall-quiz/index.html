@@ -59,12 +59,18 @@ body{font-family:'Noto Sans KR',-apple-system,sans-serif;background:var(--bg);co
 /* Day badge */
 .day-badge{position:absolute;top:16px;right:16px;font-size:13px;color:var(–text-dim);background:var(–bg);border:1px solid var(–card-border);padding:6px 14px;border-radius:20px}
 
-/* Day selector - horizontal scroll */
-.day-selector{display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -28px 32px;padding:0 28px;scrollbar-width:none}
-.day-selector::-webkit-scrollbar{display:none}
-.day-chip{padding:10px 18px;background:transparent;border:1px solid var(–card-border);border-radius:24px;font-size:14px;color:var(–text);cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0}
+/* Day selector */
+.day-selector{display:flex;gap:8px;justify-content:center;margin-bottom:32px;flex-wrap:wrap}
+.day-chip{padding:10px 18px;background:transparent;border:1px solid var(–card-border);border-radius:24px;font-size:14px;color:var(–text);cursor:pointer;transition:all .15s;white-space:nowrap}
 .day-chip:hover{border-color:#555}
 .day-chip.selected{background:var(–text);border-color:var(–text);color:var(–bg);font-weight:600}
+.day-range{display:flex;align-items:center;gap:6px;padding:8px 16px;border:1px solid var(–card-border);border-radius:24px;transition:all .15s;cursor:pointer}
+.day-range.selected{background:var(–text);border-color:var(–text)}
+.day-range .rlbl{font-size:14px;color:var(–text)}
+.day-range.selected .rlbl{color:var(–bg)}
+.day-range .rinput{width:38px;background:transparent;border:1px solid var(–card-border);border-radius:8px;color:var(–text);font-size:14px;font-weight:600;text-align:center;padding:4px 2px;outline:none;-moz-appearance:textfield}
+.day-range.selected .rinput{color:var(–bg);border-color:rgba(0,0,0,.25)}
+.day-range .rinput::-webkit-outer-spin-button,.day-range .rinput::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 
 /* Difficulty */
 .difficulty-selector{display:flex;gap:8px;margin-bottom:36px}
@@ -191,7 +197,7 @@ const TODAY=getTodayDay();
 let state={score:0,combo:0,maxCombo:0,lives:3,correct:0,total:0,selectedDays:[0],speed:'slow',currentWord:null,correctIdx:-1,isPlaying:false,fallInterval:null,wordY:0,usedWords:[],wordPool:[]};
 const SPEEDS={slow:{fallSpeed:1.2},normal:{fallSpeed:2},fast:{fallSpeed:3.5}};
 
-// Day selector - scrollable chips
+// Day selector - All chip + input range
 function initDaySelector(){
   const maxDay=Math.min(TODAY,Math.max(...WORDS.map(w=>w.day)));
   $('dayBadge').textContent='Day '+TODAY;
@@ -200,33 +206,33 @@ function initDaySelector(){
   const all=document.createElement('div');
   all.className='day-chip selected';
   all.textContent='All';
-  all.dataset.day='0';
   daySelector.appendChild(all);
 
-  // Day range chips (10개씩)
-  for(let i=1;i<=maxDay;i+=10){
-    const end=Math.min(i+9,maxDay);
-    const chip=document.createElement('div');
-    chip.className='day-chip';
-    chip.textContent='Day '+i+' ~ '+end;
-    chip.dataset.group=i+'-'+end;
-    daySelector.appendChild(chip);
-  }
+  // Range with inputs
+  const range=document.createElement('div');
+  range.className='day-range';
+  range.innerHTML=`<span class="rlbl">Day</span><input type="number" class="rinput" id="rFrom" min="1" max="${maxDay}" value="${Math.max(1,maxDay-9)}"><span class="rlbl">~</span><input type="number" class="rinput" id="rTo" min="1" max="${maxDay}" value="${maxDay}">`;
+  daySelector.appendChild(range);
 
-  daySelector.addEventListener('click',e=>{
-    const chip=e.target.closest('.day-chip');
-    if(!chip)return;
-    document.querySelectorAll('.day-chip').forEach(c=>c.classList.remove('selected'));
-    chip.classList.add('selected');
-    if(chip.dataset.day==='0'){state.selectedDays=[0]}
-    else{
-      const[s,e]=chip.dataset.group.split('-').map(Number);
-      state.selectedDays=[];
-      for(let i=s;i<=e;i++)state.selectedDays.push(i);
-    }
+  const rFrom=range.querySelector('#rFrom');
+  const rTo=range.querySelector('#rTo');
+
+  all.addEventListener('click',()=>{
+    all.classList.add('selected');range.classList.remove('selected');
+    state.selectedDays=[0];
   });
 
-  // Show modal after data loaded
+  function activateRange(){
+    all.classList.remove('selected');range.classList.add('selected');
+    const f=parseInt(rFrom.value)||1,t=parseInt(rTo.value)||maxDay;
+    state.selectedDays=[];
+    for(let i=f;i<=t;i++)state.selectedDays.push(i);
+  }
+  rFrom.addEventListener('focus',activateRange);
+  rTo.addEventListener('focus',activateRange);
+  rFrom.addEventListener('input',activateRange);
+  rTo.addEventListener('input',activateRange);
+
   startModal.classList.add('active');
 }
 
